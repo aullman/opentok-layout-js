@@ -125,7 +125,7 @@
      };
      
      TB.initLayoutContainer = function(container) {
-        var container = typeof(container) == "string" ? OT.$(elId) : container;
+        var container = typeof(container) == "string" ? OT.$(container) : container;
         
         OT.onLoad(function() {
             observeChildChange(container, function() {
