@@ -7,7 +7,7 @@
 **/
 
 (function() {
-    var observeChildChange = function observe(element, onChange) {
+    var observeChildChange = function observeChildChange(element, onChange) {
         observer = new MutationObserver(function(mutations) {
             var removedNodes = [];
             var addedNodes = [];
@@ -38,7 +38,7 @@
         return observer;
     };
     
-    var positionElement = function(elem, x, y, width, height) {
+    var positionElement = function positionElement(elem, x, y, width, height) {
         var targetPosition = {
             left: x + "px",
             top: y + "px",
@@ -48,14 +48,14 @@
         OT.$.css(elem, targetPosition);
     };
     
-    var layout = function(container) {
+    var layout = function layout(container) {
         var count = container.children.length,
             Height = parseInt(OT.$.height(container), 10),
             Width = parseInt(OT.$.width(container), 10),
             availableRatio = Height / Width,
             vidRatio;
         
-        var tryVidRatio = function(vidRatio) {
+        var tryVidRatio = function tryVidRatio(vidRatio) {
             var minDiff,
                 targetCols,
                 targetRows;
@@ -132,6 +132,9 @@
         }
      };
      
+     if (!TB) {
+         throw new Error("You must include the OpenTok for WebRTC JS API before the layout-container library");
+     }
      TB.initLayoutContainer = function(container) {
         container = typeof(container) == "string" ? OT.$(container) : container;
         
