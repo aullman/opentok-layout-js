@@ -1,3 +1,11 @@
+/**
+ *  layout-container (http://github.com/opentok/layout-container)
+ *  
+ *  Automatic layout of video elements (publisher and subscriber) minimising white-space for the OpenTok on WebRTC API.
+ *
+ *  @Author: Adam Ullman (http://github.com/aullman)
+**/
+
 (function() {
     var observeChildChange = function observe(element, onChange) {
         observer = new MutationObserver(function(mutations) {
@@ -125,7 +133,7 @@
      };
      
      TB.initLayoutContainer = function(container) {
-        var container = typeof(container) == "string" ? OT.$(container) : container;
+        container = typeof(container) == "string" ? OT.$(container) : container;
         
         OT.onLoad(function() {
             observeChildChange(container, function() {
