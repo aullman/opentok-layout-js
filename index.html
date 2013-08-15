@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <title>Layout Test</title>
+        <script src="http://www-dev.tokbox.com/webrtc/v2.0/js/TB.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="src/layoutContainer.js" type="text/javascript" charset="utf-8"></script>
+        
+        <style type="text/css" media="screen">
+            #layout {
+                width: 320px;
+                height: 240px;
+                background-color: #DDD;
+                position:relative;
+            }
+            
+            #layout > div {
+                background-color: #000;
+                display: inline-block;
+                border: 1px solid #fff;
+                
+                -webkit-transition-property: width, height, left, top;
+                -webkit-transition-duration: 0.5s;
+                -webkit-transition-timing-function: ease-out;
+                -moz-transition-property: width, height, left, top;
+                -moz-transition-duration: 0.5s;
+                transition-property: width, height, left, top;
+                transition-duration: 0.5s;
+                transition-timing-function: ease-out;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="layout">
+            <div></div>
+        </div>
+        <input type="button" name="add" value="Add" id="add" onclick="addElement()">
+        <input type="button" name="remove" value="Remove" id="remove" onclick="removeElement()">
+        <input type="text" name="width" id="width" placeholder="width">
+        <input type="text" name="height" placeholder="height" id="height">
+        <input type="button" name="changeDims" value="Change Dimensions" id="changeDims" onclick="changeDims()">
+    </body>
+    <script type="text/javascript" charset="utf-8">
+        
+        TB.initLayoutContainer(document.getElementById('layout'));
+        
+        function addElement() {
+            layout.appendChild(document.createElement("div"));
+        }
+        
+        function removeElement() {
+            layout.removeChild(layout.firstChild);
+        }
+        
+        function changeDims() {
+            OT.$.css(layout, {
+                width: parseInt(document.getElementById('width').value, 10) + "px",
+                height: parseInt(document.getElementById('height').value, 10) + "px"
+            });
+        }
+        
+        
+    </script>
+</html>
