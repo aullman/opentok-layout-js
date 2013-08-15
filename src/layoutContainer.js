@@ -7,7 +7,7 @@
 **/
 
 (function() {
-    var observeChildChange = function observe(element, onChange) {
+    var observeChildChange = function observeChildChange(element, onChange) {
         observer = new MutationObserver(function(mutations) {
             var removedNodes = [];
             var addedNodes = [];
@@ -22,7 +22,7 @@
             });
 
             if (addedNodes.length || removedNodes.length) {
-                setTimeout(function() {
+                OT.$.callAsync(function() {
                     onChange(addedNodes, removedNodes);
                 });
             }
@@ -38,7 +38,7 @@
         return observer;
     };
     
-    var positionElement = function(elem, x, y, width, height) {
+    var positionElement = function positionElement(elem, x, y, width, height) {
         var targetPosition = {
             left: x + "px",
             top: y + "px",
@@ -46,16 +46,35 @@
             height: height + "px"
         };
         OT.$.css(elem, targetPosition);
+        
+        var sub = elem.querySelector(".OT_root");
+        if (sub) {
+            // If this is the parent of a subscriber or publisher then we need
+            // to force the mutation observer on the publisher or subscriber to
+            // trigger to get it to fix it's layout
+            var oldWidth = sub.style.width;
+            sub.style.width = width + "px";
+            // sub.style.height = height + "px";
+            sub.style.width = oldWidth || "";
+        }
     };
     
-    var layout = function(container) {
+    var layout = function layout(container) {
+        if (OT.$.css(container, "display") === "none") {
+            return;
+        }
+        
         var count = container.children.length,
-            Height = parseInt(OT.$.height(container), 10),
-            Width = parseInt(OT.$.width(container), 10),
+            Height = parseInt(OT.$.height(container), 10)  - 
+                        parseInt(OT.$.css(container, "borderTop"), 10) - 
+                        parseInt(OT.$.css(container, "borderBottom"), 10),
+            Width = parseInt(OT.$.width(container), 10) -
+                        parseInt(OT.$.css(container, "borderLeft"), 10) -
+                        parseInt(OT.$.css(container, "borderRight"), 10),
             availableRatio = Height / Width,
             vidRatio;
         
-        var tryVidRatio = function(vidRatio) {
+        var tryVidRatio = function tryVidRatio(vidRatio) {
             var minDiff,
                 targetCols,
                 targetRows;
@@ -132,6 +151,9 @@
         }
      };
      
+     if (!TB) {
+         throw new Error("You must include the OpenTok for WebRTC JS API before the layout-container library");
+     }
      TB.initLayoutContainer = function(container) {
         container = typeof(container) == "string" ? OT.$(container) : container;
         
