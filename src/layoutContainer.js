@@ -7,6 +7,7 @@
 **/
 
 (function() {
+    var defaults = OT.$.defaults ? OT.$.defaults : OT._.defaults;
     var observeChildChange = function observeChildChange(element, onChange) {
         observer = new MutationObserver(function(mutations) {
             var removedNodes = [];
@@ -163,15 +164,15 @@
          throw new Error("You must include the OpenTok for WebRTC JS API before the layout-container library");
      }
      TB.initLayoutContainer = function(container, opts) {
-         opts = OT.$.defaults(opts || {}, {maxRatio: 3/2, minRatio: 3/4, fixedRatio: false, animate: false});
+         opts = defaults(opts || {}, {maxRatio: 3/2, minRatio: 3/4, fixedRatio: false, animate: false});
         container = typeof(container) == "string" ? OT.$(container) : container;
         
         OT.onLoad(function() {
             observeChildChange(container, function() {
-                layout(container);
+                layout(container, opts);
             });
             OT.$.observeStyleChanges(container, ['width', 'height'], function() {
-                layout(container);
+                layout(container, opts);
             });
             layout(container, opts);
         });
