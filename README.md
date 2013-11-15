@@ -18,10 +18,16 @@ The <a href="http://www.tokbox.com/opentok">OpenTok for WebRTC JS API</a> is req
 Usage
 -----
 
-You just need to call `TB.initLayoutContainer` and pass it the element you want it to layout. It works best if you set the position of the element to be absolute or relative.
+Call `TB.initLayoutContainer` and pass it the element you want it to layout. It works best if you set the position of the element to be absolute or relative. You will then be returned an object with a layout method that you can call to layout the page.
 
 ```javascript
-TB.initLayoutContainer(document.getElementById("layout"));
+var layout = TB.initLayoutContainer(document.getElementById("layout"), {
+    maxRatio: 16/9,     // The widest ratio that will be used (default 16/9)
+    minRatio: 3/4,      // The narrowest ratio that will be used (default 3/4)
+    fixedRatio: false,  // If this is true then the aspect ratio of the video is maintained (default false)
+    animate: false      // Whether to use jQuery animate when positioning (default false)
+});
+layout.layout()
 ```
 
 In an OpenTok application you would do something like:
@@ -30,7 +36,7 @@ In an OpenTok application you would do something like:
 <html>
 <head>
     <title>Layout Container Example</title>
-    <script src="http://www-dev.tokbox.com/webrtc/v2.0/js/TB.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="http://static.opentok.com/webrtc/v2.0/js/TB.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/layoutContainer.js" type="text/javascript" charset="utf-8"></script>
     <style type="text/css" media="screen">
         #layoutContainer {
@@ -50,7 +56,7 @@ In an OpenTok application you would do something like:
     var layoutContainer = document.getElementById("layoutContainer");
     
     // Initialize the layout container
-    TB.initLayoutContainer(layoutContainer);
+    var layout = TB.initLayoutContainer(layoutContainer).layout;
     
     // Below is a normal hello world OpenTok application
     // The layout container will detect elements getting added and
@@ -66,6 +72,7 @@ In an OpenTok application you would do something like:
                 subCont.setAttribute("id", streams[i].stream.streamId);
                 layoutContainer.appendChild(subCont);
                 session.subscribe(streams[i], streams[i].stream.streamId);
+                layout();
             }
         }
     };
@@ -75,6 +82,7 @@ In an OpenTok application you would do something like:
         sessionConnected: function(event){
             subscribeToStreams(event.streams);
             session.publish("publisherContainer");
+            layout();
         },
         streamCreated: function(event){
             subscribeToStreams(event.streams);
@@ -84,22 +92,30 @@ In an OpenTok application you would do something like:
 </html>
 ```
 
-Now anything you put into the layout container will automatically be positioned so that it is within
+Now anything you put into the layout container will automatically be positioned and sized so that it minimises the white-space within the box given.
+
+Resizing the Window
+---------------
+
+If the size of the container varies depending on the size of the window you may need to do:
+
+```javascript
+var resizeTimeout;
+window.onresize = function() {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(function () {
+    layout();
+  }, 20);
+}
+```
+
+This throttles calling layout so that it's not called over an over again when you're resizing the window.
 
 Animations
 -------
 
-You can add fancy animations with CSS transitions. This will work in all browsers that support the OpenTok on WebRTC API. eg.
+If you want to use the animate property you will need to include the jQuery library and set the animate option to true.
 
-```css
-#layout > div {
-    -webkit-transition-property: width, height, left, top;
-    -webkit-transition-duration: 0.5s;
-    -webkit-transition-timing-function: ease-out;
-    -moz-transition-property: width, height, left, top;
-    -moz-transition-duration: 0.5s;
-    transition-property: width, height, left, top;
-    transition-duration: 0.5s;
-    transition-timing-function: ease-out;
-}
+```javascript
+var layout = TB.initLayoutContainer(document.getElementById("layout"), {animate: true});
 ```
