@@ -6,61 +6,69 @@
         <meta http-equiv="Content-type" content="text/html; charset=utf-8">
         <title>Layout Test</title>
         <script src="http://static.opentok.com/webrtc/v2.0/js/TB.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="https://code.jquery.com/jquery-1.6.2.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="src/layoutContainer.js" type="text/javascript" charset="utf-8"></script>
         
         <style type="text/css" media="screen">
             #layout {
-                width: 320px;
-                height: 240px;
+                position: absolute;
+                top: 80px;
+                left: 0;
+                right: 0;
+                bottom: 0;
                 background-color: #DDD;
-                position:relative;
             }
             
             #layout > div {
                 background-color: #000;
                 display: inline-block;
                 border: 1px solid #fff;
-                
-                -webkit-transition-property: width, height, left, top;
-                -webkit-transition-duration: 0.5s;
-                -webkit-transition-timing-function: ease-out;
-                -moz-transition-property: width, height, left, top;
-                -moz-transition-duration: 0.5s;
-                transition-property: width, height, left, top;
-                transition-duration: 0.5s;
-                transition-timing-function: ease-out;
+            }
+            
+            body > p {
+                width: 100%;
+                text-align: center;
+                float: right;
+            }
+            
+            body > input {
+                float: left;
             }
         </style>
     </head>
     <body>
-        <div id="layout">
-            <div></div>
-        </div>
+        <div id="layout"></div>
         <input type="button" name="add" value="Add" id="add" onclick="addElement()">
         <input type="button" name="remove" value="Remove" id="remove" onclick="removeElement()">
-        <input type="text" name="width" id="width" placeholder="width">
-        <input type="text" name="height" placeholder="height" id="height">
-        <input type="button" name="changeDims" value="Change Dimensions" id="changeDims" onclick="changeDims()">
+        <p>Click the Add/Remove buttons to add and remove video windows. Go ahead and resize the window and see it lay out automatically!</p>
     </body>
     <script type="text/javascript" charset="utf-8">
-        
-        TB.initLayoutContainer(document.getElementById('layout'));
+        var layoutEl = document.getElementById("layout");
+        var layout = TB.initLayoutContainer(layoutEl, {
+            animate: {
+                duration: 500,
+                easing: "swing"
+            }
+        }).layout;
         
         function addElement() {
-            layout.appendChild(document.createElement("div"));
+            var el = document.createElement("div");
+            TB.initPublisher(1127, el);
+            layoutEl.appendChild(el);
+            layout();
         }
         
         function removeElement() {
-            layout.removeChild(layout.firstChild);
+            layoutEl.removeChild(layoutEl.firstChild);
+            layout();
         }
         
-        function changeDims() {
-            OT.$.css(layout, {
-                width: parseInt(document.getElementById('width').value, 10) + "px",
-                height: parseInt(document.getElementById('height').value, 10) + "px"
-            });
-        }
-        
-        
+        var resizeTimeout;
+        window.onresize = function() {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(function () {
+            layout();
+          }, 20);
+        };
     </script>
 </html>

@@ -106,7 +106,7 @@ window.onresize = function() {
   resizeTimeout = setTimeout(function () {
     layout();
   }, 20);
-}
+};
 ```
 
 This throttles calling layout so that it's not called over an over again when you're resizing the window.
@@ -114,8 +114,16 @@ This throttles calling layout so that it's not called over an over again when yo
 Animations
 -------
 
-If you want to use the animate property you will need to include the jQuery library and set the animate option to true.
+If you want to use the animate property you will need to include the jQuery library and set the animate option to true and it will use the default values for animate (duration=200, easing="swing"). You can also specify your own values and a completion handler. For more details about the jQuery animate property see the [jQuery documentation](http://api.jquery.com/animate/).
 
 ```javascript
-var layout = TB.initLayoutContainer(document.getElementById("layout"), {animate: true});
+var layout = TB.initLayoutContainer(document.getElementById("layout"), {
+  animate: {
+    duration: 500,
+    easing: "linear",
+    complete: function() {
+      console.log('finished moving ' + this);
+    }
+  }
+});
 ```
