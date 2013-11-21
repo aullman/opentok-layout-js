@@ -12,7 +12,7 @@
         <style type="text/css" media="screen">
             #layout {
                 position: absolute;
-                top: 80px;
+                top: 100px;
                 left: 0;
                 right: 0;
                 bottom: 0;
@@ -23,6 +23,7 @@
                 background-color: #000;
                 display: inline-block;
                 border: 1px solid #fff;
+                margin: 10px;
             }
             
             body > p {
@@ -40,7 +41,8 @@
         <div id="layout"></div>
         <input type="button" name="add" value="Add" id="add" onclick="addElement()">
         <input type="button" name="remove" value="Remove" id="remove" onclick="removeElement()">
-        <p>Click the Add/Remove buttons to add and remove video windows. Go ahead and resize the window and see it lay out automatically!</p>
+        <p>Click the Add/Remove buttons to add and remove video windows. Go ahead and resize the window and see it lay out automatically!<br>
+            Double-click on elements to make them bigger or smaller</p>
     </body>
     <script type="text/javascript" charset="utf-8">
         var layoutEl = document.getElementById("layout");
@@ -48,7 +50,8 @@
             animate: {
                 duration: 500,
                 easing: "swing"
-            }
+            },
+            bigFixedRatio: false
         }).layout;
         
         function addElement() {
@@ -70,5 +73,14 @@
             layout();
           }, 20);
         };
+        
+        $("#layout>*").live("dblclick", function () {
+            if ($(this).hasClass("OT_big")) {
+                $(this).removeClass("OT_big");
+            } else {
+                $(this).addClass("OT_big");
+            }
+            layout();
+        });
     </script>
 </html>
