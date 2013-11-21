@@ -131,7 +131,7 @@
         }
         var id = container.getAttribute("id");
         if (!id) {
-            id = TB.$.uuid();
+            id = "OT_" + TB.$.uuid();
             container.setAttribute("id", id);
         }
         
@@ -146,7 +146,7 @@
             offsetTop = 0;
         
         var bigOnes = container.querySelectorAll("#" + id + ">." + opts.bigClass),
-            smallOnes = container.querySelectorAll("#" + id + ">*:not(.OT_big)");
+            smallOnes = container.querySelectorAll("#" + id + ">*:not(." + opts.bigClass + ")");
         
         if (bigOnes.length > 0 && smallOnes.length > 0) {
             var bigVideo = bigOnes[0].querySelector("video"),
