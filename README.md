@@ -8,7 +8,7 @@ It automatically detects when an element is added or when the container is resiz
 Demo
 ----
 
-[Demo of layout container in action](http://opentok.github.io/layout-container "Layout-container Demo")
+[Demo of layout container in action](https://opentok.github.io/layout-container "Layout-container Demo")
 
 Dependencies
 -------
@@ -22,10 +22,15 @@ Call `TB.initLayoutContainer` and pass it the element you want it to layout. It 
 
 ```javascript
 var layout = TB.initLayoutContainer(document.getElementById("layout"), {
-    maxRatio: 16/9,     // The widest ratio that will be used (default 16/9)
-    minRatio: 3/4,      // The narrowest ratio that will be used (default 3/4)
-    fixedRatio: false,  // If this is true then the aspect ratio of the video is maintained (default false)
+    maxRatio: 3/2,     // The narrowest ratio that will be used (default 2x3)
+    minRatio: 9/16,      // The widest ratio that will be used (default 16x9)
+    fixedRatio: false,  // If this is true then the aspect ratio of the video is maintained and minRatio and maxRatio are ignored (default false)
     animate: false      // Whether to use jQuery animate when positioning (default false)
+    bigClass: "OT_big", // The class to add to elements that should be sized bigger
+    bigPercentage: 0.8  // The maximum percentage of space the big ones should take up
+    bigFixedRatio: false, // fixedRatio for the big ones
+    bigMaxRatio: 3/2,     // The narrowest ratio to use for the big elements (default 2x3)
+    bigMinRatio: 9/16     // The widest ratio to use for the big elements (default 16x9)
 });
 layout.layout()
 ```
@@ -127,3 +132,18 @@ var layout = TB.initLayoutContainer(document.getElementById("layout"), {
   }
 });
 ```
+
+Big Elements
+--------
+
+If you add the `bigClass` to elements in the layout container they will be treated differently. They are essentially in a layout container of their own which takes up `bigPercentage` of the space and has it's own settings for ratios (`bigMaxRatio`, `bigMinRatio`, `bigFixedRatio`).
+
+You can have multiple elements which are treated as big elements which allow you to have all kinds of different layouts.
+
+To see how this works try the [demo](https://opentok.github.io/layout-container "Layout-container Demo") and double click on elements.
+
+
+Padding, Margins and Borders
+----------
+
+The Layout Container will take into account the padding, margins and borders on it's children. If you want spacing between elements simply give them a margin or padding and they will be spaced accordingly.
