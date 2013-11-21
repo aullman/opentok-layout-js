@@ -10,6 +10,9 @@
         <script src="src/layoutContainer.js" type="text/javascript" charset="utf-8"></script>
         
         <style type="text/css" media="screen">
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+            }
             #layout {
                 position: absolute;
                 top: 100px;
@@ -21,28 +24,50 @@
             
             #layout > div {
                 background-color: #000;
-                display: inline-block;
-                border: 1px solid #fff;
+                display: inline-block;           border: 1px solid #fff;
                 margin: 10px;
             }
             
-            body > p {
+            body > div#description {
+                color: #333;
+                margin: 0;
                 width: 100%;
                 text-align: center;
-                float: right;
             }
             
-            body > input {
-                float: left;
+            input {
+                width: 100px;
+                height: 25px;
+                border: none;
+                border-radius: 5px;
+                color: white;
+                margin-right: 5px;
+                font-size: 14px;
+            }
+            
+            input#add {
+                background-color: #67AB4D;
+            }
+            
+            input#remove {
+                background-color: #C24442;
+            }
+            
+            #buttons {
+                margin-top: 10px;
+                width: 100%;
+                text-align: center;
             }
         </style>
     </head>
     <body>
         <div id="layout"></div>
-        <input type="button" name="add" value="Add" id="add" onclick="addElement()">
-        <input type="button" name="remove" value="Remove" id="remove" onclick="removeElement()">
-        <p>Click the Add/Remove buttons to add and remove video windows. Go ahead and resize the window and see it lay out automatically!<br>
-            Double-click on elements to make them bigger or smaller</p>
+        <div id="description">Click the Add/Remove buttons to add and remove video windows. Go ahead and resize the window and see it lay out automatically!<br>
+            Double-click on elements to make them bigger or smaller</div>
+        <div id="buttons">
+            <input type="button" name="add" value="Add" id="add" onclick="addElement()">
+            <input type="button" name="remove" value="Remove" id="remove" onclick="removeElement()">
+        </div>
     </body>
     <script type="text/javascript" charset="utf-8">
         var layoutEl = document.getElementById("layout");
