@@ -32,7 +32,7 @@
             $(elem).stop();
             $(elem).animate(targetPosition, animate.duration || 200, animate.easing || "swing", function () {
                 fixAspectRatio();
-                animate.complete.call(this);
+                if (animate.complete) animate.complete.call(this);
             });
         } else {
             OT.$.css(elem, targetPosition);
