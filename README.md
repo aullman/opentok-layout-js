@@ -1,4 +1,4 @@
-layout-container
+opentok-layout-js
 ================
 
 Automatic layout of video elements (publisher and subscriber) minimising white-space for the OpenTok on WebRTC API. This is intended for use with the OpenTok on WebRTC JS API.
@@ -41,7 +41,7 @@ In an OpenTok application you would do something like:
 <html>
 <head>
     <title>Layout Container Example</title>
-    <script src="http://static.opentok.com/webrtc/v2.0/js/TB.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="http://static.opentok.com/webrtc/v2.2/js/TB.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="js/layoutContainer.js" type="text/javascript" charset="utf-8"></script>
     <style type="text/css" media="screen">
         #layoutContainer {
@@ -60,49 +60,38 @@ In an OpenTok application you would do something like:
 <script type="text/javascript" charset="utf-8">
     var layoutContainer = document.getElementById("layoutContainer");
     
-    // Initialize the layout container
+    // Initialize the layout container and get a reference to the layout method
     var layout = TB.initLayoutContainer(layoutContainer).layout;
     
-    // Below is a normal hello world OpenTok application
-    // The layout container will detect elements getting added and
+    // Below is a normal hello world OpenTok application for v2.2 of the API
+    // The layout container will redraw when the layout mtehod is called and
     // adjust the layout accordingly
     var sessionId = "mySessionId";
     var token = "myToken";
     var apiKey = "myAPIKey";
     
-    var subscribeToStreams = function(streams) {
-        for (var i=0; i < streams.length; i++) {
-            if (session.connection.connectionId != streams[i].connection.connectionId) {
-                var subCont = document.createElement("div");
-                subCont.setAttribute("id", streams[i].stream.streamId);
-                layoutContainer.appendChild(subCont);
-                session.subscribe(streams[i], streams[i].stream.streamId);
-                layout();
-            }
-        }
-    };
-    
     var session = TB.initSession(sessionId);
-    session.on({
-        sessionConnected: function(event){
-            subscribeToStreams(event.streams);
+    session.on("streamCreated", function(event){
+        session.subscribe(event.stream, "layoutContainer", {
+            insertMode: "append"
+        });
+        layout();
+    }).connect(apiKey, token, function (err) {
+        if (!err) {
             session.publish("publisherContainer");
             layout();
-        },
-        streamCreated: function(event){
-            subscribeToStreams(event.streams);
         }
-    }).connect(apiKey, token);
+    });
 </script>
 </html>
 ```
 
-Now anything you put into the layout container will automatically be positioned and sized so that it minimises the white-space within the box given.
+Now any time you call the `layout` method the layout container will automatically be positioned and sized so that it minimises the white-space within the box given.
 
 Resizing the Window
 ---------------
 
-If the size of the container varies depending on the size of the window you may need to do:
+You want to call the layout method any time the size of the layout container changes. If the size of the container varies depending on the size of the window you may need to do:
 
 ```javascript
 var resizeTimeout;
@@ -140,7 +129,7 @@ If you add the `bigClass` to elements in the layout container they will be treat
 
 You can have multiple elements which are treated as big elements which allow you to have all kinds of different layouts.
 
-To see how this works try the [demo](https://opentok.github.io/layout-container "Layout-container Demo") and double click on elements.
+To see how this works try the [demo](https://aullman.github.io/opentok-layout-js "Layout-container Demo") and double click on elements.
 
 
 Padding, Margins and Borders
