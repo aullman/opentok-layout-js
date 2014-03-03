@@ -1,9 +1,12 @@
 /**
- *  layout-container (http://github.com/opentok/layout-container)
+ *  opentok-layout-js (http://github.com/aullman/opentok-layout-js)
  *  
- *  Automatic layout of video elements (publisher and subscriber) minimising white-space for the OpenTok on WebRTC API.
+ *  Automatic layout of video elements (publisher and subscriber) minimising 
+ *  white-space for the OpenTok on WebRTC API.
  *
  *  @Author: Adam Ullman (http://github.com/aullman)
+ *  @Copyright (c) 2014 Adam Ullman
+ *  @License: Released under the MIT license (http://opensource.org/licenses/MIT)
 **/
 
 (function() {
@@ -88,14 +91,14 @@
                 var area = (tWidth*tHeight) * count;
                 
                 // If this width and height takes up the most space then we're going with that
-                if (maxArea == undefined || (area > maxArea)) {
+                if (maxArea === undefined || (area > maxArea)) {
                     maxArea = area;
                     targetHeight = tHeight;
                     targetWidth = tWidth;
                     targetCols = cols;
                     targetRows = rows;
                 }
-            };
+            }
             return {
                 maxArea: maxArea,
                 targetCols: targetCols,
@@ -110,8 +113,7 @@
             // Try all video ratios between minRatio (landscape) and maxRatio (portrait)
             // Just a brute force approach to figuring out the best ratio
             var incr = minRatio < maxRatio ? (maxRatio - minRatio) / 20.0 : 0,
-                testRatio,
-                i;
+                testRatio;
             for (i=minRatio; i <= maxRatio; i=OT.$.roundFloat(i+incr, 5)) {
                 testRatio = tryVidRatio(i);
                 if (!vidRatio || testRatio.maxArea > vidRatio.maxArea) vidRatio = testRatio;
@@ -132,13 +134,13 @@
         // Loop through each stream in the container and place it inside
         var x = 0,
             y = 0;
-        for (i=0; i < children.length; i++) {
+        for (var i=0; i < children.length; i++) {
             var elem = children[i];
-            if (i % vidRatio.targetCols == 0) {
+            if (i % vidRatio.targetCols === 0) {
                 // We are the first element of the row
                 x = firstColMarginLeft;
                 if (i == lastRowIndex) x += lastRowMargin;
-                y += i == 0 ? firstRowMarginTop : vidRatio.targetHeight;
+                y += i === 0 ? firstRowMarginTop : vidRatio.targetHeight;
             } else {
                 x += vidRatio.targetWidth;
             }
