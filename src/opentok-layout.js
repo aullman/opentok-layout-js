@@ -1,4 +1,4 @@
-/**
+/*!
  *  opentok-layout-js (http://github.com/aullman/opentok-layout-js)
  *  
  *  Automatic layout of video elements (publisher and subscriber) minimising 
