@@ -6,7 +6,7 @@ var gulp = require('gulp'),
 gulp.task('default', function(){
     gulp.src('src/opentok-layout.js')
         .pipe(jshint())
-        .pipe(uglify())
+        .pipe(uglify({preserveComments: "some"}))
         .pipe(rename('opentok-layout.min.js'))
         .pipe(gulp.dest('./build'));
 });
