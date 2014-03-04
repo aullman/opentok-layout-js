@@ -1,6 +1,6 @@
 {
   "name": "opentok-layout-js",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "homepage": "https://github.com/aullman/opentok-layout-js",
   "authors": [
     "Adam Ullman <adam@tokbox.com>"
@@ -16,6 +16,7 @@
     "**/.*",
     "node_modules",
     "bower_components",
+    "package.json",
     "gulpfile.js",
     "build",
     "test",
