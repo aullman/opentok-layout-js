@@ -42,7 +42,7 @@ In an OpenTok application you would do something like:
 <head>
     <title>Layout Container Example</title>
     <script src="http://static.opentok.com/webrtc/v2.2/js/TB.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="js/layoutContainer.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/opentok-layout.min.js" type="text/javascript" charset="utf-8"></script>
     <style type="text/css" media="screen">
         #layoutContainer {
             width: 320px;
