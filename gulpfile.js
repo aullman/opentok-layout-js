@@ -8,5 +8,5 @@ gulp.task('default', function(){
         .pipe(jshint())
         .pipe(uglify({preserveComments: "some"}))
         .pipe(rename('opentok-layout.min.js'))
-        .pipe(gulp.dest('./build'));
+        .pipe(gulp.dest('./src'));
 });
