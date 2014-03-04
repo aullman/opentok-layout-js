@@ -4,9 +4,9 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify');
 
 gulp.task('default', function(){
-    gulp.src('src/opentok-layout.js')
+    gulp.src('./opentok-layout.js')
         .pipe(jshint())
         .pipe(uglify({preserveComments: "some"}))
         .pipe(rename('opentok-layout.min.js'))
-        .pipe(gulp.dest('./src'));
+        .pipe(gulp.dest('./'));
 });
