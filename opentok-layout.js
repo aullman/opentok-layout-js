@@ -62,8 +62,8 @@
         var count = children.length,
             availableRatio = Height / Width,
             vidRatio;
-    
-        var tryVidRatio = function tryVidRatio(vidRatio) {
+        
+        var getBestDimensions = function getBestDimensions(minRatio, maxRatio) {
             var maxArea,
                 targetCols,
                 targetRows,
@@ -71,25 +71,30 @@
                 targetWidth,
                 tWidth,
                 tHeight;
-            
+
             // Iterate through every possible combination of rows and columns
             // and see which one has the least amount of whitespace
             for (var i=1; i <= count; i++) {
                 var cols = i;
                 var rows = Math.ceil(count / cols);
-                
-                if ((rows/cols) * vidRatio > availableRatio) {
-                    // Our widgets are taking up the whole height
-                    tHeight = Math.floor( Height/rows );
-                    tWidth = Math.floor( tHeight/vidRatio );
-                } else {
-                    // Our widgets are taking up the whole width
-                    tWidth = Math.floor( Width/cols );
-                    tHeight = Math.floor( tWidth*vidRatio );
+
+                // Try taking up the whole height and width
+                tHeight = Math.floor( Height/rows );
+                tWidth = Math.floor(Width/cols);
+
+                tRatio = tHeight/tWidth;
+                if (tRatio > maxRatio) {
+                    // We went over decrease the height
+                    tRatio = maxRatio;
+                    tHeight = tWidth * tRatio;
+                } else if (tRatio < minRatio) {
+                    // We went under decrease the width
+                    tRatio = minRatio;
+                    tWidth = tHeight / tRatio;
                 }
-                
+
                 var area = (tWidth*tHeight) * count;
-                
+
                 // If this width and height takes up the most space then we're going with that
                 if (maxArea === undefined || (area > maxArea)) {
                     maxArea = area;
@@ -108,21 +113,19 @@
                 ratio: vidRatio
             };
         };
-    
+
         if (!fixedRatio) {
-            // Try all video ratios between minRatio (landscape) and maxRatio (portrait)
-            // Just a brute force approach to figuring out the best ratio
-            var incr = minRatio < maxRatio ? (maxRatio - minRatio) / 20.0 : 0,
-                testRatio;
-            for (i=minRatio; i <= maxRatio; i=OT.$.roundFloat(i+incr, 5)) {
-                testRatio = tryVidRatio(i);
-                if (!vidRatio || testRatio.maxArea > vidRatio.maxArea) vidRatio = testRatio;
-            }
+            vidRatio = getBestDimensions(minRatio, maxRatio);
         } else {
             // Use the ratio of the first video element we find
-            var video = children[0].querySelector("video");
-            if (video) vidRatio = tryVidRatio(video.videoHeight/video.videoWidth);
-            else vidRatio = tryVidRatio(3/4);   // Use the default video ratio
+            var video = children.length > 0 && children[0].querySelector("video");
+            if (video && video.videoHeight && video.videoWidth) {
+                vidRatio = getBestDimensions(video.videoHeight/video.videoWidth,
+                    video.videoHeight/video.videoWidth);
+            }
+            else {
+                vidRatio = getBestDimensions(3/4, 3/4);   // Use the default video ratio
+            }
         }
 
         var spacesInLastRow = (vidRatio.targetRows * vidRatio.targetCols) - count,

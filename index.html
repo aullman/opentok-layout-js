@@ -7,7 +7,7 @@
         <title>Layout Test</title>
         <script src="https://swww.tokbox.com/webrtc/v2.2/js/TB.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="https://code.jquery.com/jquery-1.6.2.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="src/opentok-layout.js" type="text/javascript" charset="utf-8"></script>
+        <script src="opentok-layout.js" type="text/javascript" charset="utf-8"></script>
         
         <style type="text/css" media="screen">
             body {
@@ -24,8 +24,8 @@
             
             #layout > div {
                 background-color: #000;
-                display: inline-block;           border: 1px solid #fff;
-                margin: 10px;
+                display: inline-block;
+                border: 1px solid #fff;
             }
             
             body > div#description {
@@ -83,6 +83,8 @@
             var el = document.createElement("div");
             TB.initPublisher(1127, el, {
                 resolution: "1280x720"
+            }, function (err) {
+                layout();
             });
             layoutEl.appendChild(el);
             layout();
