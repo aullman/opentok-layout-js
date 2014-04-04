@@ -173,7 +173,7 @@
         }
         var id = container.getAttribute("id");
         if (!id) {
-            id = "OT_" + TB.$.uuid();
+            id = "OT_" + OT.$.uuid();
             container.setAttribute("id", id);
         }
         
