@@ -192,8 +192,11 @@
         
         if (bigOnes.length > 0 && smallOnes.length > 0) {
             var bigVideo = bigOnes[0].querySelector("video");
-            if (bigVideo) bigRatio = bigVideo.videoHeight / bigVideo.videoWidth;
-            else bigRatio = 3 / 4;
+            if (bigVideo && bigVideo.videoHeight && bigVideo.videoWidth) {
+                bigRatio = bigVideo.videoHeight / bigVideo.videoWidth;
+            } else {
+                bigRatio = 3 / 4;
+            }
             var bigWidth, bigHeight;
             
             if (availableRatio > bigRatio) {
