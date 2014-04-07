@@ -167,6 +167,10 @@
         }
     };
     
+    var filterDisplayNone = function (element) {
+        return OT.$.css(element, "display") !== "none";
+    };
+    
     var layout = function layout(container, opts, fixedRatio) {
         if (OT.$.css(container, "display") === "none") {
             return;
@@ -185,10 +189,13 @@
                     getCSSNumber(container, "borderRight"),
             availableRatio = Height/Width,
             offsetLeft = 0,
-            offsetTop = 0;
-        
-        var bigOnes = container.querySelectorAll("#" + id + ">." + opts.bigClass),
-            smallOnes = container.querySelectorAll("#" + id + ">*:not(." + opts.bigClass + ")");
+            offsetTop = 0,
+            bigOnes = Array.prototype.filter.call(
+                container.querySelectorAll("#" + id + ">." + opts.bigClass), 
+                filterDisplayNone),
+            smallOnes = Array.prototype.filter.call(
+                container.querySelectorAll("#" + id + ">*:not(." + opts.bigClass + ")"),
+                filterDisplayNone);
         
         if (bigOnes.length > 0 && smallOnes.length > 0) {
             var bigVideo = bigOnes[0].querySelector("video");
