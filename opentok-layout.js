@@ -190,6 +190,8 @@
             availableRatio = Height/Width,
             offsetLeft = 0,
             offsetTop = 0,
+            bigOffsetTop = 0,
+            bigOffsetLeft = 0,
             bigOnes = Array.prototype.filter.call(
                 container.querySelectorAll("#" + id + ">." + opts.bigClass), 
                 filterDisplayNone),
@@ -211,28 +213,34 @@
                 bigWidth = Width;
                 bigHeight = Math.min(Math.floor(Height * opts.bigPercentage), Width * bigRatio);
                 offsetTop = bigHeight;
+                bigOffsetTop = Height - offsetTop;
             } else {
                 // We are wide, going to take up the whole height and arrange the small guys on the right
                 bigHeight = Height;
                 bigWidth = Math.min(Width * opts.bigPercentage, Math.floor(bigHeight / bigRatio));
                 offsetLeft = bigWidth;
+                bigOffsetLeft = Width - offsetLeft;
             }
-            arrange(bigOnes, bigWidth, bigHeight, 0, 0, opts.bigFixedRatio, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
+            if (opts.bigFirst) {
+              arrange(bigOnes, bigWidth, bigHeight, 0, 0, opts.bigFixedRatio, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
+              arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
+            } else {
+              arrange(smallOnes, Width - offsetLeft, Height - offsetTop, 0, 0, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
+              arrange(bigOnes, bigWidth, bigHeight, bigOffsetLeft, bigOffsetTop, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
+            }
         } else if (bigOnes.length > 0 && smallOnes.length === 0) {
             // We only have one bigOne just center it
             arrange(bigOnes, Width, Height, 0, 0, opts.bigFixedRatio, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
+        } else {
+            arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
         }
-        
-        // Arrange the small guys
-        // 
-        arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
      };
      
      if (!TB) {
          throw new Error("You must include the OpenTok for WebRTC JS API before the layout-container library");
      }
      TB.initLayoutContainer = function(container, opts) {
-         opts = OT.$.defaults(opts || {}, {maxRatio: 3/2, minRatio: 9/16, fixedRatio: false, animate: false, bigClass: "OT_big", bigPercentage: 0.8, bigFixedRatio: false, bigMaxRatio: 3/2, bigMinRatio: 9/16});
+         opts = OT.$.defaults(opts || {}, {maxRatio: 3/2, minRatio: 9/16, fixedRatio: false, animate: false, bigClass: "OT_big", bigPercentage: 0.8, bigFixedRatio: false, bigMaxRatio: 3/2, bigMinRatio: 9/16, bigFirst: true});
          container = typeof(container) == "string" ? OT.$(container) : container;
         
          OT.onLoad(function() {
