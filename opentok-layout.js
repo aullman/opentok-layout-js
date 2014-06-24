@@ -226,7 +226,7 @@
               arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
             } else {
               arrange(smallOnes, Width - offsetLeft, Height - offsetTop, 0, 0, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
-              arrange(bigOnes, bigWidth, bigHeight, bigOffsetLeft, bigOffsetTop, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
+              arrange(bigOnes, bigWidth, bigHeight, bigOffsetLeft, bigOffsetTop, opts.bigFixedRatio, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
             }
         } else if (bigOnes.length > 0 && smallOnes.length === 0) {
             // We only have one bigOne just center it
