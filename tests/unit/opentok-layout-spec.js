@@ -70,9 +70,9 @@ describe('opentok-layout', function () {
     it('animates if you tell it to', function (done) {
       var layoutContainer = TB.initLayoutContainer(layoutDiv, {animate: true});
       layoutContainer.layout();
-      expect(div1.style.width).not.toBe('200px');
+      expect(200 - parseFloat(div1.style.width)).not.toBeLessThan(10);
       setTimeout(function () {
-        expect(div1.style.width).toBe('200px');
+        expect(200 - parseFloat(div1.style.width)).toBeLessThan(10);
         done();
       }, 250);
     });
@@ -80,9 +80,9 @@ describe('opentok-layout', function () {
     it('allows you to set the animate duration', function (done) {
       var layoutContainer = TB.initLayoutContainer(layoutDiv, {animate: {duration: 100}});
       layoutContainer.layout();
-      expect(div1.style.width).not.toBe('200px');
+      expect(200 - parseFloat(div1.style.width)).not.toBeLessThan(10);
       setTimeout(function () {
-        expect(div1.style.width).toBe('200px');
+        expect(200 - parseFloat(div1.style.width)).toBeLessThan(10);
         done();
       }, 150);
     });
