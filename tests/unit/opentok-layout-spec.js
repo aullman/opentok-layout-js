@@ -150,6 +150,30 @@ describe('opentok-layout', function () {
         expect(div1.style.left).toBe('80px');
         expect(div1.style.top).toBe('0px');
       });
+
+      it('takes margin into account', function () {
+        div1.style.margin = "5px";
+        div2.style.margin = "5px";
+
+        var layoutContainer = TB.initLayoutContainer(layoutDiv);
+        layoutContainer.layout();
+        expect(div1.style.width).toBe('310px');
+        expect(div2.style.width).toBe('70px');
+        expect(div1.style.height).toBe('290px');
+        expect(div2.style.height).toBe('110px');
+      });
+
+      it('takes padding into account', function () {
+        div1.style.padding = "5px";
+        div2.style.padding = "5px";
+
+        var layoutContainer = TB.initLayoutContainer(layoutDiv);
+        layoutContainer.layout();
+        expect(div1.style.width).toBe('310px');
+        expect(div2.style.width).toBe('70px');
+        expect(div1.style.height).toBe('290px');
+        expect(div2.style.height).toBe('110px');
+      });
     });
   });
 
