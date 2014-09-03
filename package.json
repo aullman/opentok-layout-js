@@ -8,12 +8,18 @@
   },
   "devDependencies": {
     "gulp": "~3.5.5",
-    "gulp-uglify": "~0.2.1",
+    "gulp-bower": "0.0.6",
     "gulp-jshint": "~1.5.0",
-    "gulp-rename": "~1.1.0"
+    "gulp-rename": "~1.1.0",
+    "gulp-uglify": "~0.2.1",
+    "karma": "^0.12.22",
+    "karma-chrome-launcher": "^0.1.4",
+    "karma-firefox-launcher": "^0.1.3",
+    "karma-jasmine": "~0.2.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node node_modules/karma/bin/karma start karma.conf.js --single-run --browsers Firefox",
+    "postinstall": "./node_modules/gulp/bin/gulp.js"
   },
   "repository": {
     "type": "git",
