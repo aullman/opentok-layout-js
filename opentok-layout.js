@@ -10,6 +10,7 @@
 **/
 
 (function() {
+    jQuery.noConflict();
     var positionElement = function positionElement(elem, x, y, width, height, animate) {
         var targetPosition = {
             left: x + "px",
@@ -31,30 +32,68 @@
             }
         };
         
-        if (animate && $) {
-            $(elem).stop();
-            $(elem).animate(targetPosition, animate.duration || 200, animate.easing || "swing", function () {
+        if (animate && jQuery && !OT.OTHelper) {
+            jQuery(elem).stop();
+            jQuery(elem).animate(targetPosition, animate.duration || 200, animate.easing || "swing", function () {
                 fixAspectRatio();
-                if (animate.complete) animate.complete.call(this);
+                if (animate.complete){
+                    animate.complete.call(this); 
+                }
             });
         } else {
-            OT.$.css(elem, targetPosition);
+            if(OT.OTHelper){
+                OT.OTHelper.css(elem, targetPosition);
+                jQuery(elem).css({
+                    'left': x + "px",
+                    'top': y + "px",
+                    'width': width + "px",
+                    'height': height + "px",
+                });
+                
+                //Update native views which are included by OpenTok Cordova plug-in
+                if(typeof OT.updateViews === 'function'){
+                    OT.updateViews();
+                }
+
+            }else{
+                OT.$.css(elem, targetPosition);
+                jQuery(elem).css({
+                    'left': x + "px",
+                    'top': y + "px",
+                    'width': width + "px",
+                    'height': height + "px",
+                });
+
+            }
         }
         fixAspectRatio();
+
     };
     
     var getCSSNumber = function (elem, prop) {
-        var cssStr = OT.$.css(elem, prop);
+        if(OT.OTHelper){
+            var cssStr = OT.OTHelper.css(elem, prop);
+        }else{
+            var cssStr = OT.$.css(elem, prop);
+        }
         return cssStr ? parseInt(cssStr, 10) : 0;
     };
     
     var getHeight = function (elem) {
-        var heightStr = OT.$.height(elem);
+        if(OT.OTHelper){
+            var heightStr = OT.OTHelper.height(elem);
+        }else{
+            var heightStr = OT.$.height(elem);
+        }
         return heightStr ? parseInt(heightStr, 10) : 0;
     };
     
     var getWidth = function (elem) {
-        var widthStr = OT.$.width(elem);
+        if(OT.OTHelper){
+            var widthStr = OT.OTHelper.width(elem);
+        }else{
+            var widthStr = OT.$.width(elem);
+        }
         return widthStr ? parseInt(widthStr, 10) : 0;
     };
     
@@ -147,46 +186,92 @@
             } else {
                 x += vidRatio.targetWidth;
             }
+            if(OT.OTHelper){
+                OT.OTHelper.css(elem, "position", "absolute");
+                jQuery(elem).css({'position': "absolute"});
 
-            OT.$.css(elem, "position", "absolute");
-            var actualWidth = vidRatio.targetWidth - getCSSNumber(elem, "paddingLeft") -
+            }else{
+                OT.$.css(elem, "position", "absolute");
+                jQuery(elem).css({'position': "absolute"});
+
+            }
+            /*var actualWidth = vidRatio.targetWidth - getCSSNumber(elem, "paddingLeft") -
                             getCSSNumber(elem, "paddingRight") -
                             getCSSNumber(elem, "marginLeft") - 
                             getCSSNumber(elem, "marginRight") -
                             getCSSNumber(elem, "borderLeft") -
                             getCSSNumber(elem, "borderRight");
+            
+
 
              var actualHeight = vidRatio.targetHeight - getCSSNumber(elem, "paddingTop") -
                             getCSSNumber(elem, "paddingBottom") -
                             getCSSNumber(elem, "marginTop") - 
                             getCSSNumber(elem, "marginBottom") -
                             getCSSNumber(elem, "borderTop") - 
-                            getCSSNumber(elem, "borderBottom");
+                            getCSSNumber(elem, "borderBottom");*/
+            var actualWidth = vidRatio.targetWidth - getCSSNumber(elem, "padding-left") -
+                getCSSNumber(elem, "padding-right") -
+                getCSSNumber(elem, "margin-left") - 
+                getCSSNumber(elem, "margin-right") -
+                getCSSNumber(elem, "border-left") -
+                getCSSNumber(elem, "border-right");
+            var actualHeight = vidRatio.targetHeight - getCSSNumber(elem, "padding-top") -
+                getCSSNumber(elem, "padding-bottom") -
+                getCSSNumber(elem, "margin-top") - 
+                getCSSNumber(elem, "margin-bottom") -
+                getCSSNumber(elem, "border-top") - 
+                getCSSNumber(elem, "border-bottom");
+
 
             positionElement(elem, x+offsetLeft, y+offsetTop, actualWidth, actualHeight, animate);
         }
     };
     
     var filterDisplayNone = function (element) {
-        return OT.$.css(element, "display") !== "none";
+        if(OT.OTHelper){
+            return OT.OTHelper.css(element, "display") !== "none";
+        }else{
+            return OT.$.css(element, "display") !== "none";
+        }
     };
-    
+
     var layout = function layout(container, opts, fixedRatio) {
-        if (OT.$.css(container, "display") === "none") {
-            return;
+        if(OT.OTHelper){
+            if (OT.OTHelper.css(container, "display") === "none") {
+                return;
+            }
+        }else{
+        
+            if (OT.$.css(container, "display") === "none") {
+                return;
+            }
         }
         var id = container.getAttribute("id");
         if (!id) {
-            id = "OT_" + OT.$.uuid();
+            if(OT.OTHelper){
+                id = "OT_" + OT.OTHelper.uuid();
+            }else{
+                id = "OT_" + OT.$.uuid();
+                
+            }
             container.setAttribute("id", id);
         }
         
-        var Height = getHeight(container) - 
+        /*var Height = getHeight(container) - 
                     getCSSNumber(container, "borderTop") - 
                     getCSSNumber(container, "borderBottom"),
             Width = getWidth(container) -
                     getCSSNumber(container, "borderLeft") -
-                    getCSSNumber(container, "borderRight"),
+                    getCSSNumber(container, "borderRight"),*/
+        
+            var Height =  getHeight(container) - 
+                    getCSSNumber(container, "border-top") - 
+                    getCSSNumber(container, "border-bottom"),
+            Width = getWidth(container) -
+                    getCSSNumber(container, "border-left") -
+                    getCSSNumber(container, "border-right"),
+
             availableRatio = Height/Width,
             offsetLeft = 0,
             offsetTop = 0,
@@ -240,15 +325,28 @@
          throw new Error("You must include the OpenTok for WebRTC JS API before the layout-container library");
      }
      TB.initLayoutContainer = function(container, opts) {
-         opts = OT.$.defaults(opts || {}, {maxRatio: 3/2, minRatio: 9/16, fixedRatio: false, animate: false, bigClass: "OT_big", bigPercentage: 0.8, bigFixedRatio: false, bigMaxRatio: 3/2, bigMinRatio: 9/16, bigFirst: true});
-         container = typeof(container) == "string" ? OT.$(container) : container;
-        
-         OT.onLoad(function() {
-             layout(container, opts);
-         });
-        
+
+         if(OT.OTHelper){
+             console.log(OT);
+             opts = OT.OTHelper.defaults(opts || {}, {maxRatio: 3/2, minRatio: 9/16, fixedRatio: false, animate: false, bigClass: "OT_big", bigPercentage: 0.8, bigFixedRatio: false, bigMaxRatio: 3/2, bigMinRatio: 9/16, bigFirst: true});
+             container = typeof(container) == "string" ? OT.OTHelper(container) : container;
+            
+             //no onload function?
+            layout(container, opts);
+            
+             /*OT.updateViews();
+             TB.updateViews();*/
+         }else{
+             opts = OT.$.defaults(opts || {}, {maxRatio: 3/2, minRatio: 9/16, fixedRatio: false, animate: false, bigClass: "OT_big", bigPercentage: 0.8, bigFixedRatio: false, bigMaxRatio: 3/2, bigMinRatio: 9/16, bigFirst: true});
+             container = typeof(container) == "string" ? OT.$(container) : container;
+             OT.onLoad(function() {
+                layout(container, opts);
+            });
+         }
          return {
-             layout: layout.bind(null, container, opts)
+             layout: layout.bind(null, container, opts),
+             height: getHeight(container),
+             width: getWidth(container)
          };
      };
 })();
