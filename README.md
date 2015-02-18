@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/aullman/opentok-layout-js.svg?branch=master)](https://travis-ci.org/aullman/opentok-layout-js)
+[![Code Climate](https://codeclimate.com/github/aullman/opentok-layout-js/badges/gpa.svg)](https://codeclimate.com/github/aullman/opentok-layout-js)
+[![Test Coverage](https://codeclimate.com/github/aullman/opentok-layout-js/badges/coverage.svg)](https://codeclimate.com/github/aullman/opentok-layout-js)
 
 opentok-layout-js
 ================
