@@ -12,7 +12,7 @@ It automatically detects when an element is added or when the container is resiz
 Demo
 ----
 
-[Demo of layout container in action](http://aullman.github.io/opentok-layout-js/ "Layout-container Demo")
+[Demo of layout container in action](https://aullman.github.io/opentok-layout-js/ "Layout-container Demo")
 
 Dependencies
 -------
