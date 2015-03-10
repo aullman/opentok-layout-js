@@ -10,6 +10,8 @@
 **/
 
 (function() {
+    var $;
+
     var positionElement = function positionElement(elem, x, y, width, height, animate) {
         var targetPosition = {
             left: x + "px",
@@ -251,4 +253,10 @@
              layout: layout.bind(null, container, opts)
          };
      };
+
+    // jQuery is optional, so we detect its presence at runtime
+    if (typeof jQuery !== 'undefined') {
+        $ = jQuery.noConflict();
+    }
+
 })();
