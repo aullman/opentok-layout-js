@@ -9,6 +9,16 @@
  *  @License: Released under the MIT license (http://opensource.org/licenses/MIT)
 **/
 
+// TODO: don't rely on internal OT.$ API.
+// in CommonJS context, this should be a `require()`d dependency.
+// in browser globals context, ...? (when using bower, there are dependencies that it has handled
+// for you, so these might be safe to assume)
+
+
+if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
+  exports = window;
+}
+
 (function() {
     var $;
 
@@ -236,23 +246,36 @@
         } else {
             arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
         }
-     };
-     
-     if (!TB) {
-         throw new Error("You must include the OpenTok for WebRTC JS API before the layout-container library");
-     }
-     TB.initLayoutContainer = function(container, opts) {
-         opts = OT.$.defaults(opts || {}, {maxRatio: 3/2, minRatio: 9/16, fixedRatio: false, animate: false, bigClass: "OT_big", bigPercentage: 0.8, bigFixedRatio: false, bigMaxRatio: 3/2, bigMinRatio: 9/16, bigFirst: true});
-         container = typeof(container) == "string" ? OT.$(container) : container;
-        
-         OT.onLoad(function() {
-             layout(container, opts);
-         });
-        
-         return {
-             layout: layout.bind(null, container, opts)
-         };
-     };
+    };
+
+    exports.initLayoutContainer = function(container, opts) {
+        // NOTE: internal OT.$ API
+        opts = OT.$.defaults(opts || {}, {
+            maxRatio: 3/2,
+            minRatio: 9/16,
+            fixedRatio: false,
+            animate: false,
+            bigClass: "OT_big",
+            bigPercentage: 0.8,
+            bigFixedRatio: false,
+            bigMaxRatio: 3/2,
+            bigMinRatio: 9/16,
+            bigFirst: true
+        });
+        // NOTE: internal OT.$ API
+        container = typeof(container) == "string" ? OT.$(container) : container;
+
+        // TODO: should we add event hooks to external globals like this?
+        // this could be left as a responsibility of the user, and i think that would be more sound
+        // the OT.onLoad() method has (publicly) undefined behavior
+        OT.onLoad(function() {
+            layout(container, opts);
+        });
+
+        return {
+            layout: layout.bind(null, container, opts)
+        };
+    };
 
     // jQuery is optional, so we detect its presence at runtime
     if (typeof jQuery !== 'undefined') {
