@@ -2,7 +2,7 @@
   "name": "opentok-layout-js",
   "version": "0.0.12",
   "description": "Automatic layout of video elements (publisher and subscriber) minimising white-space for the OpenTok on WebRTC API. This is intended for use with the OpenTok on WebRTC JS API.",
-  "main": "gulpfile.js",
+  "main": "opentok-layout.js",
   "dependencies": {
     "gulp": "~3.5.5"
   },
@@ -20,8 +20,8 @@
     "karma-jasmine": "~0.2.0"
   },
   "scripts": {
-    "test": "node node_modules/karma/bin/karma start karma.conf.js --single-run --browsers Firefox",
-    "postinstall": "./node_modules/gulp/bin/gulp.js"
+    "test": "karma start karma.conf.js --single-run --browsers Firefox",
+    "postinstall": "gulp"
   },
   "repository": {
     "type": "git",
