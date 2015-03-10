@@ -1,6 +1,6 @@
 /*!
  *  opentok-layout-js (http://github.com/aullman/opentok-layout-js)
- *  
+ *
  *  Automatic layout of video elements (publisher and subscriber) minimising 
  *  white-space for the OpenTok on WebRTC API.
  *
@@ -29,7 +29,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             width: width + "px",
             height: height + "px"
         };
-        
+
         var fixAspectRatio = function () {
             var sub = elem.querySelector(".OT_root");
             if (sub) {
@@ -42,7 +42,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
                 sub.style.width = oldWidth || "";
             }
         };
-        
+
         if (animate && $) {
             $(elem).stop();
             $(elem).animate(targetPosition, animate.duration || 200, animate.easing || "swing", function () {
@@ -50,31 +50,35 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
                 if (animate.complete) animate.complete.call(this);
             });
         } else {
+            // NOTE: internal OT.$ API
             OT.$.css(elem, targetPosition);
         }
         fixAspectRatio();
     };
-    
+
     var getCSSNumber = function (elem, prop) {
+        // NOTE: internal OT.$ API
         var cssStr = OT.$.css(elem, prop);
         return cssStr ? parseInt(cssStr, 10) : 0;
     };
-    
+
     var getHeight = function (elem) {
+        // NOTE: internal OT.$ API
         var heightStr = OT.$.height(elem);
         return heightStr ? parseInt(heightStr, 10) : 0;
     };
-    
+
     var getWidth = function (elem) {
+        // NOTE: internal OT.$ API
         var widthStr = OT.$.width(elem);
         return widthStr ? parseInt(widthStr, 10) : 0;
     };
-    
+
     var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, fixedRatio, minRatio, maxRatio, animate) {
         var count = children.length,
             availableRatio = Height / Width,
             vidRatio;
-        
+
         var getBestDimensions = function getBestDimensions(minRatio, maxRatio) {
             var maxArea,
                 targetCols,
@@ -160,6 +164,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
                 x += vidRatio.targetWidth;
             }
 
+            // NOTE: internal OT.$ API
             OT.$.css(elem, "position", "absolute");
             var actualWidth = vidRatio.targetWidth - getCSSNumber(elem, "paddingLeft") -
                             getCSSNumber(elem, "paddingRight") -
@@ -178,21 +183,24 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             positionElement(elem, x+offsetLeft, y+offsetTop, actualWidth, actualHeight, animate);
         }
     };
-    
+
     var filterDisplayNone = function (element) {
+        // NOTE: internal OT.$ API
         return OT.$.css(element, "display") !== "none";
     };
-    
+
     var layout = function layout(container, opts, fixedRatio) {
+        // NOTE: internal OT.$ API
         if (OT.$.css(container, "display") === "none") {
             return;
         }
         var id = container.getAttribute("id");
         if (!id) {
+            // NOTE: internal OT.$ API
             id = "OT_" + OT.$.uuid();
             container.setAttribute("id", id);
         }
-        
+
         var Height = getHeight(container) - 
                     getCSSNumber(container, "borderTop") - 
                     getCSSNumber(container, "borderBottom"),
@@ -210,7 +218,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             smallOnes = Array.prototype.filter.call(
                 container.querySelectorAll("#" + id + ">*:not(." + opts.bigClass + ")"),
                 filterDisplayNone);
-        
+
         if (bigOnes.length > 0 && smallOnes.length > 0) {
             var bigVideo = bigOnes[0].querySelector("video");
             if (bigVideo && bigVideo.videoHeight && bigVideo.videoWidth) {
@@ -219,7 +227,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
                 bigRatio = 3 / 4;
             }
             var bigWidth, bigHeight;
-            
+
             if (availableRatio > bigRatio) {
                 // We are tall, going to take up the whole width and arrange small guys at the bottom
                 bigWidth = Width;
