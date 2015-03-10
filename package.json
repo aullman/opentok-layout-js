@@ -20,7 +20,7 @@
     "karma-jasmine": "~0.2.0"
   },
   "scripts": {
-    "test": "karma start karma.conf.js --single-run --browsers Firefox",
+    "test": "node node_modules/karma/bin/karma start karma.conf.js --single-run --browsers Firefox",
     "postinstall": "gulp"
   },
   "repository": {
