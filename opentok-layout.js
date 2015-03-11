@@ -290,4 +290,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
         $ = jQuery.noConflict();
     }
 
+    // NOTE: deprecated API, will be removed in next major version
+    OT.initLayoutContainer = exports.initLayoutContainer;
+
 })();

@@ -5,9 +5,9 @@
     <head>
         <meta http-equiv="Content-type" content="text/html; charset=utf-8">
         <title>Layout Test</title>
-        <script src="https://swww.tokbox.com/webrtc/v2.2/js/TB.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="https://code.jquery.com/jquery-1.6.2.min.js" type="text/javascript" charset="utf-8"></script>
-        <script src="opentok-layout.js" type="text/javascript" charset="utf-8"></script>
+        <script src="https://swww.tokbox.com/v2/js/opentok.min.js"></script>
+        <script src="https://code.jquery.com/jquery-1.6.2.min.js"></script>
+        <script src="opentok-layout.js"></script>
         
         <style type="text/css" media="screen">
             body {
@@ -71,7 +71,7 @@
     </body>
     <script type="text/javascript" charset="utf-8">
         var layoutEl = document.getElementById("layout");
-        var layout = TB.initLayoutContainer(layoutEl, {
+        var layout = initLayoutContainer(layoutEl, {
             animate: {
                 duration: 500,
                 easing: "swing"
@@ -81,7 +81,7 @@
         
         function addElement() {
             var el = document.createElement("div");
-            TB.initPublisher(1127, el, {
+            OT.initPublisher(el, {
                 resolution: "1280x720"
             }, function (err) {
                 layout();
