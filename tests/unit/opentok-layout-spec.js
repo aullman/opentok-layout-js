@@ -74,7 +74,7 @@ describe('opentok-layout', function () {
       setTimeout(function () {
         expect(200 - parseFloat(div1.style.width)).toBeLessThan(10);
         done();
-      }, 250);
+      }, 500);
     });
     
     it('allows you to set the animate duration', function (done) {
