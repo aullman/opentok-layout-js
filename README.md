@@ -22,10 +22,10 @@ The <a href="http://www.tokbox.com/opentok">OpenTok for WebRTC JS API</a> is req
 Usage
 -----
 
-Call `TB.initLayoutContainer` and pass it the element you want it to layout. It works best if you set the position of the element to be absolute or relative. You will then be returned an object with a layout method that you can call to layout the page.
+Call `initLayoutContainer` and pass it the element you want it to layout. It works best if you set the position of the element to be absolute or relative. You will then be returned an object with a layout method that you can call to layout the page.
 
 ```javascript
-var layout = TB.initLayoutContainer(document.getElementById("layout"), {
+var layout = initLayoutContainer(document.getElementById("layout"), {
     maxRatio: 3/2,     // The narrowest ratio that will be used (default 2x3)
     minRatio: 9/16,      // The widest ratio that will be used (default 16x9)
     fixedRatio: false,  // If this is true then the aspect ratio of the video is maintained and minRatio and maxRatio are ignored (default false)
@@ -46,8 +46,8 @@ In an OpenTok application you would do something like:
 <html>
 <head>
     <title>Layout Container Example</title>
-    <script src="http://static.opentok.com/webrtc/v2.2/js/TB.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="js/opentok-layout.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="http://static.opentok.com/v2/js/opentok.min.js"></script>
+    <script src="js/opentok-layout.min.js"></script>
     <style type="text/css" media="screen">
         #layoutContainer {
             width: 320px;
@@ -66,16 +66,16 @@ In an OpenTok application you would do something like:
     var layoutContainer = document.getElementById("layoutContainer");
     
     // Initialize the layout container and get a reference to the layout method
-    var layout = TB.initLayoutContainer(layoutContainer).layout;
+    var layout = initLayoutContainer(layoutContainer).layout;
     
-    // Below is a normal hello world OpenTok application for v2.2 of the API
+    // Below is a normal hello world OpenTok application for v2 of the API
     // The layout container will redraw when the layout mtehod is called and
     // adjust the layout accordingly
     var sessionId = "mySessionId";
     var token = "myToken";
     var apiKey = "myAPIKey";
     
-    var session = TB.initSession(sessionId);
+    var session = OT.initSession(sessionId);
     session.on("streamCreated", function(event){
         session.subscribe(event.stream, "layoutContainer", {
             insertMode: "append"

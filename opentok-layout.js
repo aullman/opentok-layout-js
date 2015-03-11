@@ -1,6 +1,6 @@
 /*!
  *  opentok-layout-js (http://github.com/aullman/opentok-layout-js)
- *  
+ *
  *  Automatic layout of video elements (publisher and subscriber) minimising 
  *  white-space for the OpenTok on WebRTC API.
  *
@@ -9,7 +9,19 @@
  *  @License: Released under the MIT license (http://opensource.org/licenses/MIT)
 **/
 
+// TODO: don't rely on internal OT.$ API.
+// in CommonJS context, this should be a `require()`d dependency.
+// in browser globals context, ...? (when using bower, there are dependencies that it has handled
+// for you, so these might be safe to assume)
+
+
+if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
+  exports = window;
+}
+
 (function() {
+    var $;
+
     var positionElement = function positionElement(elem, x, y, width, height, animate) {
         var targetPosition = {
             left: x + "px",
@@ -17,7 +29,7 @@
             width: width + "px",
             height: height + "px"
         };
-        
+
         var fixAspectRatio = function () {
             var sub = elem.querySelector(".OT_root");
             if (sub) {
@@ -30,7 +42,7 @@
                 sub.style.width = oldWidth || "";
             }
         };
-        
+
         if (animate && $) {
             $(elem).stop();
             $(elem).animate(targetPosition, animate.duration || 200, animate.easing || "swing", function () {
@@ -38,31 +50,35 @@
                 if (animate.complete) animate.complete.call(this);
             });
         } else {
+            // NOTE: internal OT.$ API
             OT.$.css(elem, targetPosition);
         }
         fixAspectRatio();
     };
-    
+
     var getCSSNumber = function (elem, prop) {
+        // NOTE: internal OT.$ API
         var cssStr = OT.$.css(elem, prop);
         return cssStr ? parseInt(cssStr, 10) : 0;
     };
-    
+
     var getHeight = function (elem) {
+        // NOTE: internal OT.$ API
         var heightStr = OT.$.height(elem);
         return heightStr ? parseInt(heightStr, 10) : 0;
     };
-    
+
     var getWidth = function (elem) {
+        // NOTE: internal OT.$ API
         var widthStr = OT.$.width(elem);
         return widthStr ? parseInt(widthStr, 10) : 0;
     };
-    
+
     var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, fixedRatio, minRatio, maxRatio, animate) {
         var count = children.length,
             availableRatio = Height / Width,
             vidRatio;
-        
+
         var getBestDimensions = function getBestDimensions(minRatio, maxRatio) {
             var maxArea,
                 targetCols,
@@ -148,6 +164,7 @@
                 x += vidRatio.targetWidth;
             }
 
+            // NOTE: internal OT.$ API
             OT.$.css(elem, "position", "absolute");
             var actualWidth = vidRatio.targetWidth - getCSSNumber(elem, "paddingLeft") -
                             getCSSNumber(elem, "paddingRight") -
@@ -166,21 +183,24 @@
             positionElement(elem, x+offsetLeft, y+offsetTop, actualWidth, actualHeight, animate);
         }
     };
-    
+
     var filterDisplayNone = function (element) {
+        // NOTE: internal OT.$ API
         return OT.$.css(element, "display") !== "none";
     };
-    
+
     var layout = function layout(container, opts, fixedRatio) {
+        // NOTE: internal OT.$ API
         if (OT.$.css(container, "display") === "none") {
             return;
         }
         var id = container.getAttribute("id");
         if (!id) {
+            // NOTE: internal OT.$ API
             id = "OT_" + OT.$.uuid();
             container.setAttribute("id", id);
         }
-        
+
         var Height = getHeight(container) - 
                     getCSSNumber(container, "borderTop") - 
                     getCSSNumber(container, "borderBottom"),
@@ -198,7 +218,7 @@
             smallOnes = Array.prototype.filter.call(
                 container.querySelectorAll("#" + id + ">*:not(." + opts.bigClass + ")"),
                 filterDisplayNone);
-        
+
         if (bigOnes.length > 0 && smallOnes.length > 0) {
             var bigVideo = bigOnes[0].querySelector("video");
             if (bigVideo && bigVideo.videoHeight && bigVideo.videoWidth) {
@@ -207,7 +227,7 @@
                 bigRatio = 3 / 4;
             }
             var bigWidth, bigHeight;
-            
+
             if (availableRatio > bigRatio) {
                 // We are tall, going to take up the whole width and arrange small guys at the bottom
                 bigWidth = Width;
@@ -234,21 +254,43 @@
         } else {
             arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
         }
-     };
-     
-     if (!TB) {
-         throw new Error("You must include the OpenTok for WebRTC JS API before the layout-container library");
-     }
-     TB.initLayoutContainer = function(container, opts) {
-         opts = OT.$.defaults(opts || {}, {maxRatio: 3/2, minRatio: 9/16, fixedRatio: false, animate: false, bigClass: "OT_big", bigPercentage: 0.8, bigFixedRatio: false, bigMaxRatio: 3/2, bigMinRatio: 9/16, bigFirst: true});
-         container = typeof(container) == "string" ? OT.$(container) : container;
-        
-         OT.onLoad(function() {
-             layout(container, opts);
-         });
-        
-         return {
-             layout: layout.bind(null, container, opts)
-         };
-     };
+    };
+
+    exports.initLayoutContainer = function(container, opts) {
+        // NOTE: internal OT.$ API
+        opts = OT.$.defaults(opts || {}, {
+            maxRatio: 3/2,
+            minRatio: 9/16,
+            fixedRatio: false,
+            animate: false,
+            bigClass: "OT_big",
+            bigPercentage: 0.8,
+            bigFixedRatio: false,
+            bigMaxRatio: 3/2,
+            bigMinRatio: 9/16,
+            bigFirst: true
+        });
+        // NOTE: internal OT.$ API
+        container = typeof(container) == "string" ? OT.$(container) : container;
+
+        // TODO: should we add event hooks to external globals like this?
+        // this could be left as a responsibility of the user, and i think that would be more sound
+        // the OT.onLoad() method has (publicly) undefined behavior
+        OT.onLoad(function() {
+            layout(container, opts);
+        });
+
+        return {
+            layout: layout.bind(null, container, opts)
+        };
+    };
+
+    // jQuery is optional, so we detect its presence at runtime
+    if (typeof jQuery !== 'undefined') {
+        $ = jQuery.noConflict();
+    }
+
+    // NOTE: deprecated API, will be removed in next major version
+    OT.initLayoutContainer = exports.initLayoutContainer;
+
 })();

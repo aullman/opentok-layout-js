@@ -1,12 +1,12 @@
 describe('opentok-layout', function () {
   it('defines initLayoutContainer', function () {
-    expect(TB.hasOwnProperty('initLayoutContainer')).toBe(true);
+    expect(window.hasOwnProperty('initLayoutContainer')).toBe(true);
   });
   
   it('defines a layout method', function () {
     var layoutDiv = document.createElement('div');
     document.body.appendChild(layoutDiv);
-    layoutContainer = TB.initLayoutContainer(layoutDiv);
+    layoutContainer = initLayoutContainer(layoutDiv);
     
     expect(layoutContainer.hasOwnProperty('layout')).toBe(true);
     expect(typeof layoutContainer.layout).toEqual('function');
@@ -39,7 +39,7 @@ describe('opentok-layout', function () {
     });
     
     it('handles default layout', function () {
-      var layoutContainer = TB.initLayoutContainer(layoutDiv);
+      var layoutContainer = initLayoutContainer(layoutDiv);
       layoutContainer.layout();
       expect(div1.style.width).toBe('200px');
       expect(div2.style.width).toBe('200px');
@@ -52,7 +52,7 @@ describe('opentok-layout', function () {
     });
 
     it('maintains aspect ratio if you set fixedRatio:true', function () {
-      var layoutContainer = TB.initLayoutContainer(layoutDiv, {fixedRatio: true});
+      var layoutContainer = initLayoutContainer(layoutDiv, {fixedRatio: true});
       layoutContainer.layout();
       var width = parseFloat(div1.style.width, 10);
       var height = parseFloat(div1.style.height, 10);
@@ -60,7 +60,7 @@ describe('opentok-layout', function () {
     });
 
     it('lets you change the min and maxRatio to force a ratio', function () {
-      var layoutContainer = TB.initLayoutContainer(layoutDiv, {minRatio: 9/16, maxRatio: 9/16});
+      var layoutContainer = initLayoutContainer(layoutDiv, {minRatio: 9/16, maxRatio: 9/16});
       layoutContainer.layout();
       var width = parseFloat(div1.style.width, 10);
       var height = parseFloat(div1.style.height, 10);
@@ -68,17 +68,17 @@ describe('opentok-layout', function () {
     });
     
     it('animates if you tell it to', function (done) {
-      var layoutContainer = TB.initLayoutContainer(layoutDiv, {animate: true});
+      var layoutContainer = initLayoutContainer(layoutDiv, {animate: true});
       layoutContainer.layout();
       expect(200 - parseFloat(div1.style.width)).not.toBeLessThan(10);
       setTimeout(function () {
         expect(200 - parseFloat(div1.style.width)).toBeLessThan(10);
         done();
-      }, 250);
+      }, 500);
     });
     
     it('allows you to set the animate duration', function (done) {
-      var layoutContainer = TB.initLayoutContainer(layoutDiv, {animate: {duration: 100}});
+      var layoutContainer = initLayoutContainer(layoutDiv, {animate: {duration: 100}});
       layoutContainer.layout();
       expect(200 - parseFloat(div1.style.width)).not.toBeLessThan(10);
       setTimeout(function () {
@@ -97,7 +97,7 @@ describe('opentok-layout', function () {
         expect(this.style.width).toBe('200px');
         if (div1Complete && div2Complete) done();
       };
-      var layoutContainer = TB.initLayoutContainer(layoutDiv, {animate: {complete:animateComplete}});
+      var layoutContainer = initLayoutContainer(layoutDiv, {animate: {complete:animateComplete}});
       layoutContainer.layout();
     });
     
@@ -107,7 +107,7 @@ describe('opentok-layout', function () {
       });
 
       it('handles default layout', function () {
-        var layoutContainer = TB.initLayoutContainer(layoutDiv);
+        var layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
         expect(div1.style.width).toBe('320px');
         expect(div2.style.width).toBe('80px');
@@ -120,7 +120,7 @@ describe('opentok-layout', function () {
       });
 
       it('handles bigFixedRatio:true', function () {
-        var layoutContainer = TB.initLayoutContainer(layoutDiv, {bigFixedRatio: true});
+        var layoutContainer = initLayoutContainer(layoutDiv, {bigFixedRatio: true});
         layoutContainer.layout();
         var width = parseFloat(div1.style.width, 10);
         var height = parseFloat(div1.style.height, 10);
@@ -128,7 +128,7 @@ describe('opentok-layout', function () {
       });
 
       it('lets you change the bigMinRatio and bigMaxRatio to force a ratio', function () {
-        var layoutContainer = TB.initLayoutContainer(layoutDiv, {bigMinRatio: 9/16, bigMaxRatio: 9/16});
+        var layoutContainer = initLayoutContainer(layoutDiv, {bigMinRatio: 9/16, bigMaxRatio: 9/16});
         layoutContainer.layout();
         var width = parseFloat(div1.style.width, 10);
         var height = parseFloat(div1.style.height, 10);
@@ -136,7 +136,7 @@ describe('opentok-layout', function () {
       });
 
       it('handles bigPercentage', function () {
-        var layoutContainer = TB.initLayoutContainer(layoutDiv, {bigPercentage: 0.9});
+        var layoutContainer = initLayoutContainer(layoutDiv, {bigPercentage: 0.9});
         layoutContainer.layout();
         expect(div1.style.width).toBe('360px');
         expect(div2.style.width).toBe('40px');
@@ -145,7 +145,7 @@ describe('opentok-layout', function () {
       });
 
       it('handles bigFirst', function () {
-        var layoutContainer = TB.initLayoutContainer(layoutDiv, {bigFirst: false});
+        var layoutContainer = initLayoutContainer(layoutDiv, {bigFirst: false});
         layoutContainer.layout();
         expect(div1.style.left).toBe('80px');
         expect(div1.style.top).toBe('0px');
@@ -155,7 +155,7 @@ describe('opentok-layout', function () {
         div1.style.margin = "5px";
         div2.style.margin = "5px";
 
-        var layoutContainer = TB.initLayoutContainer(layoutDiv);
+        var layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
         expect(div1.style.width).toBe('310px');
         expect(div2.style.width).toBe('70px');
@@ -167,7 +167,7 @@ describe('opentok-layout', function () {
         div1.style.padding = "5px";
         div2.style.padding = "5px";
 
-        var layoutContainer = TB.initLayoutContainer(layoutDiv);
+        var layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
         expect(div1.style.width).toBe('310px');
         expect(div2.style.width).toBe('70px');
@@ -201,7 +201,7 @@ describe('opentok-layout', function () {
     });
     
     it('handles default layout', function () {
-      var layoutContainer = TB.initLayoutContainer(layoutDiv);
+      var layoutContainer = initLayoutContainer(layoutDiv);
       layoutContainer.layout();
       // Expect them to all have the same width and height
       for (var i = 0; i < divs.length; i++) {
@@ -212,7 +212,7 @@ describe('opentok-layout', function () {
 
     it('handles a big element', function () {
       divs[0].className = "OT_big";
-      var layoutContainer = TB.initLayoutContainer(layoutDiv);
+      var layoutContainer = initLayoutContainer(layoutDiv);
       layoutContainer.layout();
       // Expect div[0] to be big
       expect(divs[0].style.width).toBe('320px');
