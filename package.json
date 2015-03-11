@@ -4,7 +4,6 @@
   "description": "Automatic layout of video elements (publisher and subscriber) minimising white-space for the OpenTok on WebRTC API. This is intended for use with the OpenTok on WebRTC JS API.",
   "main": "opentok-layout.js",
   "dependencies": {
-    "gulp": "~3.5.5"
   },
   "devDependencies": {
     "codeclimate-test-reporter": "0.0.4",
