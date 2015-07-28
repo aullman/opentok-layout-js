@@ -19,9 +19,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
   exports = window;
 }
 
-(function() {
-    var $;
-
+(function($) {
     var positionElement = function positionElement(elem, x, y, width, height, animate) {
         var targetPosition = {
             left: x + "px",
@@ -285,12 +283,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
         };
     };
 
-    // jQuery is optional, so we detect its presence at runtime
-    if (typeof jQuery !== 'undefined') {
-        $ = jQuery.noConflict();
-    }
-
     // NOTE: deprecated API, will be removed in next major version
     OT.initLayoutContainer = exports.initLayoutContainer;
 
-})();
+})(jQuery);

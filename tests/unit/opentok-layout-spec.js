@@ -11,7 +11,11 @@ describe('opentok-layout', function () {
     expect(layoutContainer.hasOwnProperty('layout')).toBe(true);
     expect(typeof layoutContainer.layout).toEqual('function');
   });
-  
+
+  it('does not break jQuery', function() {
+    expect(window.$).toBeDefined();
+  });
+
   describe('handling layout of 2 elements', function () {
     var layoutDiv, div1, div2;
     beforeEach(function () {
