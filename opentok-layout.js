@@ -60,6 +60,11 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
         return cssStr ? parseInt(cssStr, 10) : 0;
     };
 
+    // Really cheap UUID function
+    var cheapUUID = function() {
+      return (Math.random() * 100000000).toFixed(0);
+    };
+
     var getHeight = function (elem) {
         // NOTE: internal OT.$ API
         var heightStr = OT.$.height(elem);
@@ -194,8 +199,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
         }
         var id = container.getAttribute("id");
         if (!id) {
-            // NOTE: internal OT.$ API
-            id = "OT_" + OT.$.uuid();
+            id = "OT_" + cheapUUID();
             container.setAttribute("id", id);
         }
 
