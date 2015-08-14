@@ -1,19 +1,30 @@
-describe('opentok-layout', function () {
+describe('opentok layout', function () {
+  //describe('with jQuery specs', specs);
+  describe('without jQuery', function () {
+    beforeEach(function () {
+      window.$ = undefined;
+      window.jQuery = undefined;
+    });
+    describe('specs', specs);
+  });
+})
+
+function specs() {
   it('defines initLayoutContainer', function () {
     expect(window.hasOwnProperty('initLayoutContainer')).toBe(true);
   });
-  
+
   it('defines a layout method', function () {
     var layoutDiv = document.createElement('div');
     document.body.appendChild(layoutDiv);
     layoutContainer = initLayoutContainer(layoutDiv);
-    
+
     expect(layoutContainer.hasOwnProperty('layout')).toBe(true);
     expect(typeof layoutContainer.layout).toEqual('function');
   });
 
   it('does not break jQuery', function() {
-    expect(window.$).toBeDefined();
+    expect(window.$).toBe(window.jQuery);
   });
 
   describe('handling layout of 2 elements', function () {
@@ -26,7 +37,7 @@ describe('opentok-layout', function () {
       layoutDiv.style.height = "300px";
       layoutDiv.style.backgroundColor = "grey";
       document.body.appendChild(layoutDiv);
-      
+
       div1 = document.createElement('div');
       div2 = document.createElement('div');
       div1.style.backgroundColor = "green";
@@ -34,14 +45,14 @@ describe('opentok-layout', function () {
       layoutDiv.appendChild(div1);
       layoutDiv.appendChild(div2);
     });
-    
+
     afterEach(function () {
       document.body.removeChild(layoutDiv);
       layoutDiv = null;
       div1 = null;
       div2 = null;
     });
-    
+
     it('handles default layout', function () {
       var layoutContainer = initLayoutContainer(layoutDiv);
       layoutContainer.layout();
@@ -70,41 +81,43 @@ describe('opentok-layout', function () {
       var height = parseFloat(div1.style.height, 10);
       expect(width/height).toBeCloseTo(16/9, 3);
     });
-    
-    it('animates if you tell it to', function (done) {
-      var layoutContainer = initLayoutContainer(layoutDiv, {animate: true});
-      layoutContainer.layout();
-      expect(200 - parseFloat(div1.style.width)).not.toBeLessThan(10);
-      setTimeout(function () {
-        expect(200 - parseFloat(div1.style.width)).toBeLessThan(10);
-        done();
-      }, 500);
-    });
-    
-    it('allows you to set the animate duration', function (done) {
-      var layoutContainer = initLayoutContainer(layoutDiv, {animate: {duration: 100}});
-      layoutContainer.layout();
-      expect(200 - parseFloat(div1.style.width)).not.toBeLessThan(10);
-      setTimeout(function () {
-        expect(200 - parseFloat(div1.style.width)).toBeLessThan(10);
-        done();
-      }, 150);
-    });
-    
-    it('calls the animate completionHandler on complete for each element', function (done) {
-      var div1Complete = false,
-        div2Complete = false;
-      
-      var animateComplete = function () {
-        if (this === div1) div1Complete = true;
-        if (this === div2) div2Complete = true;
-        expect(this.style.width).toBe('200px');
-        if (div1Complete && div2Complete) done();
-      };
-      var layoutContainer = initLayoutContainer(layoutDiv, {animate: {complete:animateComplete}});
-      layoutContainer.layout();
-    });
-    
+
+    if (window.jQuery) {
+      it('animates if you tell it to', function (done) {
+        var layoutContainer = initLayoutContainer(layoutDiv, {animate: true});
+        layoutContainer.layout();
+        expect(200 - parseFloat(div1.style.width)).not.toBeLessThan(10);
+        setTimeout(function () {
+          expect(200 - parseFloat(div1.style.width)).toBeLessThan(10);
+          done();
+        }, 500);
+      });
+
+      it('allows you to set the animate duration', function (done) {
+        var layoutContainer = initLayoutContainer(layoutDiv, {animate: {duration: 100}});
+        layoutContainer.layout();
+        expect(200 - parseFloat(div1.style.width)).not.toBeLessThan(10);
+        setTimeout(function () {
+          expect(200 - parseFloat(div1.style.width)).toBeLessThan(10);
+          done();
+        }, 150);
+      });
+
+      it('calls the animate completionHandler on complete for each element', function (done) {
+        var div1Complete = false,
+          div2Complete = false;
+
+        var animateComplete = function () {
+          if (this === div1) div1Complete = true;
+          if (this === div2) div2Complete = true;
+          expect(this.style.width).toBe('200px');
+          if (div1Complete && div2Complete) done();
+        };
+        var layoutContainer = initLayoutContainer(layoutDiv, {animate: {complete:animateComplete}});
+        layoutContainer.layout();
+      });
+    }
+
     describe('with a big element', function () {
       beforeEach(function () {
         div1.className = "OT_big";
@@ -191,19 +204,19 @@ describe('opentok-layout', function () {
       layoutDiv.style.height = "300px";
       layoutDiv.style.backgroundColor = "grey";
       document.body.appendChild(layoutDiv);
-      
+
       for (var i = 0; i < divCount; i++) {
         divs[i] = document.createElement('div');
         layoutDiv.appendChild(divs[i]);
       }
     });
-    
+
     afterEach(function () {
       document.body.removeChild(layoutDiv);
       layoutDiv = null;
       divs = [];
     });
-    
+
     it('handles default layout', function () {
       var layoutContainer = initLayoutContainer(layoutDiv);
       layoutContainer.layout();
@@ -228,4 +241,4 @@ describe('opentok-layout', function () {
       }
     });
   });
-});
+};

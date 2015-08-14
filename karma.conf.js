@@ -13,15 +13,6 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
 
 
-    // list of files / patterns to load in the browser
-    files: [
-      'https://static.opentok.com/v2/js/opentok.js',
-      'https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js',
-      'opentok-layout.js',
-      'tests/**/*spec.js'
-    ],
-
-
     // list of files to exclude
     exclude: [
     ],

@@ -1,7 +1,7 @@
 /*!
  *  opentok-layout-js (http://github.com/aullman/opentok-layout-js)
  *
- *  Automatic layout of video elements (publisher and subscriber) minimising 
+ *  Automatic layout of video elements (publisher and subscriber) minimising
  *  white-space for the OpenTok on WebRTC API.
  *
  *  @Author: Adam Ullman (http://github.com/aullman)
@@ -42,6 +42,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
         };
 
         if (animate && $) {
+            console.log('animate');
             $(elem).stop();
             $(elem).animate(targetPosition, animate.duration || 200, animate.easing || "swing", function () {
                 fixAspectRatio();
@@ -171,16 +172,16 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             OT.$.css(elem, "position", "absolute");
             var actualWidth = vidRatio.targetWidth - getCSSNumber(elem, "paddingLeft") -
                             getCSSNumber(elem, "paddingRight") -
-                            getCSSNumber(elem, "marginLeft") - 
+                            getCSSNumber(elem, "marginLeft") -
                             getCSSNumber(elem, "marginRight") -
                             getCSSNumber(elem, "borderLeft") -
                             getCSSNumber(elem, "borderRight");
 
              var actualHeight = vidRatio.targetHeight - getCSSNumber(elem, "paddingTop") -
                             getCSSNumber(elem, "paddingBottom") -
-                            getCSSNumber(elem, "marginTop") - 
+                            getCSSNumber(elem, "marginTop") -
                             getCSSNumber(elem, "marginBottom") -
-                            getCSSNumber(elem, "borderTop") - 
+                            getCSSNumber(elem, "borderTop") -
                             getCSSNumber(elem, "borderBottom");
 
             positionElement(elem, x+offsetLeft, y+offsetTop, actualWidth, actualHeight, animate);
@@ -203,8 +204,8 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             container.setAttribute("id", id);
         }
 
-        var Height = getHeight(container) - 
-                    getCSSNumber(container, "borderTop") - 
+        var Height = getHeight(container) -
+                    getCSSNumber(container, "borderTop") -
                     getCSSNumber(container, "borderBottom"),
             Width = getWidth(container) -
                     getCSSNumber(container, "borderLeft") -
@@ -215,7 +216,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             bigOffsetTop = 0,
             bigOffsetLeft = 0,
             bigOnes = Array.prototype.filter.call(
-                container.querySelectorAll("#" + id + ">." + opts.bigClass), 
+                container.querySelectorAll("#" + id + ">." + opts.bigClass),
                 filterDisplayNone),
             smallOnes = Array.prototype.filter.call(
                 container.querySelectorAll("#" + id + ">*:not(." + opts.bigClass + ")"),
@@ -290,4 +291,4 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
     // NOTE: deprecated API, will be removed in next major version
     OT.initLayoutContainer = exports.initLayoutContainer;
 
-})(jQuery);
+})(window.hasOwnProperty('jQuery') ? jQuery : undefined);
