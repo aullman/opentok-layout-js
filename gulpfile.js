@@ -13,27 +13,26 @@ gulp.task('default', function(){
 });
 
 gulp.task('test', function (done) {
+  // Run tests without jQuery
   new Server({
-    // Run tests with jQuery
     configFile: __dirname + '/karma.conf.js',
     browsers: ['Firefox'],
     // list of files / patterns to load in the browser
     files: [
       'https://static.opentok.com/v2/js/opentok.js',
-      'https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js',
       'opentok-layout.js',
       'tests/**/*spec.js'
     ],
     singleRun: true
   }, function () {
-    // Run tests without jQuery
+    // Run tests with jQuery
     new Server({
-      // Run tests with jQuery
       configFile: __dirname + '/karma.conf.js',
       browsers: ['Firefox'],
       // list of files / patterns to load in the browser
       files: [
         'https://static.opentok.com/v2/js/opentok.js',
+        'https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js',
         'opentok-layout.js',
         'tests/**/*spec.js'
       ],
