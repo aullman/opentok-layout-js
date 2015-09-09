@@ -263,5 +263,15 @@ function specs() {
         expect(rect.height).toBe(150);
       }
     });
+
+    it('handles hidden elements', function () {
+      divs[0].style.display = 'none';
+      var layoutContainer = initLayoutContainer(layoutDiv);
+      layoutContainer.layout();
+      for (var i = 1; i < divs.length; i++) {
+        expect(divs[i].style.width).toBe('200px');
+        expect(divs[i].style.height).toBe('150px');
+      }
+    });
   });
 };
