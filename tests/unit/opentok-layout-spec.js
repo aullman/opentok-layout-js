@@ -49,7 +49,7 @@ function specs() {
     });
 
     afterEach(function () {
-      //document.body.removeChild(layoutDiv);
+      document.body.removeChild(layoutDiv);
       layoutDiv = null;
       div1 = null;
       div2 = null;
