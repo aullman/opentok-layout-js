@@ -1,15 +1,5 @@
+/*globals describe, beforeEach, expect, it, afterEach, initLayoutContainer */
 describe('opentok layout', function () {
-  //describe('with jQuery specs', specs);
-  describe('without jQuery', function () {
-    beforeEach(function () {
-      window.$ = undefined;
-      window.jQuery = undefined;
-    });
-    describe('specs', specs);
-  });
-})
-
-function specs() {
   it('defines initLayoutContainer', function () {
     expect(window.hasOwnProperty('initLayoutContainer')).toBe(true);
   });
@@ -17,7 +7,7 @@ function specs() {
   it('defines a layout method', function () {
     var layoutDiv = document.createElement('div');
     document.body.appendChild(layoutDiv);
-    layoutContainer = initLayoutContainer(layoutDiv);
+    var layoutContainer = initLayoutContainer(layoutDiv);
 
     expect(layoutContainer.hasOwnProperty('layout')).toBe(true);
     expect(typeof layoutContainer.layout).toEqual('function');
@@ -32,18 +22,18 @@ function specs() {
     beforeEach(function () {
       layoutDiv = document.createElement('div');
       layoutDiv.setAttribute('id', 'layoutDiv');
-      layoutDiv.style.position = "absolute";
-      layoutDiv.style.width = "400px";
-      layoutDiv.style.height = "300px";
-      layoutDiv.style.backgroundColor = "grey";
+      layoutDiv.style.position = 'absolute';
+      layoutDiv.style.width = '400px';
+      layoutDiv.style.height = '300px';
+      layoutDiv.style.backgroundColor = 'grey';
       document.body.style.margin = '0px';
       document.body.style.padding = '0px';
       document.body.appendChild(layoutDiv);
 
       div1 = document.createElement('div');
       div2 = document.createElement('div');
-      div1.style.backgroundColor = "green";
-      div2.style.backgroundColor = "red";
+      div1.style.backgroundColor = 'green';
+      div2.style.backgroundColor = 'red';
       layoutDiv.appendChild(div1);
       layoutDiv.appendChild(div2);
     });
@@ -122,7 +112,7 @@ function specs() {
 
     describe('with a big element', function () {
       beforeEach(function () {
-        div1.className = "OT_big";
+        div1.className = 'OT_big';
       });
 
       it('handles default layout', function () {
@@ -148,7 +138,8 @@ function specs() {
       });
 
       it('lets you change the bigMinRatio and bigMaxRatio to force a ratio', function () {
-        var layoutContainer = initLayoutContainer(layoutDiv, {bigMinRatio: 9/16, bigMaxRatio: 9/16});
+        var layoutContainer =
+                initLayoutContainer(layoutDiv, {bigMinRatio: 9/16, bigMaxRatio: 9/16});
         layoutContainer.layout();
         var div1Rect = div1.getBoundingClientRect();
         expect(div1Rect.width/div1Rect.height).toBeCloseTo(16/9, 3);
@@ -174,8 +165,8 @@ function specs() {
       });
 
       it('takes margin into account', function () {
-        div1.style.margin = "5px";
-        div2.style.margin = "5px";
+        div1.style.margin = '5px';
+        div2.style.margin = '5px';
 
         var layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
@@ -188,8 +179,8 @@ function specs() {
       });
 
       it('takes padding into account', function () {
-        div1.style.padding = "5px";
-        div2.style.padding = "5px";
+        div1.style.padding = '5px';
+        div2.style.padding = '5px';
 
         var layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
@@ -206,10 +197,10 @@ function specs() {
     beforeEach(function () {
       layoutDiv = document.createElement('div');
       layoutDiv.setAttribute('id', 'layoutDiv');
-      layoutDiv.style.position = "absolute";
-      layoutDiv.style.width = "400px";
-      layoutDiv.style.height = "300px";
-      layoutDiv.style.backgroundColor = "grey";
+      layoutDiv.style.position = 'absolute';
+      layoutDiv.style.width = '400px';
+      layoutDiv.style.height = '300px';
+      layoutDiv.style.backgroundColor = 'grey';
       document.body.style.margin = '0px';
       document.body.style.padding = '0px';
       document.body.appendChild(layoutDiv);
@@ -238,7 +229,7 @@ function specs() {
     });
 
     it('handles a big element', function () {
-      divs[0].className = "OT_big";
+      divs[0].className = 'OT_big';
       var layoutContainer = initLayoutContainer(layoutDiv);
       layoutContainer.layout();
       // Expect div[0] to be big
@@ -274,4 +265,4 @@ function specs() {
       }
     });
   });
-};
+});

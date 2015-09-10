@@ -19,45 +19,9 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
   exports = window;
 }
 
-(function($) {
-    var positionElement = function positionElement(elem, x, y, width, height, animate) {
-        var targetPosition = {
-            left: x + "px",
-            top: y + "px",
-            width: width + "px",
-            height: height + "px"
-        };
-
-        var fixAspectRatio = function () {
-            var sub = elem.querySelector(".OT_root");
-            if (sub) {
-                // If this is the parent of a subscriber or publisher then we need
-                // to force the mutation observer on the publisher or subscriber to
-                // trigger to get it to fix it's layout
-                var oldWidth = sub.style.width;
-                sub.style.width = width + "px";
-                // sub.style.height = height + "px";
-                sub.style.width = oldWidth || "";
-            }
-        };
-
-        if (animate && $) {
-            console.log('animate');
-            $(elem).stop();
-            $(elem).animate(targetPosition, animate.duration || 200, animate.easing || "swing", function () {
-                fixAspectRatio();
-                if (animate.complete) animate.complete.call(this);
-            });
-        } else {
-            // NOTE: internal OT.$ API
-            OT.$.css(elem, targetPosition);
-        }
-        fixAspectRatio();
-    };
-
+(function() {
     var getCSSNumber = function (elem, prop) {
-        // NOTE: internal OT.$ API
-        var cssStr = OT.$.css(elem, prop);
+        var cssStr = elem.style[prop];
         return cssStr ? parseInt(cssStr, 10) : 0;
     };
 
@@ -78,7 +42,8 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
         return widthStr ? parseInt(widthStr, 10) : 0;
     };
 
-    var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, fixedRatio, minRatio, maxRatio, animate) {
+    var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, fixedRatio,
+      minRatio, maxRatio) {
         var count = children.length,
             availableRatio = Height / Width,
             vidRatio;
@@ -102,7 +67,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
                 tHeight = Math.floor( Height/rows );
                 tWidth = Math.floor(Width/cols);
 
-                tRatio = tHeight/tWidth;
+                var tRatio = tHeight/tWidth;
                 if (tRatio > maxRatio) {
                     // We went over decrease the height
                     tRatio = maxRatio;
@@ -138,7 +103,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             vidRatio = getBestDimensions(minRatio, maxRatio);
         } else {
             // Use the ratio of the first video element we find
-            var video = children.length > 0 && children[0].querySelector("video");
+            var video = children.length > 0 && children[0].querySelector('video');
             if (video && video.videoHeight && video.videoWidth) {
                 vidRatio = getBestDimensions(video.videoHeight/video.videoWidth,
                     video.videoHeight/video.videoWidth);
@@ -148,82 +113,65 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             }
         }
 
-        var spacesInLastRow = (vidRatio.targetRows * vidRatio.targetCols) - count,
-            lastRowMargin = (spacesInLastRow * vidRatio.targetWidth / 2),
-            lastRowIndex = (vidRatio.targetRows - 1) * vidRatio.targetCols,
-            firstRowMarginTop = ((Height - (vidRatio.targetRows * vidRatio.targetHeight)) / 2),
-            firstColMarginLeft = ((Width - (vidRatio.targetCols * vidRatio.targetWidth)) / 2);
-
-        // Loop through each stream in the container and place it inside
-        var x = 0,
-            y = 0;
         for (var i=0; i < children.length; i++) {
             var elem = children[i];
-            if (i % vidRatio.targetCols === 0) {
-                // We are the first element of the row
-                x = firstColMarginLeft;
-                if (i == lastRowIndex) x += lastRowMargin;
-                y += i === 0 ? firstRowMarginTop : vidRatio.targetHeight;
-            } else {
-                x += vidRatio.targetWidth;
-            }
 
-            // NOTE: internal OT.$ API
-            OT.$.css(elem, "position", "absolute");
-            var actualWidth = vidRatio.targetWidth - getCSSNumber(elem, "paddingLeft") -
-                            getCSSNumber(elem, "paddingRight") -
-                            getCSSNumber(elem, "marginLeft") -
-                            getCSSNumber(elem, "marginRight") -
-                            getCSSNumber(elem, "borderLeft") -
-                            getCSSNumber(elem, "borderRight");
+            var actualWidth = vidRatio.targetWidth - getCSSNumber(elem, 'paddingLeft') -
+                            getCSSNumber(elem, 'paddingRight') -
+                            getCSSNumber(elem, 'marginLeft') -
+                            getCSSNumber(elem, 'marginRight') -
+                            getCSSNumber(elem, 'borderLeft') -
+                            getCSSNumber(elem, 'borderRight');
 
-             var actualHeight = vidRatio.targetHeight - getCSSNumber(elem, "paddingTop") -
-                            getCSSNumber(elem, "paddingBottom") -
-                            getCSSNumber(elem, "marginTop") -
-                            getCSSNumber(elem, "marginBottom") -
-                            getCSSNumber(elem, "borderTop") -
-                            getCSSNumber(elem, "borderBottom");
+             var actualHeight = vidRatio.targetHeight - getCSSNumber(elem, 'paddingTop') -
+                            getCSSNumber(elem, 'paddingBottom') -
+                            getCSSNumber(elem, 'marginTop') -
+                            getCSSNumber(elem, 'marginBottom') -
+                            getCSSNumber(elem, 'borderTop') -
+                            getCSSNumber(elem, 'borderBottom');
 
-            positionElement(elem, x+offsetLeft, y+offsetTop, actualWidth, actualHeight, animate);
+            elem.style.width = actualWidth + 'px';
+            elem.style.height = actualHeight + 'px';
         }
     };
 
     var filterDisplayNone = function (element) {
         // NOTE: internal OT.$ API
-        return OT.$.css(element, "display") !== "none";
+        return OT.$.css(element, 'display') !== 'none';
     };
 
-    var layout = function layout(container, opts, fixedRatio) {
+    var layout = function layout(container, opts) {
         // NOTE: internal OT.$ API
-        if (OT.$.css(container, "display") === "none") {
+        if (OT.$.css(container, 'display') === 'none') {
             return;
         }
-        var id = container.getAttribute("id");
+        var id = container.getAttribute('id');
         if (!id) {
-            id = "OT_" + cheapUUID();
-            container.setAttribute("id", id);
+            id = 'OT_' + cheapUUID();
+            container.setAttribute('id', id);
         }
 
         var Height = getHeight(container) -
-                    getCSSNumber(container, "borderTop") -
-                    getCSSNumber(container, "borderBottom"),
+                    getCSSNumber(container, 'borderTop') -
+                    getCSSNumber(container, 'borderBottom'),
             Width = getWidth(container) -
-                    getCSSNumber(container, "borderLeft") -
-                    getCSSNumber(container, "borderRight"),
+                    getCSSNumber(container, 'borderLeft') -
+                    getCSSNumber(container, 'borderRight'),
             availableRatio = Height/Width,
             offsetLeft = 0,
             offsetTop = 0,
             bigOffsetTop = 0,
             bigOffsetLeft = 0,
+            bigRatio,
             bigOnes = Array.prototype.filter.call(
-                container.querySelectorAll("#" + id + ">." + opts.bigClass),
+                container.querySelectorAll('#' + id + '>.' + opts.bigClass),
                 filterDisplayNone),
             smallOnes = Array.prototype.filter.call(
-                container.querySelectorAll("#" + id + ">*:not(." + opts.bigClass + ")"),
+                container.querySelectorAll('#' + id + '>*:not(.' + opts.bigClass + ')'),
                 filterDisplayNone);
 
         if (bigOnes.length > 0 && smallOnes.length > 0) {
-            var bigVideo = bigOnes[0].querySelector("video");
+            var bigVideo = bigOnes[0].querySelector('video');
             if (bigVideo && bigVideo.videoHeight && bigVideo.videoWidth) {
                 bigRatio = bigVideo.videoHeight / bigVideo.videoWidth;
             } else {
@@ -232,30 +180,34 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             var bigWidth, bigHeight;
 
             if (availableRatio > bigRatio) {
-                // We are tall, going to take up the whole width and arrange small guys at the bottom
+                // We are tall, going to take up the whole width and arrange small
+                // guys at the bottom
                 bigWidth = Width;
                 bigHeight = Math.min(Math.floor(Height * opts.bigPercentage), Width * bigRatio);
                 offsetTop = bigHeight;
                 bigOffsetTop = Height - offsetTop;
             } else {
-                // We are wide, going to take up the whole height and arrange the small guys on the right
+                // We are wide, going to take up the whole height and arrange
+                // the small guys on the right
                 bigHeight = Height;
                 bigWidth = Math.min(Width * opts.bigPercentage, Math.floor(bigHeight / bigRatio));
                 offsetLeft = bigWidth;
                 bigOffsetLeft = Width - offsetLeft;
             }
-            if (opts.bigFirst) {
-              arrange(bigOnes, bigWidth, bigHeight, 0, 0, opts.bigFixedRatio, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
-              arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
-            } else {
-              arrange(smallOnes, Width - offsetLeft, Height - offsetTop, 0, 0, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
-              arrange(bigOnes, bigWidth, bigHeight, bigOffsetLeft, bigOffsetTop, opts.bigFixedRatio, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
+            for (var i=0; i < bigOnes.length; i++) {
+              bigOnes[i].style.order = opts.bigFirst ? -1 : 1;
             }
+            arrange(smallOnes, Width - offsetLeft, Height - offsetTop, 0, 0, opts.fixedRatio,
+              opts.minRatio, opts.maxRatio, opts.animate);
+            arrange(bigOnes, bigWidth, bigHeight, bigOffsetLeft, bigOffsetTop, opts.bigFixedRatio,
+              opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
         } else if (bigOnes.length > 0 && smallOnes.length === 0) {
             // We only have one bigOne just center it
-            arrange(bigOnes, Width, Height, 0, 0, opts.bigFixedRatio, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
+            arrange(bigOnes, Width, Height, 0, 0, opts.bigFixedRatio, opts.bigMinRatio,
+              opts.bigMaxRatio, opts.animate);
         } else {
-            arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
+            arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop,
+              opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
         }
     };
 
@@ -266,7 +218,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             minRatio: 9/16,
             fixedRatio: false,
             animate: false,
-            bigClass: "OT_big",
+            bigClass: 'OT_big',
             bigPercentage: 0.8,
             bigFixedRatio: false,
             bigMaxRatio: 3/2,
@@ -274,7 +226,13 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             bigFirst: true
         });
         // NOTE: internal OT.$ API
-        container = typeof(container) == "string" ? OT.$(container) : container;
+        container = typeof(container) === 'string' ? OT.$(container) : container;
+
+        container.style.display = 'flex';
+        container.style.flexDirection = 'row';
+        container.style.flexWrap = 'wrap';
+        container.style.justifyContent = 'center';
+        container.style.alignItems = 'center';
 
         // TODO: should we add event hooks to external globals like this?
         // this could be left as a responsibility of the user, and i think that would be more sound
@@ -291,4 +249,4 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
     // NOTE: deprecated API, will be removed in next major version
     OT.initLayoutContainer = exports.initLayoutContainer;
 
-})(window.hasOwnProperty('jQuery') ? jQuery : undefined);
+})();
