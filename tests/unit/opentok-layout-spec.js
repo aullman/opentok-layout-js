@@ -36,6 +36,8 @@ function specs() {
       layoutDiv.style.width = "400px";
       layoutDiv.style.height = "300px";
       layoutDiv.style.backgroundColor = "grey";
+      document.body.style.margin = '0px';
+      document.body.style.padding = '0px';
       document.body.appendChild(layoutDiv);
 
       div1 = document.createElement('div');
@@ -47,7 +49,7 @@ function specs() {
     });
 
     afterEach(function () {
-      document.body.removeChild(layoutDiv);
+      //document.body.removeChild(layoutDiv);
       layoutDiv = null;
       div1 = null;
       div2 = null;
@@ -56,30 +58,30 @@ function specs() {
     it('handles default layout', function () {
       var layoutContainer = initLayoutContainer(layoutDiv);
       layoutContainer.layout();
-      expect(div1.style.width).toBe('200px');
-      expect(div2.style.width).toBe('200px');
-      expect(div1.style.height).toBe('300px');
-      expect(div2.style.height).toBe('300px');
-      expect(div1.style.left).toBe('0px');
-      expect(div1.style.top).toBe('0px');
-      expect(div2.style.left).toBe('200px');
-      expect(div2.style.top).toBe('0px');
+      var div1Rect = div1.getBoundingClientRect();
+      var div2Rect = div2.getBoundingClientRect();
+      expect(div1Rect.width).toBe(200);
+      expect(div2Rect.width).toBe(200);
+      expect(div1Rect.height).toBe(300);
+      expect(div2Rect.height).toBe(300);
+      expect(div1Rect.left).toBe(0);
+      expect(div1Rect.top).toBe(0);
+      expect(div2Rect.left).toBe(200);
+      expect(div2Rect.top).toBe(0);
     });
 
     it('maintains aspect ratio if you set fixedRatio:true', function () {
       var layoutContainer = initLayoutContainer(layoutDiv, {fixedRatio: true});
       layoutContainer.layout();
-      var width = parseFloat(div1.style.width, 10);
-      var height = parseFloat(div1.style.height, 10);
-      expect(width/height).toBeCloseTo(4/3, 3);
+      var div1Rect = div1.getBoundingClientRect();
+      expect(div1Rect.width/div1Rect.height).toBeCloseTo(4/3, 3);
     });
 
     it('lets you change the min and maxRatio to force a ratio', function () {
       var layoutContainer = initLayoutContainer(layoutDiv, {minRatio: 9/16, maxRatio: 9/16});
       layoutContainer.layout();
-      var width = parseFloat(div1.style.width, 10);
-      var height = parseFloat(div1.style.height, 10);
-      expect(width/height).toBeCloseTo(16/9, 3);
+      var div1Rect = div1.getBoundingClientRect();
+      expect(div1Rect.width/div1Rect.height).toBeCloseTo(16/9, 3);
     });
 
     if (window.jQuery) {
@@ -126,46 +128,49 @@ function specs() {
       it('handles default layout', function () {
         var layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
-        expect(div1.style.width).toBe('320px');
-        expect(div2.style.width).toBe('80px');
-        expect(div1.style.height).toBe('300px');
-        expect(div2.style.height).toBe('120px');
-        expect(div1.style.left).toBe('0px');
-        expect(div1.style.top).toBe('0px');
-        expect(div2.style.left).toBe('320px');
-        expect(div2.style.top).toBe('90px');
+        var div1Rect = div1.getBoundingClientRect();
+        var div2Rect = div2.getBoundingClientRect();
+        expect(div1Rect.width).toBe(320);
+        expect(div2Rect.width).toBe(80);
+        expect(div1Rect.height).toBe(300);
+        expect(div2Rect.height).toBe(120);
+        expect(div1Rect.left).toBe(0);
+        expect(div1Rect.top).toBe(0);
+        expect(div2Rect.left).toBe(320);
+        expect(div2Rect.top).toBe(90);
       });
 
       it('handles bigFixedRatio:true', function () {
         var layoutContainer = initLayoutContainer(layoutDiv, {bigFixedRatio: true});
         layoutContainer.layout();
-        var width = parseFloat(div1.style.width, 10);
-        var height = parseFloat(div1.style.height, 10);
-        expect(width/height).toBeCloseTo(4/3, 3);
+        var div1Rect = div1.getBoundingClientRect();
+        expect(div1Rect.width/div1Rect.height).toBeCloseTo(4/3, 3);
       });
 
       it('lets you change the bigMinRatio and bigMaxRatio to force a ratio', function () {
         var layoutContainer = initLayoutContainer(layoutDiv, {bigMinRatio: 9/16, bigMaxRatio: 9/16});
         layoutContainer.layout();
-        var width = parseFloat(div1.style.width, 10);
-        var height = parseFloat(div1.style.height, 10);
-        expect(width/height).toBeCloseTo(16/9, 3);
+        var div1Rect = div1.getBoundingClientRect();
+        expect(div1Rect.width/div1Rect.height).toBeCloseTo(16/9, 3);
       });
 
       it('handles bigPercentage', function () {
         var layoutContainer = initLayoutContainer(layoutDiv, {bigPercentage: 0.9});
         layoutContainer.layout();
-        expect(div1.style.width).toBe('360px');
-        expect(div2.style.width).toBe('40px');
-        expect(div1.style.height).toBe('300px');
-        expect(div2.style.height).toBe('60px');
+        var div1Rect = div1.getBoundingClientRect();
+        var div2Rect = div2.getBoundingClientRect();
+        expect(div1Rect.width).toBe(360);
+        expect(div2Rect.width).toBe(40);
+        expect(div1Rect.height).toBe(300);
+        expect(div2Rect.height).toBe(60);
       });
 
       it('handles bigFirst', function () {
         var layoutContainer = initLayoutContainer(layoutDiv, {bigFirst: false});
         layoutContainer.layout();
-        expect(div1.style.left).toBe('80px');
-        expect(div1.style.top).toBe('0px');
+        var div1Rect = div1.getBoundingClientRect();
+        expect(div1Rect.left).toBe(80);
+        expect(div1Rect.top).toBe(0);
       });
 
       it('takes margin into account', function () {
@@ -174,10 +179,12 @@ function specs() {
 
         var layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
-        expect(div1.style.width).toBe('310px');
-        expect(div2.style.width).toBe('70px');
-        expect(div1.style.height).toBe('290px');
-        expect(div2.style.height).toBe('110px');
+        var div1Rect = div1.getBoundingClientRect();
+        var div2Rect = div2.getBoundingClientRect();
+        expect(div1Rect.width).toBe(310);
+        expect(div2Rect.width).toBe(70);
+        expect(div1Rect.height).toBe(290);
+        expect(div2Rect.height).toBe(110);
       });
 
       it('takes padding into account', function () {
@@ -186,10 +193,10 @@ function specs() {
 
         var layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
-        expect(div1.style.width).toBe('310px');
-        expect(div2.style.width).toBe('70px');
-        expect(div1.style.height).toBe('290px');
-        expect(div2.style.height).toBe('110px');
+        expect(div1.clientWidth).toBe(320);
+        expect(div2.clientWidth).toBe(80);
+        expect(div1.clientHeight).toBe(300);
+        expect(div2.clientHeight).toBe(120);
       });
     });
   });
@@ -203,6 +210,8 @@ function specs() {
       layoutDiv.style.width = "400px";
       layoutDiv.style.height = "300px";
       layoutDiv.style.backgroundColor = "grey";
+      document.body.style.margin = '0px';
+      document.body.style.padding = '0px';
       document.body.appendChild(layoutDiv);
 
       for (var i = 0; i < divCount; i++) {
@@ -222,8 +231,9 @@ function specs() {
       layoutContainer.layout();
       // Expect them to all have the same width and height
       for (var i = 0; i < divs.length; i++) {
-        expect(divs[i].style.width).toBe('133px');
-        expect(divs[i].style.height).toBe('150px');
+        var rect = divs[i].getBoundingClientRect();
+        expect(rect.width).toBe(133);
+        expect(rect.height).toBe(150);
       }
     });
 
@@ -232,12 +242,14 @@ function specs() {
       var layoutContainer = initLayoutContainer(layoutDiv);
       layoutContainer.layout();
       // Expect div[0] to be big
-      expect(divs[0].style.width).toBe('320px');
-      expect(divs[0].style.height).toBe('300px');
+      var bigRect = divs[0].getBoundingClientRect();
+      expect(bigRect.width).toBe(320);
+      expect(bigRect.height).toBe(300);
       // Expect them to all have the same width and height
       for (var i = 1; i < divs.length; i++) {
-        expect(divs[i].style.width).toBe('80px');
-        expect(divs[i].style.height).toBe('75px');
+        var rect = divs[i].getBoundingClientRect();
+        expect(rect.width).toBe(80);
+        expect(rect.height).toBe(75);
       }
     });
 
@@ -246,8 +258,9 @@ function specs() {
       var layoutContainer = initLayoutContainer(layoutDiv);
       layoutContainer.layout();
       for (var i = 1; i < divs.length; i++) {
-        expect(divs[i].style.width).toBe('200px');
-        expect(divs[i].style.height).toBe('150px');
+        var rect = divs[i].getBoundingClientRect();
+        expect(rect.width).toBe(200);
+        expect(rect.height).toBe(150);
       }
     });
   });
