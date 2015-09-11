@@ -9,3 +9,9 @@ after_script:
 addons:
   code_climate:
     repo_token: 2fb826206cbbdeefc0bedc2e7935f1fd5e9fdca31b9290614b3d22ac469583e8
+env:
+  matrix:
+    - BROWSER=chrome  BVER=stable
+    - BROWSER=firefox BVER=stable
+  global:
+  - TRAVIS=true
