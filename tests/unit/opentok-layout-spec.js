@@ -1,15 +1,5 @@
+/*globals describe, beforeEach, expect, it, afterEach, initLayoutContainer */
 describe('opentok layout', function () {
-  //describe('with jQuery specs', specs);
-  describe('without jQuery', function () {
-    beforeEach(function () {
-      window.$ = undefined;
-      window.jQuery = undefined;
-    });
-    describe('specs', specs);
-  });
-})
-
-function specs() {
   it('defines initLayoutContainer', function () {
     expect(window.hasOwnProperty('initLayoutContainer')).toBe(true);
   });
@@ -17,7 +7,7 @@ function specs() {
   it('defines a layout method', function () {
     var layoutDiv = document.createElement('div');
     document.body.appendChild(layoutDiv);
-    layoutContainer = initLayoutContainer(layoutDiv);
+    var layoutContainer = initLayoutContainer(layoutDiv);
 
     expect(layoutContainer.hasOwnProperty('layout')).toBe(true);
     expect(typeof layoutContainer.layout).toEqual('function');
@@ -32,24 +22,24 @@ function specs() {
     beforeEach(function () {
       layoutDiv = document.createElement('div');
       layoutDiv.setAttribute('id', 'layoutDiv');
-      layoutDiv.style.position = "absolute";
-      layoutDiv.style.width = "400px";
-      layoutDiv.style.height = "300px";
-      layoutDiv.style.backgroundColor = "grey";
+      layoutDiv.style.position = 'absolute';
+      layoutDiv.style.width = '400px';
+      layoutDiv.style.height = '300px';
+      layoutDiv.style.backgroundColor = 'grey';
       document.body.style.margin = '0px';
       document.body.style.padding = '0px';
       document.body.appendChild(layoutDiv);
 
       div1 = document.createElement('div');
       div2 = document.createElement('div');
-      div1.style.backgroundColor = "green";
-      div2.style.backgroundColor = "red";
+      div1.style.backgroundColor = 'green';
+      div2.style.backgroundColor = 'red';
       layoutDiv.appendChild(div1);
       layoutDiv.appendChild(div2);
     });
 
     afterEach(function () {
-      //document.body.removeChild(layoutDiv);
+      document.body.removeChild(layoutDiv);
       layoutDiv = null;
       div1 = null;
       div2 = null;
@@ -122,7 +112,7 @@ function specs() {
 
     describe('with a big element', function () {
       beforeEach(function () {
-        div1.className = "OT_big";
+        div1.className = 'OT_big';
       });
 
       it('handles default layout', function () {
@@ -148,7 +138,8 @@ function specs() {
       });
 
       it('lets you change the bigMinRatio and bigMaxRatio to force a ratio', function () {
-        var layoutContainer = initLayoutContainer(layoutDiv, {bigMinRatio: 9/16, bigMaxRatio: 9/16});
+        var layoutContainer =
+                initLayoutContainer(layoutDiv, {bigMinRatio: 9/16, bigMaxRatio: 9/16});
         layoutContainer.layout();
         var div1Rect = div1.getBoundingClientRect();
         expect(div1Rect.width/div1Rect.height).toBeCloseTo(16/9, 3);
@@ -174,8 +165,8 @@ function specs() {
       });
 
       it('takes margin into account', function () {
-        div1.style.margin = "5px";
-        div2.style.margin = "5px";
+        div1.style.margin = '5px';
+        div2.style.margin = '5px';
 
         var layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
@@ -188,8 +179,8 @@ function specs() {
       });
 
       it('takes padding into account', function () {
-        div1.style.padding = "5px";
-        div2.style.padding = "5px";
+        div1.style.padding = '5px';
+        div2.style.padding = '5px';
 
         var layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
@@ -206,16 +197,17 @@ function specs() {
     beforeEach(function () {
       layoutDiv = document.createElement('div');
       layoutDiv.setAttribute('id', 'layoutDiv');
-      layoutDiv.style.position = "absolute";
-      layoutDiv.style.width = "400px";
-      layoutDiv.style.height = "300px";
-      layoutDiv.style.backgroundColor = "grey";
+      layoutDiv.style.position = 'absolute';
+      layoutDiv.style.width = '400px';
+      layoutDiv.style.height = '300px';
+      layoutDiv.style.backgroundColor = 'grey';
       document.body.style.margin = '0px';
       document.body.style.padding = '0px';
       document.body.appendChild(layoutDiv);
-
+      var colors = ['blue', 'green', 'orange', 'teal', 'yellow'];
       for (var i = 0; i < divCount; i++) {
         divs[i] = document.createElement('div');
+        divs[i].style.backgroundColor = colors[i];
         layoutDiv.appendChild(divs[i]);
       }
     });
@@ -254,7 +246,7 @@ function specs() {
     });
 
     it('handles a big element', function () {
-      divs[0].className = "OT_big";
+      divs[0].className = 'OT_big';
       var layoutContainer = initLayoutContainer(layoutDiv);
       layoutContainer.layout();
       // Expect div[0] to be big
@@ -285,21 +277,21 @@ function specs() {
     });
 
     it('handles two big elements', function () {
-      divs[0].className = "OT_big";
-      divs[1].className = "OT_big";
+      divs[0].className = 'OT_big';
+      divs[1].className = 'OT_big';
       var layoutContainer = initLayoutContainer(layoutDiv);
       layoutContainer.layout();
       // Expect div[0] to be big
       var bigRect = divs[0].getBoundingClientRect();
-      expect(bigRect.width).toBeCloseTo(266.66, 0.01);
+      expect(bigRect.width).toBeCloseTo(266.66, 1);
       expect(bigRect.height).toBe(150);
-      expect(bigRect.left).toBeCloseTo(26.66, 0.01);
+      expect(bigRect.left).toBeCloseTo(26.66, 1);
       expect(bigRect.top).toBe(0);
       // Expect div[1] to be big
       var big2Rect = divs[1].getBoundingClientRect();
-      expect(big2Rect.width).toBeCloseTo(266.66, 0.01);
+      expect(big2Rect.width).toBeCloseTo(266.66, 1);
       expect(big2Rect.height).toBe(150);
-      expect(big2Rect.left).toBeCloseTo(26.66, 0.01);
+      expect(big2Rect.left).toBeCloseTo(26.66, 1);
       expect(big2Rect.top).toBe(150);
       // Expect them to all have the same width and height
       var rect;
@@ -363,7 +355,7 @@ function specs() {
       });
 
       it('handles a big element', function () {
-        divs[0].className = "OT_big";
+        divs[0].className = 'OT_big';
         var layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
         // Expect div[0] to be big
@@ -376,17 +368,17 @@ function specs() {
         var rect;
         for (var i = 1; i < divs.length; i++) {
           rect = divs[i].getBoundingClientRect();
-          expect(rect.width).toBeCloseTo(266.66, 0.01);
+          expect(rect.width).toBeCloseTo(266.66, 1);
           expect(rect.height).toBe(150);
         }
         rect = divs[1].getBoundingClientRect();
-        expect(rect.left).toBeCloseTo(433.33, 0.01);
+        expect(rect.left).toBeCloseTo(433.33, 1);
         expect(rect.top).toBe(0);
         rect = divs[2].getBoundingClientRect();
         expect(rect.left).toBe(700);
         expect(rect.top).toBe(0);
         rect = divs[3].getBoundingClientRect();
-        expect(rect.left).toBeCloseTo(433.33, 0.01);
+        expect(rect.left).toBeCloseTo(433.33, 1);
         expect(rect.top).toBe(150);
         rect = divs[4].getBoundingClientRect();
         expect(rect.left).toBe(700);
@@ -394,8 +386,8 @@ function specs() {
       });
 
       it('handles two big elements', function () {
-        divs[0].className = "OT_big";
-        divs[1].className = "OT_big";
+        divs[0].className = 'OT_big';
+        divs[1].className = 'OT_big';
         var layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
         // Expect div[0] to be big
@@ -446,23 +438,23 @@ function specs() {
         }
         rect = divs[0].getBoundingClientRect();
         expect(rect.left).toBe(0);
-        expect(rect.top).toBe(1);
+        expect(rect.top).toBeCloseTo(1, 0);
         rect = divs[1].getBoundingClientRect();
         expect(rect.left).toBe(200);
-        expect(rect.top).toBe(1);
+        expect(rect.top).toBeCloseTo(1, 0);
         rect = divs[2].getBoundingClientRect();
         expect(rect.left).toBe(0);
         expect(rect.top).toBe(267);
         rect = divs[3].getBoundingClientRect();
         expect(rect.left).toBe(200);
-        expect(rect.top).toBe(267);
+        expect(rect.top).toBeCloseTo(267, 0);
         rect = divs[4].getBoundingClientRect();
         expect(rect.left).toBe(100);
-        expect(rect.top).toBe(533);
+        expect(rect.top).toBeCloseTo(533, 0);
       });
 
       it('handles a big element', function () {
-        divs[0].className = "OT_big";
+        divs[0].className = 'OT_big';
         var layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
         // Expect div[0] to be big
@@ -493,8 +485,8 @@ function specs() {
       });
 
       it('handles two big elements', function () {
-        divs[0].className = "OT_big";
-        divs[1].className = "OT_big";
+        divs[0].className = 'OT_big';
+        divs[1].className = 'OT_big';
         var layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
         // Expect div[0] to be big
@@ -528,4 +520,4 @@ function specs() {
       });
     });
   });
-};
+});
