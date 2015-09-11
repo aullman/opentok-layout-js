@@ -1,8 +1,16 @@
 // Karma configuration
 // Generated on Wed Sep 03 2014 13:49:54 GMT+1000 (EST)
 
-var browser = process.env.BROWSER || 'chrome';
 module.exports = function(config) {
+  var sauceLaunchers = {
+    'Ie': {
+      base: 'SauceLabs',
+      browserName: 'internet explorer',
+      platform: process.env.BVER === '10' ? 'Windows 8' : 'Windows 8.1',
+      version: process.env.BVER
+    }
+  };
+  var browser = process.env.BROWSER || 'chrome';
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -33,11 +41,18 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress', 'coverage'],
+    reporters: ['progress', 'coverage', 'saucelabs'],
 
     coverageReporter: {
       type : 'lcov',
       dir : '../coverage/'
+    },
+
+    customLaunchers: sauceLaunchers,
+
+    sauceLabs: {
+      startConnect: false,
+      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
     },
 
     // web server port
