@@ -11,6 +11,16 @@ module.exports = function(config) {
     }
   };
   var browser = process.env.BROWSER || 'chrome';
+  var files = [
+    'https://static.opentok.com/v2/js/opentok.js',
+    '../opentok-layout.js',
+    '**/*spec.js'
+  ];
+
+  if (process.env.JQUERY) {
+    files.unshift('https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js');
+  }
+
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -21,11 +31,7 @@ module.exports = function(config) {
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['jasmine'],
 
-    files: [
-      'https://static.opentok.com/v2/js/opentok.js',
-      '../opentok-layout.js',
-      '**/*spec.js'
-    ],
+    files: files,
 
     // list of files to exclude
     exclude: [

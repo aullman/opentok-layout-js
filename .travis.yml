@@ -13,9 +13,13 @@ addons:
 env:
   matrix:
   - BROWSER=chrome  BVER=stable
+  - BROWSER=chrome  BVER=stable JQUERY=true
   - BROWSER=firefox BVER=stable
+  - BROWSER=firefox BVER=stable JQUERY=true
   - BROWSER=ie BVER=11 SAUCELABS=true
+  - BROWSER=ie BVER=11 SAUCELABS=true JQUERY=true
   - BROWSER=ie BVER=10 SAUCELABS=true
+  - BROWSER=ie BVER=10 SAUCELABS=true JQUERY=true
   global:
   - TRAVIS=true
   - SAUCE_USERNAME=adam-layout-js

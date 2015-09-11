@@ -74,6 +74,42 @@ describe('opentok layout', function () {
       expect(div1Rect.width/div1Rect.height).toBeCloseTo(16/9, 3);
     });
 
+    if (window.jQuery) {
+      it('animates if you tell it to', function (done) {
+        var layoutContainer = initLayoutContainer(layoutDiv, {animate: true});
+        layoutContainer.layout();
+        expect(200 - parseFloat(div1.style.width)).not.toBeLessThan(10);
+        setTimeout(function () {
+          expect(200 - parseFloat(div1.style.width)).toBeLessThan(10);
+          done();
+        }, 500);
+      });
+
+      it('allows you to set the animate duration', function (done) {
+        var layoutContainer = initLayoutContainer(layoutDiv, {animate: {duration: 100}});
+        layoutContainer.layout();
+        expect(200 - parseFloat(div1.style.width)).not.toBeLessThan(10);
+        setTimeout(function () {
+          expect(200 - parseFloat(div1.style.width)).toBeLessThan(10);
+          done();
+        }, 150);
+      });
+
+      it('calls the animate completionHandler on complete for each element', function (done) {
+        var div1Complete = false,
+          div2Complete = false;
+
+        var animateComplete = function () {
+          if (this === div1) div1Complete = true;
+          if (this === div2) div2Complete = true;
+          expect(this.style.width).toBe('200px');
+          if (div1Complete && div2Complete) done();
+        };
+        var layoutContainer = initLayoutContainer(layoutDiv, {animate: {complete:animateComplete}});
+        layoutContainer.layout();
+      });
+    }
+
     describe('with a big element', function () {
       beforeEach(function () {
         div1.className = 'OT_big';
