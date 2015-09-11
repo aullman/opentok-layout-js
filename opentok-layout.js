@@ -9,12 +9,6 @@
  *  @License: Released under the MIT license (http://opensource.org/licenses/MIT)
 **/
 
-// TODO: don't rely on internal OT.$ API.
-// in CommonJS context, this should be a `require()`d dependency.
-// in browser globals context, ...? (when using bower, there are dependencies that it has handled
-// for you, so these might be safe to assume)
-
-
 if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
   exports = window;
 }
@@ -30,98 +24,117 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
       return (Math.random() * 100000000).toFixed(0);
     };
 
+    // Use default values if it is not already set in val
+    var defaults = function (val, def) {
+      var res = {},
+        key;
+      for (key in val) {
+        if (val.hasOwnProperty(key)) {
+          res[key] = val[key];
+        }
+      }
+      for (key in def) {
+        if (def.hasOwnProperty(key) && !res.hasOwnProperty(key)) {
+          res[key] = def[key];
+        }
+      }
+      return res;
+    };
+
+    var isDisplayed = function (element) {
+        return window.getComputedStyle(element).display !== 'none';
+    };
+
     var getHeight = function (elem) {
-        // NOTE: internal OT.$ API
-        var heightStr = OT.$.height(elem);
-        return heightStr ? parseInt(heightStr, 10) : 0;
+      return elem.clientHeight;
     };
 
     var getWidth = function (elem) {
-        // NOTE: internal OT.$ API
-        var widthStr = OT.$.width(elem);
-        return widthStr ? parseInt(widthStr, 10) : 0;
+      return elem.clientWidth;
     };
 
-    var arrange = function arrange(children, Width, Height, fixedRatio, minRatio, maxRatio) {
-        var count = children.length,
-            vidRatio;
+    // This is the core of the layout container. It essentially just brute force tries all possible
+    // combinations of rows and columns and checks which one will take up the most space.
+    var getBestDimensions = function (minRatio, maxRatio, count, Width, Height) {
+        var maxArea,
+            targetCols,
+            targetRows,
+            targetHeight,
+            targetWidth,
+            tWidth,
+            tHeight;
 
-        var getBestDimensions = function getBestDimensions(minRatio, maxRatio) {
-            var maxArea,
-                targetCols,
-                targetRows,
-                targetHeight,
-                targetWidth,
-                tWidth,
-                tHeight;
+        // Iterate through every possible combination of rows and columns
+        // and see which one has the least amount of whitespace
+        for (var i=1; i <= count; i++) {
+            var cols = i;
+            var rows = Math.ceil(count / cols);
 
-            // Iterate through every possible combination of rows and columns
-            // and see which one has the least amount of whitespace
-            for (var i=1; i <= count; i++) {
-                var cols = i;
-                var rows = Math.ceil(count / cols);
+            // Try taking up the whole height and width
+            tHeight = Math.floor( Height/rows );
+            tWidth = Math.floor(Width/cols);
 
-                // Try taking up the whole height and width
-                tHeight = Math.floor( Height/rows );
-                tWidth = Math.floor(Width/cols);
-
-                var tRatio = tHeight/tWidth;
-                if (tRatio > maxRatio) {
-                    // We went over decrease the height
-                    tRatio = maxRatio;
-                    tHeight = tWidth * tRatio;
-                } else if (tRatio < minRatio) {
-                    // We went under decrease the width
-                    tRatio = minRatio;
-                    tWidth = tHeight / tRatio;
-                }
-
-                var area = (tWidth*tHeight) * count;
-
-                // If this width and height takes up the most space then we're going with that
-                if (maxArea === undefined || (area > maxArea)) {
-                    maxArea = area;
-                    targetHeight = tHeight;
-                    targetWidth = tWidth;
-                    targetCols = cols;
-                    targetRows = rows;
-                }
+            var tRatio = tHeight/tWidth;
+            if (tRatio > maxRatio) {
+                // We went over decrease the height
+                tRatio = maxRatio;
+                tHeight = tWidth * tRatio;
+            } else if (tRatio < minRatio) {
+                // We went under decrease the width
+                tRatio = minRatio;
+                tWidth = tHeight / tRatio;
             }
-            return {
-                maxArea: maxArea,
-                targetCols: targetCols,
-                targetRows: targetRows,
-                targetHeight: targetHeight,
-                targetWidth: targetWidth,
-                ratio: vidRatio
-            };
-        };
 
-        if (!fixedRatio) {
-            vidRatio = getBestDimensions(minRatio, maxRatio);
-        } else {
-            // Use the ratio of the first video element we find
-            var video = children.length > 0 && children[0].querySelector('video');
-            if (video && video.videoHeight && video.videoWidth) {
-                vidRatio = getBestDimensions(video.videoHeight/video.videoWidth,
-                    video.videoHeight/video.videoWidth);
-            }
-            else {
-                vidRatio = getBestDimensions(3/4, 3/4);   // Use the default video ratio
+            var area = (tWidth*tHeight) * count;
+
+            // If this width and height takes up the most space then we're going with that
+            if (maxArea === undefined || (area > maxArea)) {
+                maxArea = area;
+                targetHeight = tHeight;
+                targetWidth = tWidth;
+                targetCols = cols;
+                targetRows = rows;
             }
         }
+        return {
+            maxArea: maxArea,
+            targetCols: targetCols,
+            targetRows: targetRows,
+            targetHeight: targetHeight,
+            targetWidth: targetWidth
+        };
+    };
+
+    var getVidRatio = function (video) {
+      if (video && video.videoHeight && video.videoWidth) {
+        return video.videoHeight/video.videoWidth;
+      }
+      // Use the default video ratio
+      return 3/4;
+    };
+
+    var sizeElements = function (children, Width, Height, fixedRatio,minRatio, maxRatio) {
+        var count = children.length,
+            dimensions;
+
+        if (fixedRatio) {
+          // Use the ratio of the first video element we find
+          var video = children.length > 0 && children[0].querySelector('video');
+          minRatio = maxRatio = getVidRatio(video);
+        }
+        dimensions = getBestDimensions(minRatio, maxRatio, count, Width, Height);
 
         for (var i=0; i < children.length; i++) {
             var elem = children[i];
 
-            var actualWidth = vidRatio.targetWidth - getCSSNumber(elem, 'paddingLeft') -
+            var actualWidth = dimensions.targetWidth - getCSSNumber(elem, 'paddingLeft') -
                             getCSSNumber(elem, 'paddingRight') -
                             getCSSNumber(elem, 'marginLeft') -
                             getCSSNumber(elem, 'marginRight') -
                             getCSSNumber(elem, 'borderLeft') -
                             getCSSNumber(elem, 'borderRight');
 
-             var actualHeight = vidRatio.targetHeight - getCSSNumber(elem, 'paddingTop') -
+             var actualHeight = dimensions.targetHeight - getCSSNumber(elem, 'paddingTop') -
                             getCSSNumber(elem, 'paddingBottom') -
                             getCSSNumber(elem, 'marginTop') -
                             getCSSNumber(elem, 'marginBottom') -
@@ -133,14 +146,8 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
         }
     };
 
-    var filterDisplayNone = function (element) {
-        // NOTE: internal OT.$ API
-        return OT.$.css(element, 'display') !== 'none';
-    };
-
-    var layout = function layout(container, opts) {
-        // NOTE: internal OT.$ API
-        if (OT.$.css(container, 'display') === 'none') {
+    var layout = function (container, opts) {
+        if (!isDisplayed(container)) {
             return;
         }
         var id = container.getAttribute('id');
@@ -150,103 +157,88 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
         }
 
         var Height = getHeight(container) -
-                    getCSSNumber(container, 'borderTop') -
-                    getCSSNumber(container, 'borderBottom'),
-            Width = getWidth(container) -
-                    getCSSNumber(container, 'borderLeft') -
-                    getCSSNumber(container, 'borderRight'),
-            availableRatio = Height/Width,
-            offsetLeft = 0,
-            offsetTop = 0,
-            bigOffsetTop = 0,
-            bigOffsetLeft = 0,
-            bigRatio,
-            bigOnes = Array.prototype.filter.call(
-                container.querySelectorAll('#' + id + '>.' + opts.bigClass),
-                filterDisplayNone),
-            smallOnes = Array.prototype.filter.call(
-                container.querySelectorAll('#' + id + '>*:not(.' + opts.bigClass + ')'),
-                filterDisplayNone);
+                  getCSSNumber(container, 'borderTop') -
+                  getCSSNumber(container, 'borderBottom'),
+          Width = getWidth(container) -
+                  getCSSNumber(container, 'borderLeft') -
+                  getCSSNumber(container, 'borderRight'),
+          availableRatio = Height/Width,
+          offsetLeft = 0,
+          offsetTop = 0,
+          bigOffsetTop = 0,
+          bigOffsetLeft = 0,
+          bigRatio,
+          bigOnes = Array.prototype.filter.call(
+              container.querySelectorAll('#' + id + '>.' + opts.bigClass),
+              isDisplayed),
+          smallOnes = Array.prototype.filter.call(
+              container.querySelectorAll('#' + id + '>*:not(.' + opts.bigClass + ')'),
+              isDisplayed);
 
         if (bigOnes.length > 0 && smallOnes.length > 0) {
-            var bigVideo = bigOnes[0].querySelector('video');
-            if (bigVideo && bigVideo.videoHeight && bigVideo.videoWidth) {
-                bigRatio = bigVideo.videoHeight / bigVideo.videoWidth;
-            } else {
-                bigRatio = 3 / 4;
-            }
-            var bigWidth, bigHeight;
+          var bigVideo = bigOnes[0].querySelector('video');
+          bigRatio = getVidRatio(bigVideo);
+          var bigWidth, bigHeight;
 
-            if (availableRatio > bigRatio) {
-                // We are tall, going to take up the whole width and arrange small
-                // guys at the bottom
-                bigWidth = Width;
-                bigHeight = Math.min(Math.floor(Height * opts.bigPercentage), Width * bigRatio);
-                offsetTop = bigHeight;
-                bigOffsetTop = Height - offsetTop;
-            } else {
-                // We are wide, going to take up the whole height and arrange
-                // the small guys on the right
-                container.style.flexDirection = 'column';
-                bigHeight = Height;
-                bigWidth = Math.min(Width * opts.bigPercentage, Math.floor(bigHeight / bigRatio));
-                offsetLeft = bigWidth;
-                bigOffsetLeft = Width - offsetLeft;
-            }
-            for (var i=0; i < bigOnes.length; i++) {
-              bigOnes[i].style.order = opts.bigFirst ? -1 : 1;
-            }
-            arrange(smallOnes, Width - offsetLeft, Height - offsetTop, opts.fixedRatio,
-              opts.minRatio, opts.maxRatio, opts.animate);
-            arrange(bigOnes, bigWidth, bigHeight, opts.bigFixedRatio,
-              opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
+          if (availableRatio > bigRatio) {
+              // We are tall, going to take up the whole width and arrange small
+              // guys at the bottom
+              bigWidth = Width;
+              bigHeight = Math.min(Math.floor(Height * opts.bigPercentage), Width * bigRatio);
+              offsetTop = bigHeight;
+              bigOffsetTop = Height - offsetTop;
+          } else {
+              // We are wide, going to take up the whole height and arrange
+              // the small guys on the right
+              container.style.flexDirection = 'column';
+              bigHeight = Height;
+              bigWidth = Math.min(Width * opts.bigPercentage, Math.floor(bigHeight / bigRatio));
+              offsetLeft = bigWidth;
+              bigOffsetLeft = Width - offsetLeft;
+          }
+          for (var i=0; i < bigOnes.length; i++) {
+            bigOnes[i].style.order = opts.bigFirst ? -1 : 1;
+          }
+          sizeElements(smallOnes, Width - offsetLeft, Height - offsetTop, opts.fixedRatio,
+            opts.minRatio, opts.maxRatio, opts.animate);
+          sizeElements(bigOnes, bigWidth, bigHeight, opts.bigFixedRatio,
+            opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
         } else if (bigOnes.length > 0 && smallOnes.length === 0) {
-            // We only have one bigOne just center it
-            arrange(bigOnes, Width, Height, opts.bigFixedRatio, opts.bigMinRatio,
-              opts.bigMaxRatio, opts.animate);
+          // We only have one bigOne just center it
+          sizeElements(bigOnes, Width, Height, opts.bigFixedRatio, opts.bigMinRatio,
+            opts.bigMaxRatio, opts.animate);
         } else {
-            arrange(smallOnes, Width - offsetLeft, Height - offsetTop,
-              opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
+          sizeElements(smallOnes, Width - offsetLeft, Height - offsetTop,
+            opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
         }
     };
 
     exports.initLayoutContainer = function(container, opts) {
-        // NOTE: internal OT.$ API
-        opts = OT.$.defaults(opts || {}, {
-            maxRatio: 3/2,
-            minRatio: 9/16,
-            fixedRatio: false,
-            animate: false,
-            bigClass: 'OT_big',
-            bigPercentage: 0.8,
-            bigFixedRatio: false,
-            bigMaxRatio: 3/2,
-            bigMinRatio: 9/16,
-            bigFirst: true
-        });
-        // NOTE: internal OT.$ API
-        container = typeof(container) === 'string' ? OT.$(container) : container;
+      opts = defaults(opts || {}, {
+        maxRatio: 3/2,
+        minRatio: 9/16,
+        fixedRatio: false,
+        animate: false,
+        bigClass: 'OT_big',
+        bigPercentage: 0.8,
+        bigFixedRatio: false,
+        bigMaxRatio: 3/2,
+        bigMinRatio: 9/16,
+        bigFirst: true
+      });
+      container = typeof(container) === 'string' ? document.querySelector(container) : container;
 
-        container.style.display = 'flex';
-        container.style.flexDirection = 'row';
-        container.style.flexWrap = 'wrap';
-        container.style.justifyContent = 'center';
-        container.style.alignItems = 'center';
-        container.style.alignContent = 'center';
+      container.style.display = 'flex';
+      container.style.flexDirection = 'row';
+      container.style.flexWrap = 'wrap';
+      container.style.justifyContent = 'center';
+      container.style.alignItems = 'center';
+      container.style.alignContent = 'center';
 
-        // TODO: should we add event hooks to external globals like this?
-        // this could be left as a responsibility of the user, and i think that would be more sound
-        // the OT.onLoad() method has (publicly) undefined behavior
-        OT.onLoad(function() {
-            layout(container, opts);
-        });
+      layout(container, opts);
 
-        return {
-            layout: layout.bind(null, container, opts)
-        };
+      return {
+        layout: layout.bind(null, container, opts)
+      };
     };
-
-    // NOTE: deprecated API, will be removed in next major version
-    OT.initLayoutContainer = exports.initLayoutContainer;
-
 })();
