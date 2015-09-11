@@ -74,42 +74,6 @@ describe('opentok layout', function () {
       expect(div1Rect.width/div1Rect.height).toBeCloseTo(16/9, 3);
     });
 
-    if (window.jQuery) {
-      it('animates if you tell it to', function (done) {
-        var layoutContainer = initLayoutContainer(layoutDiv, {animate: true});
-        layoutContainer.layout();
-        expect(200 - parseFloat(div1.style.width)).not.toBeLessThan(10);
-        setTimeout(function () {
-          expect(200 - parseFloat(div1.style.width)).toBeLessThan(10);
-          done();
-        }, 500);
-      });
-
-      it('allows you to set the animate duration', function (done) {
-        var layoutContainer = initLayoutContainer(layoutDiv, {animate: {duration: 100}});
-        layoutContainer.layout();
-        expect(200 - parseFloat(div1.style.width)).not.toBeLessThan(10);
-        setTimeout(function () {
-          expect(200 - parseFloat(div1.style.width)).toBeLessThan(10);
-          done();
-        }, 150);
-      });
-
-      it('calls the animate completionHandler on complete for each element', function (done) {
-        var div1Complete = false,
-          div2Complete = false;
-
-        var animateComplete = function () {
-          if (this === div1) div1Complete = true;
-          if (this === div2) div2Complete = true;
-          expect(this.style.width).toBe('200px');
-          if (div1Complete && div2Complete) done();
-        };
-        var layoutContainer = initLayoutContainer(layoutDiv, {animate: {complete:animateComplete}});
-        layoutContainer.layout();
-      });
-    }
-
     describe('with a big element', function () {
       beforeEach(function () {
         div1.className = 'OT_big';
@@ -204,9 +168,10 @@ describe('opentok layout', function () {
       document.body.style.margin = '0px';
       document.body.style.padding = '0px';
       document.body.appendChild(layoutDiv);
-
+      var colors = ['blue', 'green', 'orange', 'teal', 'yellow'];
       for (var i = 0; i < divCount; i++) {
         divs[i] = document.createElement('div');
+        divs[i].style.backgroundColor = colors[i];
         layoutDiv.appendChild(divs[i]);
       }
     });
@@ -282,15 +247,15 @@ describe('opentok layout', function () {
       layoutContainer.layout();
       // Expect div[0] to be big
       var bigRect = divs[0].getBoundingClientRect();
-      expect(bigRect.width).toBeCloseTo(266.66, 0.01);
+      expect(bigRect.width).toBeCloseTo(266.66, 1);
       expect(bigRect.height).toBe(150);
-      expect(bigRect.left).toBeCloseTo(26.66, 0.01);
+      expect(bigRect.left).toBeCloseTo(26.66, 1);
       expect(bigRect.top).toBe(0);
       // Expect div[1] to be big
       var big2Rect = divs[1].getBoundingClientRect();
-      expect(big2Rect.width).toBeCloseTo(266.66, 0.01);
+      expect(big2Rect.width).toBeCloseTo(266.66, 1);
       expect(big2Rect.height).toBe(150);
-      expect(big2Rect.left).toBeCloseTo(26.66, 0.01);
+      expect(big2Rect.left).toBeCloseTo(26.66, 1);
       expect(big2Rect.top).toBe(150);
       // Expect them to all have the same width and height
       var rect;
@@ -300,13 +265,13 @@ describe('opentok layout', function () {
         expect(rect.height).toBe(100);
       }
       rect = divs[2].getBoundingClientRect();
-      expect(rect.left).toBe(320);
+      expect(rect.left).toBeCloseTo(293.33, 2);
       expect(rect.top).toBe(0);
       rect = divs[3].getBoundingClientRect();
-      expect(rect.left).toBe(320);
+      expect(rect.left).toBeCloseTo(293.33, 2);
       expect(rect.top).toBe(100);
       rect = divs[4].getBoundingClientRect();
-      expect(rect.left).toBe(320);
+      expect(rect.left).toBeCloseTo(293.33, 2);
       expect(rect.top).toBe(200);
     });
 
@@ -361,23 +326,23 @@ describe('opentok layout', function () {
         var bigRect = divs[0].getBoundingClientRect();
         expect(bigRect.width).toBe(400);
         expect(bigRect.height).toBe(300);
-        expect(bigRect.left).toBe(0);
+        expect(bigRect.left).toBeCloseTo(33.33, 1);
         expect(bigRect.top).toBe(0);
         // Expect them to all have the same width and height
         var rect;
         for (var i = 1; i < divs.length; i++) {
           rect = divs[i].getBoundingClientRect();
-          expect(rect.width).toBeCloseTo(266.66, 0.01);
+          expect(rect.width).toBeCloseTo(266.66, 1);
           expect(rect.height).toBe(150);
         }
         rect = divs[1].getBoundingClientRect();
-        expect(rect.left).toBeCloseTo(433.33, 0.01);
-        expect(rect.top).toBe(0);
-        rect = divs[2].getBoundingClientRect();
-        expect(rect.left).toBe(700);
+        expect(rect.left).toBeCloseTo(433.33, 1);
         expect(rect.top).toBe(0);
         rect = divs[3].getBoundingClientRect();
-        expect(rect.left).toBeCloseTo(433.33, 0.01);
+        expect(rect.left).toBe(700);
+        expect(rect.top).toBe(0);
+        rect = divs[2].getBoundingClientRect();
+        expect(rect.left).toBeCloseTo(433.33, 1);
         expect(rect.top).toBe(150);
         rect = divs[4].getBoundingClientRect();
         expect(rect.left).toBe(700);
@@ -437,19 +402,19 @@ describe('opentok layout', function () {
         }
         rect = divs[0].getBoundingClientRect();
         expect(rect.left).toBe(0);
-        expect(rect.top).toBe(1);
+        expect(rect.top).toBeCloseTo(1, 0);
         rect = divs[1].getBoundingClientRect();
         expect(rect.left).toBe(200);
-        expect(rect.top).toBe(1);
+        expect(rect.top).toBeCloseTo(1, 0);
         rect = divs[2].getBoundingClientRect();
         expect(rect.left).toBe(0);
         expect(rect.top).toBe(267);
         rect = divs[3].getBoundingClientRect();
         expect(rect.left).toBe(200);
-        expect(rect.top).toBe(267);
+        expect(rect.top).toBeCloseTo(267, 0);
         rect = divs[4].getBoundingClientRect();
         expect(rect.left).toBe(100);
-        expect(rect.top).toBe(533);
+        expect(rect.top).toBeCloseTo(533, 0);
       });
 
       it('handles a big element', function () {

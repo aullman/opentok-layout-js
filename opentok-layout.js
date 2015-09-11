@@ -42,10 +42,8 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
         return widthStr ? parseInt(widthStr, 10) : 0;
     };
 
-    var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, fixedRatio,
-      minRatio, maxRatio) {
+    var arrange = function arrange(children, Width, Height, fixedRatio, minRatio, maxRatio) {
         var count = children.length,
-            availableRatio = Height / Width,
             vidRatio;
 
         var getBestDimensions = function getBestDimensions(minRatio, maxRatio) {
@@ -189,6 +187,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             } else {
                 // We are wide, going to take up the whole height and arrange
                 // the small guys on the right
+                container.style.flexDirection = 'column';
                 bigHeight = Height;
                 bigWidth = Math.min(Width * opts.bigPercentage, Math.floor(bigHeight / bigRatio));
                 offsetLeft = bigWidth;
@@ -197,16 +196,16 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             for (var i=0; i < bigOnes.length; i++) {
               bigOnes[i].style.order = opts.bigFirst ? -1 : 1;
             }
-            arrange(smallOnes, Width - offsetLeft, Height - offsetTop, 0, 0, opts.fixedRatio,
+            arrange(smallOnes, Width - offsetLeft, Height - offsetTop, opts.fixedRatio,
               opts.minRatio, opts.maxRatio, opts.animate);
-            arrange(bigOnes, bigWidth, bigHeight, bigOffsetLeft, bigOffsetTop, opts.bigFixedRatio,
+            arrange(bigOnes, bigWidth, bigHeight, opts.bigFixedRatio,
               opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
         } else if (bigOnes.length > 0 && smallOnes.length === 0) {
             // We only have one bigOne just center it
-            arrange(bigOnes, Width, Height, 0, 0, opts.bigFixedRatio, opts.bigMinRatio,
+            arrange(bigOnes, Width, Height, opts.bigFixedRatio, opts.bigMinRatio,
               opts.bigMaxRatio, opts.animate);
         } else {
-            arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop,
+            arrange(smallOnes, Width - offsetLeft, Height - offsetTop,
               opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
         }
     };
@@ -233,6 +232,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
         container.style.flexWrap = 'wrap';
         container.style.justifyContent = 'center';
         container.style.alignItems = 'center';
+        container.style.alignContent = 'center';
 
         // TODO: should we add event hooks to external globals like this?
         // this could be left as a responsibility of the user, and i think that would be more sound
