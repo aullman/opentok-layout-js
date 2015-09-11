@@ -234,6 +234,15 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
       container.style.justifyContent = 'center';
       container.style.alignItems = 'center';
       container.style.alignContent = 'center';
+      // IE 10 prefixes
+      container.style.msFlexDirection = 'row';
+      container.style.msFlexWrap = 'wrap';
+      container.style.msJustifyContent = 'center';
+      container.style.msAlignItems = 'center';
+      container.style.msAlignContent = 'center';
+      if (window.getComputedStyle(container).hasOwnProperty('msAlignContent')) {
+        container.style.display = '-ms-flexbox';
+      }
 
       layout(container, opts);
 
