@@ -93,105 +93,103 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
       return res;
     };
 
-    var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, fixedRatio,
-      minRatio, maxRatio, animate) {
-        var count = children.length,
-            vidRatio;
+    var getBestDimensions = function getBestDimensions(minRatio, maxRatio, count, Width, Height) {
+        var maxArea,
+            targetCols,
+            targetRows,
+            targetHeight,
+            targetWidth,
+            tWidth,
+            tHeight;
 
-        var getBestDimensions = function getBestDimensions(minRatio, maxRatio) {
-            var maxArea,
-                targetCols,
-                targetRows,
-                targetHeight,
-                targetWidth,
-                tWidth,
-                tHeight;
+        // Iterate through every possible combination of rows and columns
+        // and see which one has the least amount of whitespace
+        for (var i=1; i <= count; i++) {
+            var cols = i;
+            var rows = Math.ceil(count / cols);
 
-            // Iterate through every possible combination of rows and columns
-            // and see which one has the least amount of whitespace
-            for (var i=1; i <= count; i++) {
-                var cols = i;
-                var rows = Math.ceil(count / cols);
+            // Try taking up the whole height and width
+            tHeight = Math.floor( Height/rows );
+            tWidth = Math.floor(Width/cols);
 
-                // Try taking up the whole height and width
-                tHeight = Math.floor( Height/rows );
-                tWidth = Math.floor(Width/cols);
-
-                var tRatio = tHeight/tWidth;
-                if (tRatio > maxRatio) {
-                    // We went over decrease the height
-                    tRatio = maxRatio;
-                    tHeight = tWidth * tRatio;
-                } else if (tRatio < minRatio) {
-                    // We went under decrease the width
-                    tRatio = minRatio;
-                    tWidth = tHeight / tRatio;
-                }
-
-                var area = (tWidth*tHeight) * count;
-
-                // If this width and height takes up the most space then we're going with that
-                if (maxArea === undefined || (area > maxArea)) {
-                    maxArea = area;
-                    targetHeight = tHeight;
-                    targetWidth = tWidth;
-                    targetCols = cols;
-                    targetRows = rows;
-                }
+            var tRatio = tHeight/tWidth;
+            if (tRatio > maxRatio) {
+                // We went over decrease the height
+                tRatio = maxRatio;
+                tHeight = tWidth * tRatio;
+            } else if (tRatio < minRatio) {
+                // We went under decrease the width
+                tRatio = minRatio;
+                tWidth = tHeight / tRatio;
             }
-            return {
-                maxArea: maxArea,
-                targetCols: targetCols,
-                targetRows: targetRows,
-                targetHeight: targetHeight,
-                targetWidth: targetWidth,
-                ratio: vidRatio
-            };
-        };
 
-        if (!fixedRatio) {
-            vidRatio = getBestDimensions(minRatio, maxRatio);
-        } else {
-            // Use the ratio of the first video element we find
-            var video = children.length > 0 && children[0].querySelector('video');
-            if (video && video.videoHeight && video.videoWidth) {
-                vidRatio = getBestDimensions(video.videoHeight/video.videoWidth,
-                    video.videoHeight/video.videoWidth);
-            }
-            else {
-                vidRatio = getBestDimensions(3/4, 3/4);   // Use the default video ratio
+            var area = (tWidth*tHeight) * count;
+
+            // If this width and height takes up the most space then we're going with that
+            if (maxArea === undefined || (area > maxArea)) {
+                maxArea = area;
+                targetHeight = tHeight;
+                targetWidth = tWidth;
+                targetCols = cols;
+                targetRows = rows;
             }
         }
+        return {
+            maxArea: maxArea,
+            targetCols: targetCols,
+            targetRows: targetRows,
+            targetHeight: targetHeight,
+            targetWidth: targetWidth
+        };
+    };
 
-        var spacesInLastRow = (vidRatio.targetRows * vidRatio.targetCols) - count,
-            lastRowMargin = (spacesInLastRow * vidRatio.targetWidth / 2),
-            lastRowIndex = (vidRatio.targetRows - 1) * vidRatio.targetCols,
-            firstRowMarginTop = ((Height - (vidRatio.targetRows * vidRatio.targetHeight)) / 2),
-            firstColMarginLeft = ((Width - (vidRatio.targetCols * vidRatio.targetWidth)) / 2);
+    var getVidRatio = function (video) {
+      if (video && video.videoHeight && video.videoWidth) {
+          return video.videoHeight/video.videoWidth;
+      }
+      return 3/4;   // Use the default video ratio
+    };
+
+    var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, fixedRatio,
+      minRatio, maxRatio, animate) {
+        var count = children.length;
+
+        if (fixedRatio) {
+            // Use the ratio of the first video element we find
+            var video = children.length > 0 && children[0].querySelector('video');
+            minRatio = maxRatio = getVidRatio(video);
+        }
+        var dimensions = getBestDimensions(minRatio, maxRatio, count, Width, Height);
+
+        var spacesInLastRow = (dimensions.targetRows * dimensions.targetCols) - count,
+            lastRowMargin = (spacesInLastRow * dimensions.targetWidth / 2),
+            lastRowIndex = (dimensions.targetRows - 1) * dimensions.targetCols,
+            firstRowMarginTop = ((Height - (dimensions.targetRows * dimensions.targetHeight)) / 2),
+            firstColMarginLeft = ((Width - (dimensions.targetCols * dimensions.targetWidth)) / 2);
 
         // Loop through each stream in the container and place it inside
         var x = 0,
             y = 0;
         for (var i=0; i < children.length; i++) {
             var elem = children[i];
-            if (i % vidRatio.targetCols === 0) {
+            if (i % dimensions.targetCols === 0) {
                 // We are the first element of the row
                 x = firstColMarginLeft;
                 if (i === lastRowIndex) x += lastRowMargin;
-                y += i === 0 ? firstRowMarginTop : vidRatio.targetHeight;
+                y += i === 0 ? firstRowMarginTop : dimensions.targetHeight;
             } else {
-                x += vidRatio.targetWidth;
+                x += dimensions.targetWidth;
             }
 
             elem.style.position = 'absolute';
-            var actualWidth = vidRatio.targetWidth - getCSSNumber(elem, 'paddingLeft') -
+            var actualWidth = dimensions.targetWidth - getCSSNumber(elem, 'paddingLeft') -
                             getCSSNumber(elem, 'paddingRight') -
                             getCSSNumber(elem, 'marginLeft') -
                             getCSSNumber(elem, 'marginRight') -
                             getCSSNumber(elem, 'borderLeft') -
                             getCSSNumber(elem, 'borderRight');
 
-             var actualHeight = vidRatio.targetHeight - getCSSNumber(elem, 'paddingTop') -
+             var actualHeight = dimensions.targetHeight - getCSSNumber(elem, 'paddingTop') -
                             getCSSNumber(elem, 'paddingBottom') -
                             getCSSNumber(elem, 'marginTop') -
                             getCSSNumber(elem, 'marginBottom') -
@@ -237,11 +235,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
 
         if (bigOnes.length > 0 && smallOnes.length > 0) {
             var bigVideo = bigOnes[0].querySelector('video');
-            if (bigVideo && bigVideo.videoHeight && bigVideo.videoWidth) {
-                bigRatio = bigVideo.videoHeight / bigVideo.videoWidth;
-            } else {
-                bigRatio = 3 / 4;
-            }
+            bigRatio = getVidRatio(bigVideo);
             var bigWidth, bigHeight;
 
             if (availableRatio > bigRatio) {
