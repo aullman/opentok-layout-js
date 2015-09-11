@@ -265,13 +265,13 @@ describe('opentok layout', function () {
         expect(rect.height).toBe(100);
       }
       rect = divs[2].getBoundingClientRect();
-      expect(rect.left).toBeCloseTo(293.33, 2);
+      expect(rect.left).toBe(320);
       expect(rect.top).toBe(0);
       rect = divs[3].getBoundingClientRect();
-      expect(rect.left).toBeCloseTo(293.33, 2);
+      expect(rect.left).toBe(320);
       expect(rect.top).toBe(100);
       rect = divs[4].getBoundingClientRect();
-      expect(rect.left).toBeCloseTo(293.33, 2);
+      expect(rect.left).toBe(320);
       expect(rect.top).toBe(200);
     });
 
@@ -326,7 +326,7 @@ describe('opentok layout', function () {
         var bigRect = divs[0].getBoundingClientRect();
         expect(bigRect.width).toBe(400);
         expect(bigRect.height).toBe(300);
-        expect(bigRect.left).toBeCloseTo(33.33, 1);
+        expect(bigRect.left).toBe(0);
         expect(bigRect.top).toBe(0);
         // Expect them to all have the same width and height
         var rect;
@@ -338,10 +338,10 @@ describe('opentok layout', function () {
         rect = divs[1].getBoundingClientRect();
         expect(rect.left).toBeCloseTo(433.33, 1);
         expect(rect.top).toBe(0);
-        rect = divs[3].getBoundingClientRect();
+        rect = divs[2].getBoundingClientRect();
         expect(rect.left).toBe(700);
         expect(rect.top).toBe(0);
-        rect = divs[2].getBoundingClientRect();
+        rect = divs[3].getBoundingClientRect();
         expect(rect.left).toBeCloseTo(433.33, 1);
         expect(rect.top).toBe(150);
         rect = divs[4].getBoundingClientRect();
