@@ -17,6 +17,8 @@
 
 if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
   exports = window;
+} else {
+  var window = null;
 }
 
 (function($) {
@@ -90,7 +92,8 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
                 targetHeight,
                 targetWidth,
                 tWidth,
-                tHeight;
+                tHeight,
+                tRatio;
 
             // Iterate through every possible combination of rows and columns
             // and see which one has the least amount of whitespace
@@ -288,7 +291,4 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
         };
     };
 
-    // NOTE: deprecated API, will be removed in next major version
-    OT.initLayoutContainer = exports.initLayoutContainer;
-
-})(window.hasOwnProperty('jQuery') ? jQuery : undefined);
+})((window && window.hasOwnProperty('jQuery')) ? jQuery : undefined);
