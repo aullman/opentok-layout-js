@@ -218,6 +218,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             offsetTop = 0,
             bigOffsetTop = 0,
             bigOffsetLeft = 0,
+            bigRatio = 0,
             bigOnes = Array.prototype.filter.call(
                 container.querySelectorAll("#" + id + ">." + opts.bigClass),
                 filterDisplayNone),
