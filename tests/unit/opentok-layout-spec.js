@@ -23,6 +23,8 @@ describe('opentok layout', function () {
       layoutDiv = document.createElement('div');
       layoutDiv.setAttribute('id', 'layoutDiv');
       layoutDiv.style.position = 'absolute';
+      layoutDiv.style.top = '0px';
+      layoutDiv.style.left = '0px';
       layoutDiv.style.width = '400px';
       layoutDiv.style.height = '300px';
       layoutDiv.style.backgroundColor = 'grey';
@@ -162,6 +164,8 @@ describe('opentok layout', function () {
       layoutDiv = document.createElement('div');
       layoutDiv.setAttribute('id', 'layoutDiv');
       layoutDiv.style.position = 'absolute';
+      layoutDiv.style.top = '0px';
+      layoutDiv.style.left = '0px';
       layoutDiv.style.width = '400px';
       layoutDiv.style.height = '300px';
       layoutDiv.style.backgroundColor = 'grey';

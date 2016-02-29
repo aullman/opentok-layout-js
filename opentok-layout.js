@@ -16,9 +16,7 @@
 
 
 if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
-  exports = window;
-} else {
-  var window = null;
+   exports = window;
 }
 
 (function($) {
@@ -44,7 +42,6 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
         };
 
         if (animate && $) {
-            console.log('animate');
             $(elem).stop();
             $(elem).animate(targetPosition, animate.duration || 200, animate.easing || "swing", function () {
                 fixAspectRatio();
