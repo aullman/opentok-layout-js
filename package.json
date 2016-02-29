@@ -18,7 +18,7 @@
     "karma-jasmine": "~0.2.0",
     "karma-sauce-launcher": "^0.2.14",
     "opentok-test-scripts": "^1.0.1",
-    "travis-multirunner": "^2.7.2"
+    "travis-multirunner": "^3.0.0"
   },
   "scripts": {
     "test": "./node_modules/.bin/run-tests",
