@@ -21,7 +21,7 @@
     "travis-multirunner": "^3.0.0"
   },
   "scripts": {
-    "test": "./node_modules/.bin/run-tests",
+    "test": "node ./tests/test-node.js && ./node_modules/.bin/run-tests",
     "start": "http-server"
   },
   "repository": {
