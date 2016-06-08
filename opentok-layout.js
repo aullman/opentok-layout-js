@@ -289,4 +289,4 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
         };
     };
 
-})((window && window.hasOwnProperty('jQuery')) ? jQuery : undefined);
+})((typeof window !== 'undefined' && window.hasOwnProperty('jQuery')) ? jQuery : undefined);
