@@ -15,10 +15,6 @@
 // for you, so these might be safe to assume)
 
 
-if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
-   exports = window;
-}
-
 (function($) {
     var positionElement = function positionElement(elem, x, y, width, height, animate) {
         var targetPosition = {
@@ -260,7 +256,7 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
         }
     };
 
-    exports.initLayoutContainer = function(container, opts) {
+    var initLayoutContainer = function(container, opts) {
         // NOTE: internal OT.$ API
         opts = OT.$.defaults(opts || {}, {
             maxRatio: 3/2,
@@ -288,5 +284,11 @@ if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
             layout: layout.bind(null, container, opts)
         };
     };
+
+    if (typeof module === 'undefined' || typeof module.exports === 'undefined') {
+      window.initLayoutContainer = initLayoutContainer;
+    } else {
+      module.exports.initLayoutContainer = initLayoutContainer;
+    }
 
 })((typeof window !== 'undefined' && window.hasOwnProperty('jQuery')) ? jQuery : undefined);
