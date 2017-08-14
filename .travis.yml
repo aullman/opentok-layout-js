@@ -1,5 +1,6 @@
 sudo: false
 language: node_js
+dist: trusty
 node_js:
 - '0.12'
 before_install:
@@ -8,8 +9,6 @@ before_install:
 after_script:
 - cat coverage/*/lcov.info | ./node_modules/codeclimate-test-reporter/bin/codeclimate.js
 addons:
-  packages:
-  - g++-4.8
   code_climate:
     repo_token: 2fb826206cbbdeefc0bedc2e7935f1fd5e9fdca31b9290614b3d22ac469583e8
 env:
