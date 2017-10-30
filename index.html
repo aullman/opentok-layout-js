@@ -73,6 +73,7 @@
             }
 
             #advanced {
+              display: none;
               margin-bottom: 10px;
             }
         </style>
@@ -95,6 +96,7 @@
           </div>
           <input type="button" name="add" value="Add" id="add" onclick="addElement()">
           <input type="button" name="remove" value="Remove" id="remove" onclick="removeElement()">
+          <a href="#advanced" onclick="showAdvanced()" id="showAdvancedLink">Advanced</a>
         </div>
     </body>
     <script type="text/javascript" charset="utf-8">
@@ -118,6 +120,11 @@
           }).layout;
         }
         updateLayoutValues();
+
+        function showAdvanced() {
+          advanced.style.display = 'block';
+          showAdvancedLink.style.display = 'none';
+        }
 
         function addElement() {
             var el = document.createElement("div");
