@@ -8,34 +8,37 @@
         <script src="https://swww.tokbox.com/v2/js/opentok.min.js"></script>
         <script src="https://code.jquery.com/jquery-1.6.2.min.js"></script>
         <script src="opentok-layout.js"></script>
-        
+
         <style type="text/css" media="screen">
             body {
                 font-family: Arial, Helvetica, sans-serif;
             }
             #layout {
                 position: absolute;
-                top: 100px;
+                top: 120px;
                 left: 0;
                 right: 0;
                 bottom: 0;
                 background-color: #DDD;
             }
-            
+
             #layout > div {
                 background-color: #000;
                 display: inline-block;
                 border: 1px solid #fff;
+
+                transition-property: all;
+                transition-duration: 0.5s;
             }
-            
+
             body > div#description {
                 color: #333;
                 margin: 0;
                 width: 100%;
                 text-align: center;
             }
-            
-            input {
+
+            input[type="button"] {
                 width: 100px;
                 height: 25px;
                 border: none;
@@ -44,19 +47,33 @@
                 margin-right: 5px;
                 font-size: 14px;
             }
-            
+
+            input[type="text"] {
+              width: 40px;
+            }
+
             input#add {
                 background-color: #67AB4D;
             }
-            
+
             input#remove {
                 background-color: #C24442;
             }
-            
+
+            label {
+              margin-left: 5px;
+              margin-right: 2px;
+              font-weight: bold;
+            }
+
             #buttons {
                 margin-top: 10px;
                 width: 100%;
                 text-align: center;
+            }
+
+            #advanced {
+              margin-bottom: 10px;
             }
         </style>
     </head>
@@ -65,20 +82,43 @@
         <div id="description">Click the Add/Remove buttons to add and remove video windows. Go ahead and resize the window and see it lay out automatically!<br>
             Double-click on elements to make them bigger or smaller</div>
         <div id="buttons">
-            <input type="button" name="add" value="Add" id="add" onclick="addElement()">
-            <input type="button" name="remove" value="Remove" id="remove" onclick="removeElement()">
+          <div id="advanced">
+            <label>maxRatio</label><input id="maxRatio" type="text" name="maxRatio" value="3/2">
+            <label>minRatio</label><input id="minRatio" type="text" name="minRatio" value="9/16">
+            <label>fixedRatio</label><input id="fixedRatio" type="text" name="fixedRatio" value="false">
+            <label>bigPercentage</label><input id="bigPercentage" type="text" name="bigPercentage" value="0.8">
+            <label>bigFixedRatio</label><input id="bigFixedRatio" type="text" name="bigFixedRatio" value="false">
+            <label>bigMaxRatio</label><input id="bigMaxRatio" type="text" name="bigMaxRatio" value="3/2">
+            <label>bigMinRatio</label><input id="bigMinRatio" type="text" name="bigMinRatio" value="9/16">
+            <label>bigFirst</label><input id="bigFirst" type="text" name="bigFirst" value="true">
+            <label>animateDuration</label><input id="animateDuration" type="text" name="animateDuration" value="500">
+          </div>
+          <input type="button" name="add" value="Add" id="add" onclick="addElement()">
+          <input type="button" name="remove" value="Remove" id="remove" onclick="removeElement()">
         </div>
     </body>
     <script type="text/javascript" charset="utf-8">
         var layoutEl = document.getElementById("layout");
-        var layout = initLayoutContainer(layoutEl, {
-            animate: {
-                duration: 500,
-                easing: "swing"
-            },
-            bigFixedRatio: false
-        }).layout;
-        
+        var layout;
+
+        function updateLayoutValues() {
+          layout = initLayoutContainer(layoutEl, {
+              animate: {
+                  duration: eval(animateDuration.value),
+                  easing: "swing"
+              },
+              maxRatio: eval(maxRatio.value),
+              minRatio: eval(minRatio.value),
+              fixedRatio: eval(fixedRatio.value),
+              bigPercentage: eval(bigPercentage.value),
+              bigFixedRatio: eval(bigFixedRatio.value),
+              bigMaxRatio: eval(bigMaxRatio.value),
+              bigMinRatio: eval(bigMinRatio.value),
+              bigFirst: eval(bigFirst.value),
+          }).layout;
+        }
+        updateLayoutValues();
+
         function addElement() {
             var el = document.createElement("div");
             OT.initPublisher(el, {
@@ -89,12 +129,12 @@
             layoutEl.appendChild(el);
             layout();
         }
-        
+
         function removeElement() {
             layoutEl.removeChild(layoutEl.firstChild);
             layout();
         }
-        
+
         var resizeTimeout;
         window.onresize = function() {
           clearTimeout(resizeTimeout);
@@ -102,7 +142,11 @@
             layout();
           }, 20);
         };
-        
+
+        $("input[type='text']").live('change', function() {
+          updateLayoutValues();
+        });
+
         $("#layout>*").live("dblclick", function () {
             if ($(this).hasClass("OT_big")) {
                 $(this).removeClass("OT_big");

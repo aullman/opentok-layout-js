@@ -2,6 +2,8 @@
 [![Code Climate](https://codeclimate.com/github/aullman/opentok-layout-js/badges/gpa.svg)](https://codeclimate.com/github/aullman/opentok-layout-js)
 [![Test Coverage](https://codeclimate.com/github/aullman/opentok-layout-js/badges/coverage.svg)](https://codeclimate.com/github/aullman/opentok-layout-js)
 
+[![Demo of Layout Container](https://github.com/aullman/opentok-layout-js/raw/master/layout-demo.gif)](https://aullman.github.io/opentok-layout-js/ "Layout-container Demo")
+
 opentok-layout-js
 ================
 
@@ -29,7 +31,6 @@ var layout = initLayoutContainer(document.getElementById("layout"), {
     maxRatio: 3/2,     // The narrowest ratio that will be used (default 2x3)
     minRatio: 9/16,      // The widest ratio that will be used (default 16x9)
     fixedRatio: false,  // If this is true then the aspect ratio of the video is maintained and minRatio and maxRatio are ignored (default false)
-    animate: false      // Whether to use jQuery animate when positioning (default false)
     bigClass: "OT_big", // The class to add to elements that should be sized bigger
     bigPercentage: 0.8  // The maximum percentage of space the big ones should take up
     bigFixedRatio: false, // fixedRatio for the big ones
@@ -64,17 +65,17 @@ In an OpenTok application you would do something like:
 </body>
 <script type="text/javascript" charset="utf-8">
     var layoutContainer = document.getElementById("layoutContainer");
-    
+
     // Initialize the layout container and get a reference to the layout method
     var layout = initLayoutContainer(layoutContainer).layout;
-    
+
     // Below is a normal hello world OpenTok application for v2 of the API
     // The layout container will redraw when the layout mtehod is called and
     // adjust the layout accordingly
     var sessionId = "mySessionId";
     var token = "myToken";
     var apiKey = "myAPIKey";
-    
+
     var session = OT.initSession(sessionId);
     session.on("streamCreated", function(event){
         session.subscribe(event.stream, "layoutContainer", {
@@ -113,18 +114,13 @@ This throttles calling layout so that it's not called over an over again when yo
 Animations
 -------
 
-If you want to use the animate property you will need to include the jQuery library and set the animate option to true and it will use the default values for animate (duration=200, easing="swing"). You can also specify your own values and a completion handler. For more details about the jQuery animate property see the [jQuery documentation](http://api.jquery.com/animate/).
+If you want to animate things you can use CSS3 transitions on the children. eg.
 
-```javascript
-var layout = TB.initLayoutContainer(document.getElementById("layout"), {
-  animate: {
-    duration: 500,
-    easing: "linear",
-    complete: function() {
-      console.log('finished moving ' + this);
-    }
-  }
-});
+```css
+.container > * {
+  transition-property: all;
+  transition-duration: 0.5s;
+}
 ```
 
 Big Elements
