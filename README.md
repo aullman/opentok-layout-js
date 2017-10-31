@@ -47,6 +47,46 @@ var layout = initLayoutContainer(document.getElementById("layout"), {
 layout.layout()
 ```
 
+Examples
+----
+
+### Cropping videos to fit best.
+
+In this example we crop the videos to take up the most space in the window.
+
+```javascript
+initLayoutContainer(document.getElementById("layout"));
+```
+
+![Cropping videos to fit best](https://github.com/aullman/opentok-layout-js/raw/master/standard-cropping.png)
+
+### Respecting different aspect ratios
+
+In this example we are respecting the native aspect ratio of multiple different videos.
+
+```javascript
+initLayoutContainer(document.getElementById("layout"), {
+  fixedRatio: true
+});
+```
+
+![Respecting different aspect ratios](https://github.com/aullman/opentok-layout-js/raw/master/standard-fixed-ratio.png)
+
+### Some big videos
+
+This example has 2 big videos focused and the other 4 small.
+
+![Some big videos](https://github.com/aullman/opentok-layout-js/raw/master/2-big-4-small.png)
+
+## Some big respecting aspect ratios
+
+This example has 2 big and we're respecting the native aspect ratios of the different videos.
+
+![Some big respecting aspect ratios](https://github.com/aullman/opentok-layout-js/raw/master/2-bit-4-small-fixed-ratio.png)
+
+
+## Using in an OpenTok Application
+
 In an OpenTok application you would do something like:
 
 ```html
@@ -157,40 +197,3 @@ Padding, Margins and Borders
 ----------
 
 The Layout Container will take into account the padding, margins and borders on it's children. If you want spacing between elements simply give them a margin or padding and they will be spaced accordingly.
-
-Examples
-----
-
-### Cropping videos to fit best.
-
-In this example we crop the videos to take up the most space in the window.
-
-```javascript
-initLayoutContainer(document.getElementById("layout"));
-```
-
-![Cropping videos to fit best](https://github.com/aullman/opentok-layout-js/raw/master/standard-cropping.gif)
-
-### Respecting different aspect ratios
-
-In this example we are respecting the native aspect ratio of multiple different videos.
-
-```javascript
-initLayoutContainer(document.getElementById("layout"), {
-  fixedRatio: true
-});
-```
-
-![Respecting different aspect ratios](https://github.com/aullman/opentok-layout-js/raw/master/standard-fixed-ratio.gif)
-
-### Some big videos
-
-This example has 2 big videos focused and the other 4 small.
-
-![Some big videos](https://github.com/aullman/opentok-layout-js/raw/master/2-big-4-small.gif)
-
-## Some big respecting aspect ratios
-
-This example has 2 big and we're respecting the native aspect ratios of the different videos.
-
-![Some big respecting aspect ratios](https://github.com/aullman/opentok-layout-js/raw/master/2-bit-4-small-fixed-ratio.gif)
