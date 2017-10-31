@@ -53,6 +53,19 @@
         fixAspectRatio();
     };
 
+    var getVideoRatio = function(elem) {
+      if (!elem) {
+        return 3 / 4;
+      }
+      var video = elem.querySelector('video');
+      if (video && video.videoHeight && video.videoWidth) {
+        return video.videoHeight / video.videoWidth;
+      } else if (elem.videoHeight && elem.videoWidth) {
+        return elem.videoHeight / elem.videoWidth;
+      }
+      return 3 / 4;
+    }
+
     var getCSSNumber = function (elem, prop) {
         // NOTE: internal OT.$ API
         var cssStr = OT.$.css(elem, prop);
@@ -79,7 +92,7 @@
     var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, fixedRatio,
       minRatio, maxRatio, animate) {
         var count = children.length,
-            vidRatio;
+            dimensions;
 
         var getBestDimensions = function getBestDimensions(minRatio, maxRatio) {
             var maxArea,
@@ -129,54 +142,85 @@
                 targetRows: targetRows,
                 targetHeight: targetHeight,
                 targetWidth: targetWidth,
-                ratio: vidRatio
+                ratio: targetHeight / targetWidth
             };
         };
 
         if (!fixedRatio) {
-            vidRatio = getBestDimensions(minRatio, maxRatio);
+          dimensions = getBestDimensions(minRatio, maxRatio);
         } else {
-            // Use the ratio of the first video element we find
-            var video = children.length > 0 && children[0].querySelector('video');
-            if (video && video.videoHeight && video.videoWidth) {
-                vidRatio = getBestDimensions(video.videoHeight/video.videoWidth,
-                    video.videoHeight/video.videoWidth);
-            }
-            else {
-                vidRatio = getBestDimensions(3/4, 3/4);   // Use the default video ratio
-            }
+          // Use the ratio of the first video element we find to approximate
+          var ratio = getVideoRatio(children.length > 0 ? children[0] : null);
+          dimensions = getBestDimensions(ratio, ratio);
         }
-
-        var spacesInLastRow = (vidRatio.targetRows * vidRatio.targetCols) - count,
-            lastRowMargin = (spacesInLastRow * vidRatio.targetWidth / 2),
-            lastRowIndex = (vidRatio.targetRows - 1) * vidRatio.targetCols,
-            firstRowMarginTop = ((Height - (vidRatio.targetRows * vidRatio.targetHeight)) / 2),
-            firstColMarginLeft = ((Width - (vidRatio.targetCols * vidRatio.targetWidth)) / 2);
 
         // Loop through each stream in the container and place it inside
         var x = 0,
-            y = 0;
+            y = 0,
+            rows = [],
+            row;
+        // Iterate through the chilren and create an array with a new item for each row
+        // and calculate the width of each row so that we know if we go over the size and need
+        // to adjust
         for (var i=0; i < children.length; i++) {
-            var elem = children[i];
-            if (i % vidRatio.targetCols === 0) {
-                // We are the first element of the row
-                x = firstColMarginLeft;
-                if (i === lastRowIndex) x += lastRowMargin;
-                y += i === 0 ? firstRowMarginTop : vidRatio.targetHeight;
-            } else {
-                x += vidRatio.targetWidth;
-            }
+          if (i % dimensions.targetCols === 0) {
+            // This is a new row
+            row = {
+              children: [],
+              width: 0,
+              height: 0
+            };
+            rows.push(row);
+          }
+          var elem = children[i];
+          row.children.push(elem);
+          var targetWidth = dimensions.targetWidth;
+          var targetHeight = dimensions.targetHeight;
+          // If we're using a fixedRatio then we need to set the correct ratio for this element
+          if (fixedRatio) {
+            targetWidth = targetHeight / getVideoRatio(elem);
+          }
+          row.width += targetWidth;
+          row.height = targetHeight;
+        }
+        // Calculate total row height adjusting if we go too wide
+        var totalRowHeight = 0;
+        for (i = 0; i < rows.length; i++) {
+          var row = rows[i];
+          if (row.width > Width) {
+            // Went over on the width, need to adjust the height proportionally
+            row.height = Math.floor(row.height * (Width / row.width));
+            row.width = Width;
+          }
+          totalRowHeight += row.height;
+        }
+        // vertical centering
+        y = ((Height - (totalRowHeight)) / 2);
+        // Iterate through each row and place each child
+        for (i = 0; i < rows.length; i++) {
+          var row = rows[i];
+          // center the row
+          var rowMarginLeft = ((Width - row.width) / 2);
+          x = rowMarginLeft;
+          for (var j = 0; j < row.children.length; j++) {
+            var elem = row.children[j];
 
+            var targetWidth = dimensions.targetWidth;
+            var targetHeight = row.height;
+            // If we're using a fixedRatio then we need to set the correct ratio for this element
+            if (fixedRatio) {
+              targetWidth = Math.floor(targetHeight / getVideoRatio(elem));
+            }
             // NOTE: internal OT.$ API
             OT.$.css(elem, 'position', 'absolute');
-            var actualWidth = vidRatio.targetWidth - getCSSNumber(elem, 'paddingLeft') -
+            var actualWidth = targetWidth - getCSSNumber(elem, 'paddingLeft') -
                             getCSSNumber(elem, 'paddingRight') -
                             getCSSNumber(elem, 'marginLeft') -
                             getCSSNumber(elem, 'marginRight') -
                             getCSSNumber(elem, 'borderLeft') -
                             getCSSNumber(elem, 'borderRight');
 
-             var actualHeight = vidRatio.targetHeight - getCSSNumber(elem, 'paddingTop') -
+             var actualHeight = targetHeight - getCSSNumber(elem, 'paddingTop') -
                             getCSSNumber(elem, 'paddingBottom') -
                             getCSSNumber(elem, 'marginTop') -
                             getCSSNumber(elem, 'marginBottom') -
@@ -184,6 +228,9 @@
                             getCSSNumber(elem, 'borderBottom');
 
             positionElement(elem, x+offsetLeft, y+offsetTop, actualWidth, actualHeight, animate);
+            x += targetWidth;
+          }
+          y += targetHeight;
         }
     };
 
@@ -214,7 +261,6 @@
             offsetTop = 0,
             bigOffsetTop = 0,
             bigOffsetLeft = 0,
-            bigRatio = 0,
             bigOnes = Array.prototype.filter.call(
                 container.querySelectorAll('#' + id + '>.' + opts.bigClass),
                 filterDisplayNone),
@@ -223,26 +269,20 @@
                 filterDisplayNone);
 
         if (bigOnes.length > 0 && smallOnes.length > 0) {
-            var bigVideo = bigOnes[0].querySelector('video');
-            if (bigVideo && bigVideo.videoHeight && bigVideo.videoWidth) {
-                bigRatio = bigVideo.videoHeight / bigVideo.videoWidth;
-            } else {
-                bigRatio = 3 / 4;
-            }
             var bigWidth, bigHeight;
 
-            if (availableRatio > bigRatio) {
+            if (availableRatio > getVideoRatio(bigOnes[0])) {
                 // We are tall, going to take up the whole width and arrange small
                 // guys at the bottom
                 bigWidth = Width;
-                bigHeight = Math.min(Math.floor(Height * opts.bigPercentage), Width * bigRatio);
+                bigHeight = Math.floor(Height * opts.bigPercentage);
                 offsetTop = bigHeight;
                 bigOffsetTop = Height - offsetTop;
             } else {
                 // We are wide, going to take up the whole height and arrange the small
                 // guys on the right
                 bigHeight = Height;
-                bigWidth = Math.min(Width * opts.bigPercentage, Math.floor(bigHeight / bigRatio));
+                bigWidth = Math.floor(Width * opts.bigPercentage);
                 offsetLeft = bigWidth;
                 bigOffsetLeft = Width - offsetLeft;
             }
