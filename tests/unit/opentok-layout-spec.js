@@ -33,11 +33,7 @@ describe('opentok layout', function () {
       document.body.appendChild(layoutDiv);
 
       div1 = document.createElement('div');
-      div1.videoWidth = 640;
-      div1.videoHeight = 480;
       div2 = document.createElement('div');
-      div2.videoWidth = 480;
-      div2.videoHeight = 640;
       div1.style.backgroundColor = 'green';
       div2.style.backgroundColor = 'red';
       layoutDiv.appendChild(div1);
@@ -67,12 +63,47 @@ describe('opentok layout', function () {
     });
 
     it('maintains multiple aspect ratios if you set fixedRatio:true', function () {
+      div1.videoWidth = 640;
+      div1.videoHeight = 480;
+      div2.videoWidth = 480;
+      div2.videoHeight = 640;
       var layoutContainer = initLayoutContainer(layoutDiv, {fixedRatio: true});
       layoutContainer.layout();
       var div1Rect = div1.getBoundingClientRect();
       expect(div1Rect.width/div1Rect.height).toBeCloseTo(640/480, 1);
       var div2Rect = div2.getBoundingClientRect();
       expect(div2Rect.width/div2Rect.height).toBeCloseTo(480/640, 1);
+    });
+
+    it('grows to takes up the whole height if there are narrow elements', function() {
+      // The second element is portrait and so it doesn't take up as much
+      // space as the first one. So we should account for that and make the height larger
+      div1.videoWidth = 640;
+      div1.videoHeight = 480;
+      div2.videoWidth = 480;
+      div2.videoHeight = 640;
+      layoutDiv.style.width = '660px';
+      var layoutContainer = initLayoutContainer(layoutDiv, {fixedRatio: true});
+      layoutContainer.layout();
+      debugger;
+      var div1Rect = div1.getBoundingClientRect();
+      var div2Rect = div2.getBoundingClientRect();
+      expect(div1Rect.height).toBe(300);
+      expect(div2Rect.height).toBe(300);
+      expect(div2Rect.width).not.toBeGreaterThan(640);
+    });
+
+    it('adjusts to not go over the width if you have a wider element', function() {
+      // The second element is 720p and so we need to adjust to not go over the width
+      div1.videoWidth = 640;
+      div1.videoHeight = 480;
+      div2.videoWidth = 1280;
+      div2.videoHeight = 720;
+      layoutDiv.style.width = '600px';
+      var layoutContainer = initLayoutContainer(layoutDiv, {fixedRatio: true});
+      layoutContainer.layout();
+      var div2Rect = div2.getBoundingClientRect();
+      expect(div2Rect.left + div2Rect.width).toBeLessThan(600);
     });
 
     it('lets you change the min and maxRatio to force a ratio', function () {
@@ -217,6 +248,19 @@ describe('opentok layout', function () {
       rect = divs[4].getBoundingClientRect();
       expect(rect.left).toBe(200);
       expect(rect.top).toBe(150);
+    });
+
+    it('grows to takes up the whole height if there are narrow elements', function() {
+      divs[1].videoWidth = 480;
+      divs[1].videoHeight = 640;
+      divs[2].videoWidth = 1280;
+      divs[2].videoHeight = 720;
+      layoutDiv.style.width = '400px';
+      layoutDiv.style.height = '600px';
+      var layoutContainer = initLayoutContainer(layoutDiv, {fixedRatio: true});
+      layoutContainer.layout();
+      var rect = divs[4].getBoundingClientRect();
+      expect(rect.top + rect.height).toBe(600);
     });
 
     it('handles a big element', function () {
@@ -408,23 +452,28 @@ describe('opentok layout', function () {
         for (var i = 0; i < divs.length; i++) {
           rect = divs[i].getBoundingClientRect();
           expect(rect.width).toBe(200);
-          expect(rect.height).toBe(266);
+          if (i > divs.length - 2) {
+            // The last row grows a little bit to take up the extra space
+            expect(rect.height).toBe(268);
+          } else {
+            expect(rect.height).toBe(266);
+          }
         }
         rect = divs[0].getBoundingClientRect();
         expect(rect.left).toBe(0);
-        expect(rect.top).toBeCloseTo(1, 0);
+        expect(rect.top).toBe(0);
         rect = divs[1].getBoundingClientRect();
         expect(rect.left).toBe(200);
-        expect(rect.top).toBeCloseTo(1, 0);
+        expect(rect.top).toBe(0);
         rect = divs[2].getBoundingClientRect();
         expect(rect.left).toBe(0);
-        expect(rect.top).toBe(267);
+        expect(rect.top).toBe(266);
         rect = divs[3].getBoundingClientRect();
         expect(rect.left).toBe(200);
-        expect(rect.top).toBeCloseTo(267, 0);
+        expect(rect.top).toBe(266);
         rect = divs[4].getBoundingClientRect();
-        expect(rect.left).toBe(100);
-        expect(rect.top).toBeCloseTo(533, 0);
+        expect(rect.left).toBe(99.5);
+        expect(rect.top).toBeCloseTo(532, 0);
       });
 
       it('handles a big element', function () {

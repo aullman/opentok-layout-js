@@ -159,7 +159,7 @@
             y = 0,
             rows = [],
             row;
-        // Iterate through the chilren and create an array with a new item for each row
+        // Iterate through the children and create an array with a new item for each row
         // and calculate the width of each row so that we know if we go over the size and need
         // to adjust
         for (var i=0; i < children.length; i++) {
@@ -185,14 +185,38 @@
         }
         // Calculate total row height adjusting if we go too wide
         var totalRowHeight = 0;
+        var remainingShortRows = 0;
         for (i = 0; i < rows.length; i++) {
           var row = rows[i];
           if (row.width > Width) {
             // Went over on the width, need to adjust the height proportionally
             row.height = Math.floor(row.height * (Width / row.width));
             row.width = Width;
+          } else if (row.width < Width) {
+            remainingShortRows += 1;
           }
           totalRowHeight += row.height;
+        }
+        if (totalRowHeight < Height && remainingShortRows > 0) {
+          // We can grow some of the rows, we're not taking up the whole height
+          var remainingHeightDiff = Height - totalRowHeight;
+          totalRowHeight = 0;
+          for (i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            if (row.width < Width) {
+              // Evenly distribute the extra height between the short rows
+              var extraHeight = remainingHeightDiff / remainingShortRows;
+              if ((extraHeight / row.height) > ((Width - row.width) / row.width)) {
+                // We can't go that big or we'll go too wide
+                extraHeight = Math.floor(((Width - row.width) / row.width) * row.height);
+              }
+              row.width += Math.floor((extraHeight / row.height) * row.width);
+              row.height += extraHeight;
+              remainingHeightDiff -= extraHeight;
+              remainingShortRows -= 1;
+            }
+            totalRowHeight += row.height;
+          }
         }
         // vertical centering
         y = ((Height - (totalRowHeight)) / 2);
