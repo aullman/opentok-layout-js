@@ -5,7 +5,7 @@
     <head>
         <meta http-equiv="Content-type" content="text/html; charset=utf-8">
         <title>Layout Test</title>
-        <script src="https://swww.tokbox.com/v2/js/opentok.min.js"></script>
+        <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
         <script src="https://code.jquery.com/jquery-1.6.2.min.js"></script>
         <script src="opentok-layout.js"></script>
 
@@ -49,7 +49,7 @@
             }
 
             input[type="text"] {
-              width: 40px;
+              width: 35px;
             }
 
             input#add {
@@ -92,7 +92,9 @@
             <label>bigMaxRatio</label><input id="bigMaxRatio" type="text" name="bigMaxRatio" value="3/2">
             <label>bigMinRatio</label><input id="bigMinRatio" type="text" name="bigMinRatio" value="9/16">
             <label>bigFirst</label><input id="bigFirst" type="text" name="bigFirst" value="true">
-            <label>animateDuration</label><input id="animateDuration" type="text" name="animateDuration" value="500">
+            <label>animateDuration</label><input id="animateDuration" type="text" name="animateDuration" value="200">
+            <label>animateEasing</label><input id="animateEasing" type="text" name="animateEasing" value="swing">
+            <label>add live video</label><input type="checkbox" id="useLiveVideo" checked>
           </div>
           <input type="button" name="add" value="Add" id="add" onclick="addElement()">
           <input type="button" name="remove" value="Remove" id="remove" onclick="removeElement()">
@@ -107,7 +109,7 @@
           layout = initLayoutContainer(layoutEl, {
               animate: {
                   duration: eval(animateDuration.value),
-                  easing: "swing"
+                  easing: animateEasing.value
               },
               maxRatio: eval(maxRatio.value),
               minRatio: eval(minRatio.value),
@@ -126,15 +128,29 @@
           showAdvancedLink.style.display = 'none';
         }
 
+        const getRandomRGB = () => Math.round(Math.random() * 255);
+        function getRandomColour() {
+          return `rgb(${getRandomRGB()}, ${getRandomRGB()}, ${getRandomRGB()}`;
+        }
+
+        var ratios = [4/3, 3/4, 16/9];
         function addElement() {
-            var el = document.createElement("div");
+          var el = document.createElement("div");
+          if (useLiveVideo.checked) {
             OT.initPublisher(el, {
                 resolution: "1280x720"
             }, function (err) {
                 layout();
             });
-            layoutEl.appendChild(el);
-            layout();
+          } else {
+            el.videoHeight = 480;
+            // Pick a random ratio
+            var ratio = ratios[Math.round(Math.random() * (ratios.length - 1))];
+            el.videoWidth = 480 * ratio;
+            el.style.backgroundColor = getRandomColour();
+          }
+          layoutEl.appendChild(el);
+          layout();
         }
 
         function removeElement() {
