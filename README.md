@@ -1,6 +1,4 @@
 [![Build Status](https://travis-ci.org/aullman/opentok-layout-js.svg?branch=master)](https://travis-ci.org/aullman/opentok-layout-js)
-[![Code Climate](https://codeclimate.com/github/aullman/opentok-layout-js/badges/gpa.svg)](https://codeclimate.com/github/aullman/opentok-layout-js)
-[![Test Coverage](https://codeclimate.com/github/aullman/opentok-layout-js/badges/coverage.svg)](https://codeclimate.com/github/aullman/opentok-layout-js)
 
 [![Demo of Layout Container](https://github.com/aullman/opentok-layout-js/raw/master/layout-demo.gif)](https://aullman.github.io/opentok-layout-js/ "Layout-container Demo")
 
