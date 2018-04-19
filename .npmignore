@@ -1,3 +1,5 @@
 *.png
 *.html
 *.gif
+# ignore sauce connect
+/sc-*
