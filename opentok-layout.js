@@ -11,13 +11,28 @@
 
 /* global OT */
 
-// TODO: don't rely on internal OT.$ API.
 // in CommonJS context, this should be a `require()`d dependency.
 // in browser globals context, ...? (when using bower, there are dependencies that it has handled
 // for you, so these might be safe to assume)
 
 
 (function($) {
+    function css(el, propertyName, value) {
+        return OT ? OT.$.css(el, propertyName, value) : $(el).css(propertyName, value);
+    }
+    function height(el) {
+        return OT ? OT.$.height(el) : $(el).height();
+    }
+    function width(el) {
+        return OT ? OT.$.width(el) : $(el).width();
+    }
+    function extend(target, obj) {
+        return OT ? OT.$.defaults(target, obj) : $.extend(target, obj);
+    }
+    function wrap(el) {
+        return OT ? OT.$(el) : $(el);
+    }
+
     var positionElement = function positionElement(elem, x, y, width, height, animate) {
         var targetPosition = {
             left: x + 'px',
@@ -47,8 +62,7 @@
                 if (animate.complete) animate.complete.call(this);
             });
         } else {
-            // NOTE: internal OT.$ API
-            OT.$.css(elem, targetPosition);
+            css(elem, targetPosition);
         }
         fixAspectRatio();
     };
@@ -67,8 +81,7 @@
     }
 
     var getCSSNumber = function (elem, prop) {
-        // NOTE: internal OT.$ API
-        var cssStr = OT.$.css(elem, prop);
+        var cssStr = css(elem, prop);
         return cssStr ? parseInt(cssStr, 10) : 0;
     };
 
@@ -78,14 +91,12 @@
     };
 
     var getHeight = function (elem) {
-        // NOTE: internal OT.$ API
-        var heightStr = OT.$.height(elem);
+        var heightStr = height(elem);
         return heightStr ? parseInt(heightStr, 10) : 0;
     };
 
     var getWidth = function (elem) {
-        // NOTE: internal OT.$ API
-        var widthStr = OT.$.width(elem);
+        var widthStr = width(elem);
         return widthStr ? parseInt(widthStr, 10) : 0;
     };
 
@@ -235,8 +246,7 @@
             if (fixedRatio) {
               targetWidth = Math.floor(targetHeight / getVideoRatio(elem));
             }
-            // NOTE: internal OT.$ API
-            OT.$.css(elem, 'position', 'absolute');
+            css(elem, 'position', 'absolute');
             var actualWidth = targetWidth - getCSSNumber(elem, 'paddingLeft') -
                             getCSSNumber(elem, 'paddingRight') -
                             getCSSNumber(elem, 'marginLeft') -
@@ -259,13 +269,11 @@
     };
 
     var filterDisplayNone = function (element) {
-        // NOTE: internal OT.$ API
-        return OT.$.css(element, 'display') !== 'none';
+        return css(element, 'display') !== 'none';
     };
 
     var layout = function layout(container, opts) {
-        // NOTE: internal OT.$ API
-        if (OT.$.css(container, 'display') === 'none') {
+        if (css(container, 'display') === 'none') {
             return;
         }
         var id = container.getAttribute('id');
@@ -332,8 +340,7 @@
     };
 
     var initLayoutContainer = function(container, opts) {
-        // NOTE: internal OT.$ API
-        opts = OT.$.defaults(opts || {}, {
+        opts = extend(opts || {}, {
             maxRatio: 3/2,
             minRatio: 9/16,
             fixedRatio: false,
@@ -345,8 +352,7 @@
             bigMinRatio: 9/16,
             bigFirst: true
         });
-        // NOTE: internal OT.$ API
-        container = typeof(container) === 'string' ? OT.$(container) : container;
+        container = typeof(container) === 'string' ? wrap(container) : container;
 
         // TODO: should we add event hooks to external globals like this?
         // this could be left as a responsibility of the user, and i think that would be more sound
