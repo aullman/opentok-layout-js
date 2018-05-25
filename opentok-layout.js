@@ -18,19 +18,23 @@
 
 (function($) {
     function css(el, propertyName, value) {
-        return OT ? OT.$.css(el, propertyName, value) : $(el).css(propertyName, value);
+        if (value) {
+            return typeof OT !== 'undefined' ? OT.$.css(el, propertyName, value) : $(el).css(propertyName, value);
+        } else {
+            return typeof OT !== 'undefined' ? OT.$.css(el, propertyName) : $(el).css(propertyName);
+        }
     }
     function height(el) {
-        return OT ? OT.$.height(el) : $(el).height();
+        return typeof OT !== 'undefined' ? OT.$.height(el) : $(el).height();
     }
     function width(el) {
-        return OT ? OT.$.width(el) : $(el).width();
+        return typeof OT !== 'undefined' ? OT.$.width(el) : $(el).width();
     }
     function extend(target, obj) {
-        return OT ? OT.$.defaults(target, obj) : $.extend(target, obj);
+        return typeof OT !== 'undefined' ? OT.$.defaults(target, obj) : $.extend(target, obj);
     }
     function wrap(el) {
-        return OT ? OT.$(el) : $(el);
+        return typeof OT !== 'undefined' ? OT.$(el) : el;
     }
 
     var positionElement = function positionElement(elem, x, y, width, height, animate) {
@@ -357,9 +361,15 @@
         // TODO: should we add event hooks to external globals like this?
         // this could be left as a responsibility of the user, and i think that would be more sound
         // the OT.onLoad() method has (publicly) undefined behavior
-        OT.onLoad(function() {
-            layout(container, opts);
-        });
+        if (typeof OT !== 'undefined') {
+            OT.onLoad(function() {
+                layout(container, opts);
+            });
+        } else {
+            $(document).ready(function() {
+              layout(container, opts);
+            });
+        }
 
         return {
             layout: layout.bind(null, container, opts)
