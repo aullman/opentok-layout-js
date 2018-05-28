@@ -48,13 +48,14 @@
         }
         return css(el, 'width');
     }
-    function extend(target, obj) {
-        if (Object.assign) {
-            return Object.assign({}, target, obj);
-        }
+    function defaults(custom, defaults) {
         var res = {};
-        Object.keys(obj).forEach(function(key) {
-            res[key] = target[key] = obj[key];
+        Object.keys(defaults).forEach(function(key) {
+            if (custom.hasOwnProperty(key)) {
+                res[key] = custom[key];
+            } else {
+                res[key] = defaults[key];
+            }
         });
         return res;
     }
@@ -366,7 +367,7 @@
     };
 
     var initLayoutContainer = function(container, opts) {
-        opts = extend({
+        opts = defaults(opts || {}, {
             maxRatio: 3/2,
             minRatio: 9/16,
             fixedRatio: false,
@@ -377,7 +378,7 @@
             bigMaxRatio: 3/2,
             bigMinRatio: 9/16,
             bigFirst: true
-        }, opts || {});
+        });
         container = typeof(container) === 'string' ? document.querySelector(container) : container;
 
         if (document.readyState === 'complete') {
