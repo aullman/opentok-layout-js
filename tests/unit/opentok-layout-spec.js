@@ -85,7 +85,6 @@ describe('opentok layout', function () {
       layoutDiv.style.width = '660px';
       var layoutContainer = initLayoutContainer(layoutDiv, {fixedRatio: true});
       layoutContainer.layout();
-      debugger;
       var div1Rect = div1.getBoundingClientRect();
       var div2Rect = div2.getBoundingClientRect();
       expect(div1Rect.height).toBe(300);

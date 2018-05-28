@@ -9,15 +9,57 @@
  *  @License: Released under the MIT license (http://opensource.org/licenses/MIT)
 **/
 
-/* global OT */
-
-// TODO: don't rely on internal OT.$ API.
 // in CommonJS context, this should be a `require()`d dependency.
 // in browser globals context, ...? (when using bower, there are dependencies that it has handled
 // for you, so these might be safe to assume)
 
 
 (function($) {
+    function css(el, propertyName, value) {
+        if (value) {
+            // We are setting one css property
+            el.style[propertyName] = value;
+        } else if (typeof propertyName === 'object') {
+            // We are setting several CSS properties at once
+            Object.keys(propertyName).forEach(function(key) {
+                css(el, key, propertyName[key]);
+            });
+        } else {
+            // We are getting the css property
+            var computedStyle = getComputedStyle(el);
+            var currentValue = computedStyle.getPropertyValue(propertyName);
+
+            if (currentValue === '') {
+                currentValue = el.style[propertyName];
+            }
+
+            return currentValue;
+        }
+    }
+    function height(el) {
+        if (el.offsetHeight > 0) {
+            return el.offsetHeight + 'px';
+        }
+        return css(el, 'height');
+    }
+    function width(el) {
+        if (el.offsetWidth > 0) {
+            return el.offsetWidth + 'px';
+        }
+        return css(el, 'width');
+    }
+    function defaults(custom, defaults) {
+        var res = {};
+        Object.keys(defaults).forEach(function(key) {
+            if (custom.hasOwnProperty(key)) {
+                res[key] = custom[key];
+            } else {
+                res[key] = defaults[key];
+            }
+        });
+        return res;
+    }
+
     var positionElement = function positionElement(elem, x, y, width, height, animate) {
         var targetPosition = {
             left: x + 'px',
@@ -47,8 +89,7 @@
                 if (animate.complete) animate.complete.call(this);
             });
         } else {
-            // NOTE: internal OT.$ API
-            OT.$.css(elem, targetPosition);
+            css(elem, targetPosition);
         }
         fixAspectRatio();
     };
@@ -67,8 +108,7 @@
     }
 
     var getCSSNumber = function (elem, prop) {
-        // NOTE: internal OT.$ API
-        var cssStr = OT.$.css(elem, prop);
+        var cssStr = css(elem, prop);
         return cssStr ? parseInt(cssStr, 10) : 0;
     };
 
@@ -78,14 +118,12 @@
     };
 
     var getHeight = function (elem) {
-        // NOTE: internal OT.$ API
-        var heightStr = OT.$.height(elem);
+        var heightStr = height(elem);
         return heightStr ? parseInt(heightStr, 10) : 0;
     };
 
     var getWidth = function (elem) {
-        // NOTE: internal OT.$ API
-        var widthStr = OT.$.width(elem);
+        var widthStr = width(elem);
         return widthStr ? parseInt(widthStr, 10) : 0;
     };
 
@@ -235,8 +273,7 @@
             if (fixedRatio) {
               targetWidth = Math.floor(targetHeight / getVideoRatio(elem));
             }
-            // NOTE: internal OT.$ API
-            OT.$.css(elem, 'position', 'absolute');
+            css(elem, 'position', 'absolute');
             var actualWidth = targetWidth - getCSSNumber(elem, 'paddingLeft') -
                             getCSSNumber(elem, 'paddingRight') -
                             getCSSNumber(elem, 'marginLeft') -
@@ -259,13 +296,11 @@
     };
 
     var filterDisplayNone = function (element) {
-        // NOTE: internal OT.$ API
-        return OT.$.css(element, 'display') !== 'none';
+        return css(element, 'display') !== 'none';
     };
 
     var layout = function layout(container, opts) {
-        // NOTE: internal OT.$ API
-        if (OT.$.css(container, 'display') === 'none') {
+        if (css(container, 'display') === 'none') {
             return;
         }
         var id = container.getAttribute('id');
@@ -332,8 +367,7 @@
     };
 
     var initLayoutContainer = function(container, opts) {
-        // NOTE: internal OT.$ API
-        opts = OT.$.defaults(opts || {}, {
+        opts = defaults(opts || {}, {
             maxRatio: 3/2,
             minRatio: 9/16,
             fixedRatio: false,
@@ -345,15 +379,15 @@
             bigMinRatio: 9/16,
             bigFirst: true
         });
-        // NOTE: internal OT.$ API
-        container = typeof(container) === 'string' ? OT.$(container) : container;
+        container = typeof(container) === 'string' ? document.querySelector(container) : container;
 
-        // TODO: should we add event hooks to external globals like this?
-        // this could be left as a responsibility of the user, and i think that would be more sound
-        // the OT.onLoad() method has (publicly) undefined behavior
-        OT.onLoad(function() {
+        if (document.readyState === 'complete') {
             layout(container, opts);
-        });
+        } else {
+            window.addEventListener('load', function() {
+                layout(container, opts);
+            });
+        }
 
         return {
             layout: layout.bind(null, container, opts)
