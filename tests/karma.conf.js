@@ -22,8 +22,6 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
 
     files: [
-      // 'https://tbdev.tokbox.com/v2/js/opentok.min.js',
-      'https://code.jquery.com/jquery-1.6.2.min.js',
       '../opentok-layout.js',
       '**/*spec.js'
     ],

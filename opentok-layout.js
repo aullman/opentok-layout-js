@@ -9,8 +9,6 @@
  *  @License: Released under the MIT license (http://opensource.org/licenses/MIT)
 **/
 
-/* global OT */
-
 // in CommonJS context, this should be a `require()`d dependency.
 // in browser globals context, ...? (when using bower, there are dependencies that it has handled
 // for you, so these might be safe to assume)
@@ -19,22 +17,46 @@
 (function($) {
     function css(el, propertyName, value) {
         if (value) {
-            return typeof OT !== 'undefined' ? OT.$.css(el, propertyName, value) : $(el).css(propertyName, value);
+            // We are setting one css property
+            el.style[propertyName] = value;
+        } else if (typeof propertyName === 'object') {
+            // We are setting several CSS properties at once
+            Object.keys(propertyName).forEach(function(key) {
+                css(el, key, propertyName[key]);
+            });
         } else {
-            return typeof OT !== 'undefined' ? OT.$.css(el, propertyName) : $(el).css(propertyName);
+            // We are getting the css property
+            var computedStyle = getComputedStyle(el);
+            var currentValue = computedStyle.getPropertyValue(propertyName);
+
+            if (currentValue === '') {
+                currentValue = el.style[propertyName];
+            }
+
+            return currentValue;
         }
     }
     function height(el) {
-        return typeof OT !== 'undefined' ? OT.$.height(el) : $(el).height();
+        if (el.offsetHeight > 0) {
+            return el.offsetHeight + 'px';
+        }
+        return css(el, 'height');
     }
     function width(el) {
-        return typeof OT !== 'undefined' ? OT.$.width(el) : $(el).width();
+        if (el.offsetWidth > 0) {
+            return el.offsetWidth + 'px';
+        }
+        return css(el, 'width');
     }
     function extend(target, obj) {
-        return typeof OT !== 'undefined' ? OT.$.defaults(target, obj) : $.extend(target, obj);
-    }
-    function wrap(el) {
-        return typeof OT !== 'undefined' ? OT.$(el) : el;
+        if (Object.assign) {
+            return Object.assign({}, target, obj);
+        }
+        var res = {};
+        Object.keys(obj).forEach(function(key) {
+            res[key] = target[key] = obj[key];
+        });
+        return res;
     }
 
     var positionElement = function positionElement(elem, x, y, width, height, animate) {
@@ -344,7 +366,7 @@
     };
 
     var initLayoutContainer = function(container, opts) {
-        opts = extend(opts || {}, {
+        opts = extend({
             maxRatio: 3/2,
             minRatio: 9/16,
             fixedRatio: false,
@@ -355,19 +377,14 @@
             bigMaxRatio: 3/2,
             bigMinRatio: 9/16,
             bigFirst: true
-        });
-        container = typeof(container) === 'string' ? wrap(container) : container;
+        }, opts || {});
+        container = typeof(container) === 'string' ? document.querySelector(container) : container;
 
-        // TODO: should we add event hooks to external globals like this?
-        // this could be left as a responsibility of the user, and i think that would be more sound
-        // the OT.onLoad() method has (publicly) undefined behavior
-        if (typeof OT !== 'undefined') {
-            OT.onLoad(function() {
-                layout(container, opts);
-            });
+        if (document.readyState === 'complete') {
+            layout(container, opts);
         } else {
-            $(document).ready(function() {
-              layout(container, opts);
+            window.addEventListener('load', function() {
+                layout(container, opts);
             });
         }
 
