@@ -1,5 +1,9 @@
 *.png
 *.html
 *.gif
+/build
+/bower_components
+/coverage
 # ignore sauce connect
 /sc-*
+sauce-connect.log
