@@ -6,7 +6,6 @@
         <meta http-equiv="Content-type" content="text/html; charset=utf-8">
         <title>Layout Test</title>
         <script src="https://static.opentok.com/v2/js/opentok.min.js"></script>
-        <script src="https://code.jquery.com/jquery-1.6.2.min.js"></script>
         <script src="opentok-layout.js"></script>
 
         <style type="text/css" media="screen">
@@ -155,6 +154,14 @@
             el.videoWidth = 480 * ratio;
             el.style.backgroundColor = getRandomColour();
           }
+          el.addEventListener('dblclick', function () {
+            if (el.classList.contains('OT_big')) {
+              el.classList.remove('OT_big');
+            } else {
+              el.classList.add('OT_big');
+            }
+            layout();
+          });
           layoutEl.appendChild(el);
           layout();
         }
@@ -172,17 +179,10 @@
           }, 20);
         };
 
-        $("input[type='text']").live('change', function() {
-          updateLayoutValues();
-        });
-
-        $("#layout>*").live("dblclick", function () {
-            if ($(this).hasClass("OT_big")) {
-                $(this).removeClass("OT_big");
-            } else {
-                $(this).addClass("OT_big");
-            }
-            layout();
+        document.querySelectorAll("input[type='text']").forEach(function(el) {
+            el.addEventListener('change', function() {
+                updateLayoutValues();
+            });
         });
     </script>
 </html>
