@@ -31,6 +31,16 @@
                 transition-duration: 0.5s;
             }
 
+            #layout > div {
+                width: 0;
+                height: 0;
+                opacity: 0;
+            }
+
+            #layout > div.ot-layout {
+                opacity: 1;
+            }
+
             body > div#description {
                 color: #333;
                 margin: 0;
@@ -107,10 +117,6 @@
 
         function updateLayoutValues() {
           layout = initLayoutContainer(layoutEl, {
-              animate: {
-                  duration: eval(animateDuration.value),
-                  easing: animateEasing.value
-              },
               maxRatio: eval(maxRatio.value),
               minRatio: eval(minRatio.value),
               fixedRatio: eval(fixedRatio.value),
