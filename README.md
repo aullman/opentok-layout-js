@@ -21,8 +21,6 @@ Dependencies
 
 The <a href="http://www.tokbox.com/opentok">OpenTok for WebRTC JS API</a> is required.
 
-jQuery is also optionally required if you want to animate the transitions.
-
 Usage
 -----
 
@@ -167,17 +165,34 @@ If you want to animate things you can use CSS3 transitions on the children. eg.
 }
 ```
 
-You can also use jQuery to animate the transitions by using the animate property. You will need to include the jQuery library and set the animate option to true and it will use the default values for animate (duration=200, easing="swing"). You can also specify your own values and a completion handler. For more details about the jQuery animate property see the [jQuery documentation](http://api.jquery.com/animate/).
+This library adds an `ot-layout` className to elements once they have been layed out. This allows you to specify an initial transition for new elements being added like so:
+
+```css
+.container > * {
+    width: 0;
+    height: 0;
+    opacity: 0;
+}
+
+.container > *.ot-layout {
+    opacity: 1;
+}
+```
+
+This will make the elements be size 0x0 with opacity 0 when they are first added. Then when they have the `ot-layout` className added they will grow to the right size and fade in. You can see this effect in the [demo](https://aullman.github.io/opentok-layout-js/ "Layout-container Demo").
+
+Then if you want elements to fade out you can remove the `ot-layout` class from them before removing them from the DOM. Like so:
 
 ```javascript
-var layout = initLayoutContainer(document.getElementById("layout"), {
-  animate: {
-    duration: 500,
-    easing: "linear",
-    complete: function() {
-      console.log('finished moving ' + this);
-    }
-  }
+session.on('streamDestroyed', (event) => {
+  event.preventDefault();
+  session.getSubscribersForStream(event.stream).forEach((subscriber) => {
+    subscriber.element.classList.remove('ot-layout');
+    setTimeout(() => {
+      subscriber.destroy();
+      layout();
+    }, 200);
+  });
 });
 ```
 

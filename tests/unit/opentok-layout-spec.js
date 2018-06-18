@@ -62,6 +62,13 @@ describe('opentok layout', function () {
       expect(div2Rect.top).toBe(0);
     });
 
+    it('adds the "ot-layout" class to elements', function() {
+      var layoutContainer = initLayoutContainer(layoutDiv);
+      layoutContainer.layout();
+      expect(div1.classList.contains('ot-layout')).toBe(true);
+      expect(div2.classList.contains('ot-layout')).toBe(true);
+    });
+
     it('maintains multiple aspect ratios if you set fixedRatio:true', function () {
       div1.videoWidth = 640;
       div1.videoHeight = 480;

@@ -90,6 +90,9 @@
             });
         } else {
             css(elem, targetPosition);
+            if (!elem.classList.contains('ot-layout')) {
+                elem.classList.add('ot-layout');
+            }
         }
         fixAspectRatio();
     };
