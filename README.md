@@ -181,6 +181,21 @@ This library adds an `ot-layout` className to elements once they have been layed
 
 This will make the elements be size 0x0 with opacity 0 when they are first added. Then when they have the `ot-layout` className added they will grow to the right size and fade in. You can see this effect in the [demo](https://aullman.github.io/opentok-layout-js/ "Layout-container Demo").
 
+Then if you want elements to fade out you can remove the `ot-layout` class from them before removing them from the DOM. Like so:
+
+```javascript
+session.on('streamDestroyed', (event) => {
+  event.preventDefault();
+  session.getSubscribersForStream(event.stream).forEach((subscriber) => {
+    subscriber.element.classList.remove('ot-layout');
+    setTimeout(() => {
+      subscriber.destroy();
+      layout();
+    }, 200);
+  });
+});
+```
+
 Big Elements
 --------
 

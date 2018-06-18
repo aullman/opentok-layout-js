@@ -167,8 +167,11 @@
         }
 
         function removeElement() {
+          layoutEl.firstChild.classList.remove('ot-layout');
+          setTimeout(function() {
             layoutEl.removeChild(layoutEl.firstChild);
             layout();
+          }, 200);
         }
 
         var resizeTimeout;
