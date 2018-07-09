@@ -40,7 +40,25 @@ var layout = initLayoutContainer(document.getElementById("layout"), {
     bigFirst: true,        // Whether to place the big one in the top left (true) or bottom right
     animate: true         // Whether you want to animate the transitions
 });
-layout.layout()
+layout.layout();
+```
+
+The other way to use this library is to just use the `getLayout()` method to get the layout and position the elements yourself. Get layout takes an array of aspect ratios (Height / Width) as the first argument.
+
+```javascript
+let boxes = layout.getLayout([480/640, 480/640, 720/1280]);
+```
+
+It will return an array of boxes which each have:
+
+```javascript
+{
+    width,
+    height,
+    aspectRatio,
+    top,
+    left
+}
 ```
 
 Examples
