@@ -7,7 +7,7 @@
 		exports["initLayoutContainer"] = factory();
 	else
 		root["initLayoutContainer"] = factory();
-})(window, function() {
+})(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};

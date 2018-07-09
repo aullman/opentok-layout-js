@@ -13,7 +13,8 @@ module.exports = {
     filename: '[name].min.js',
     path: path.resolve(__dirname, ''),
     library: 'initLayoutContainer',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    globalObject: 'typeof self !== \'undefined\' ? self : this'
   },
   module: {
     rules: [{
