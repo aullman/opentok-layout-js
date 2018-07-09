@@ -7,14 +7,14 @@ module.exports = {
   },
   devtool: 'source-map',
   plugins: [
-    new UnminifiedWebpackPlugin()
+    new UnminifiedWebpackPlugin(),
   ],
   output: {
     filename: '[name].min.js',
     path: path.resolve(__dirname, ''),
     library: 'initLayoutContainer',
     libraryTarget: 'umd',
-    globalObject: 'typeof self !== \'undefined\' ? self : this'
+    globalObject: 'typeof self !== \'undefined\' ? self : this',
   },
   module: {
     rules: [{
@@ -23,9 +23,9 @@ module.exports = {
       use: {
         loader: 'babel-loader',
         options: {
-          presets: ['babel-preset-env']
-        }
-      }
-    }]
-  }
+          presets: ['babel-preset-env'],
+        },
+      },
+    }],
+  },
 };

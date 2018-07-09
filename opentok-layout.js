@@ -101,8 +101,6 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 /*!
  *  opentok-layout-js (http://github.com/aullman/opentok-layout-js)
  *
@@ -112,34 +110,248 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
  *  @Author: Adam Ullman (http://github.com/aullman)
  *  @Copyright (c) 2014 Adam Ullman
  *  @License: Released under the MIT license (http://opensource.org/licenses/MIT)
- **/
+ * */
 
 // in CommonJS context, this should be a `require()`d dependency.
 // in browser globals context, ...? (when using bower, there are dependencies that it has handled
 // for you, so these might be safe to assume)
 
+var getLayout = __webpack_require__(1);
+var layout = __webpack_require__(2);
+
+module.exports = function initLayoutContainer(container, opts) {
+  container = typeof container === 'string' ? document.querySelector(container) : container;
+  if (!(typeof HTMLElement === 'undefined' || container instanceof HTMLElement) && !opts) {
+    // container is actually the options
+    opts = container;
+  } else if (!opts) {
+    opts = {};
+  }
+
+  return {
+    layout: layout.bind(this, container, opts),
+    getLayout: getLayout.bind(this, opts)
+  };
+};
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var getBestDimensions = function getBestDimensions(minRatio, maxRatio, Width, Height, count) {
+  var maxArea = void 0;
+  var targetCols = void 0;
+  var targetRows = void 0;
+  var targetHeight = void 0;
+  var targetWidth = void 0;
+  var tWidth = void 0;
+  var tHeight = void 0;
+  var tRatio = void 0;
+
+  // Iterate through every possible combination of rows and columns
+  // and see which one has the least amount of whitespace
+  for (var i = 1; i <= count; i += 1) {
+    var cols = i;
+    var rows = Math.ceil(count / cols);
+
+    // Try taking up the whole height and width
+    tHeight = Math.floor(Height / rows);
+    tWidth = Math.floor(Width / cols);
+
+    tRatio = tHeight / tWidth;
+    if (tRatio > maxRatio) {
+      // We went over decrease the height
+      tRatio = maxRatio;
+      tHeight = tWidth * tRatio;
+    } else if (tRatio < minRatio) {
+      // We went under decrease the width
+      tRatio = minRatio;
+      tWidth = tHeight / tRatio;
+    }
+
+    var area = tWidth * tHeight * count;
+
+    // If this width and height takes up the most space then we're going with that
+    if (maxArea === undefined || area > maxArea) {
+      maxArea = area;
+      targetHeight = tHeight;
+      targetWidth = tWidth;
+      targetCols = cols;
+      targetRows = rows;
+    }
+  }
+  return {
+    maxArea: maxArea,
+    targetCols: targetCols,
+    targetRows: targetRows,
+    targetHeight: targetHeight,
+    targetWidth: targetWidth,
+    ratio: targetHeight / targetWidth
+  };
+};
+
+module.exports = function (opts, ratios) {
+  var _opts$maxRatio = opts.maxRatio,
+      maxRatio = _opts$maxRatio === undefined ? 3 / 2 : _opts$maxRatio,
+      _opts$minRatio = opts.minRatio,
+      minRatio = _opts$minRatio === undefined ? 9 / 16 : _opts$minRatio,
+      _opts$fixedRatio = opts.fixedRatio,
+      fixedRatio = _opts$fixedRatio === undefined ? false : _opts$fixedRatio,
+      _opts$containerWidth = opts.containerWidth,
+      containerWidth = _opts$containerWidth === undefined ? 640 : _opts$containerWidth,
+      _opts$containerHeight = opts.containerHeight,
+      containerHeight = _opts$containerHeight === undefined ? 480 : _opts$containerHeight;
+
+  var count = ratios.length;
+  var dimensions = void 0;
+
+  if (!fixedRatio) {
+    dimensions = getBestDimensions(minRatio, maxRatio, containerWidth, containerHeight, count);
+  } else {
+    // Use the ratio of the first video element we find to approximate
+    var ratio = ratios.length > 0 ? ratios[0] : null;
+    dimensions = getBestDimensions(ratio, ratio, containerWidth, containerHeight, count);
+  }
+
+  // Loop through each stream in the container and place it inside
+  var x = 0;
+  var y = 0;
+  var rows = [];
+  var row = void 0;
+  var boxes = [];
+  // Iterate through the children and create an array with a new item for each row
+  // and calculate the width of each row so that we know if we go over the size and need
+  // to adjust
+  for (var i = 0; i < ratios.length; i += 1) {
+    if (i % dimensions.targetCols === 0) {
+      // This is a new row
+      row = {
+        ratios: [],
+        width: 0,
+        height: 0
+      };
+      rows.push(row);
+    }
+    var _ratio = ratios[i];
+    row.ratios.push(_ratio);
+    var targetWidth = dimensions.targetWidth;
+    var targetHeight = dimensions.targetHeight;
+    // If we're using a fixedRatio then we need to set the correct ratio for this element
+    if (fixedRatio) {
+      targetWidth = targetHeight / _ratio;
+    }
+    row.width += targetWidth;
+    row.height = targetHeight;
+  }
+  // Calculate total row height adjusting if we go too wide
+  var totalRowHeight = 0;
+  var remainingShortRows = 0;
+  for (var _i = 0; _i < rows.length; _i += 1) {
+    row = rows[_i];
+    if (row.width > containerWidth) {
+      // Went over on the width, need to adjust the height proportionally
+      row.height = Math.floor(row.height * (containerWidth / row.width));
+      row.width = containerWidth;
+    } else if (row.width < containerWidth) {
+      remainingShortRows += 1;
+    }
+    totalRowHeight += row.height;
+  }
+  if (totalRowHeight < containerHeight && remainingShortRows > 0) {
+    // We can grow some of the rows, we're not taking up the whole height
+    var remainingHeightDiff = containerHeight - totalRowHeight;
+    totalRowHeight = 0;
+    for (var _i2 = 0; _i2 < rows.length; _i2 += 1) {
+      row = rows[_i2];
+      if (row.width < containerWidth) {
+        // Evenly distribute the extra height between the short rows
+        var extraHeight = remainingHeightDiff / remainingShortRows;
+        if (extraHeight / row.height > (containerWidth - row.width) / row.width) {
+          // We can't go that big or we'll go too wide
+          extraHeight = Math.floor((containerWidth - row.width) / row.width * row.height);
+        }
+        row.width += Math.floor(extraHeight / row.height * row.width);
+        row.height += extraHeight;
+        remainingHeightDiff -= extraHeight;
+        remainingShortRows -= 1;
+      }
+      totalRowHeight += row.height;
+    }
+  }
+  // vertical centering
+  y = (containerHeight - totalRowHeight) / 2;
+  // Iterate through each row and place each child
+  for (var _i3 = 0; _i3 < rows.length; _i3 += 1) {
+    row = rows[_i3];
+    // center the row
+    var rowMarginLeft = (containerWidth - row.width) / 2;
+    x = rowMarginLeft;
+    var _targetHeight = void 0;
+    for (var j = 0; j < row.ratios.length; j += 1) {
+      var _ratio2 = row.ratios[j];
+
+      var _targetWidth = dimensions.targetWidth;
+      _targetHeight = row.height;
+      // If we're using a fixedRatio then we need to set the correct ratio for this element
+      if (fixedRatio) {
+        _targetWidth = Math.floor(_targetHeight / _ratio2);
+      }
+
+      boxes.push({
+        aspectRatio: _ratio2,
+        left: x,
+        top: y,
+        width: _targetWidth,
+        height: _targetHeight
+      });
+      x += _targetWidth;
+    }
+    y += _targetHeight;
+  }
+  return boxes;
+};
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var getLayout = __webpack_require__(1);
 
 function css(el, propertyName, value) {
   if (value) {
     // We are setting one css property
     el.style[propertyName] = value;
-  } else if ((typeof propertyName === 'undefined' ? 'undefined' : _typeof(propertyName)) === 'object') {
+    return NaN;
+  }
+  if ((typeof propertyName === 'undefined' ? 'undefined' : _typeof(propertyName)) === 'object') {
     // We are setting several CSS properties at once
     Object.keys(propertyName).forEach(function (key) {
       css(el, key, propertyName[key]);
     });
-  } else {
-    // We are getting the css property
-    var computedStyle = getComputedStyle(el);
-    var currentValue = computedStyle.getPropertyValue(propertyName);
-
-    if (currentValue === '') {
-      currentValue = el.style[propertyName];
-    }
-
-    return currentValue;
+    return NaN;
   }
+  // We are getting the css property
+  var computedStyle = getComputedStyle(el);
+  var currentValue = computedStyle.getPropertyValue(propertyName);
+
+  if (currentValue === '') {
+    currentValue = el.style[propertyName];
+  }
+
+  return currentValue;
 }
+
+var filterDisplayNone = function filterDisplayNone(element) {
+  return css(element, 'display') !== 'none';
+};
 
 function height(el) {
   if (el.offsetHeight > 0) {
@@ -155,24 +367,14 @@ function width(el) {
   return css(el, 'width');
 }
 
-function defaults(custom, defaults) {
-  var res = {};
-  Object.keys(defaults).forEach(function (key) {
-    if (custom.hasOwnProperty(key)) {
-      res[key] = custom[key];
-    } else {
-      res[key] = defaults[key];
-    }
-  });
-  return res;
-}
+var positionElement = function positionElement(elem, x, y, w, h, animate) {
+  var _this = this;
 
-var positionElement = function positionElement(elem, x, y, width, height, animate) {
   var targetPosition = {
     left: x + 'px',
     top: y + 'px',
-    width: width + 'px',
-    height: height + 'px'
+    width: w + 'px',
+    height: h + 'px'
   };
 
   var fixAspectRatio = function fixAspectRatio() {
@@ -182,7 +384,7 @@ var positionElement = function positionElement(elem, x, y, width, height, animat
       // to force the mutation observer on the publisher or subscriber to
       // trigger to get it to fix it's layout
       var oldWidth = sub.style.width;
-      sub.style.width = width + 'px';
+      sub.style.width = w + 'px';
       // sub.style.height = height + 'px';
       sub.style.width = oldWidth || '';
     }
@@ -192,7 +394,7 @@ var positionElement = function positionElement(elem, x, y, width, height, animat
     $(elem).stop();
     $(elem).animate(targetPosition, animate.duration || 200, animate.easing || 'swing', function () {
       fixAspectRatio();
-      if (animate.complete) animate.complete.call(this);
+      if (animate.complete) animate.complete.call(_this);
     });
   } else {
     css(elem, targetPosition);
@@ -210,7 +412,8 @@ var getVideoRatio = function getVideoRatio(elem) {
   var video = elem.querySelector('video');
   if (video && video.videoHeight && video.videoWidth) {
     return video.videoHeight / video.videoWidth;
-  } else if (elem.videoHeight && elem.videoWidth) {
+  }
+  if (elem.videoHeight && elem.videoWidth) {
     return elem.videoHeight / elem.videoWidth;
   }
   return 3 / 4;
@@ -236,161 +439,55 @@ var getWidth = function getWidth(elem) {
   return widthStr ? parseInt(widthStr, 10) : 0;
 };
 
-var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, fixedRatio, minRatio, maxRatio, animate) {
-  var count = children.length,
-      dimensions;
+var arrange = function arrange(children, containerWidth, containerHeight, offsetLeft, offsetTop, fixedRatio, minRatio, maxRatio, animate) {
+  var boxes = getLayout({
+    containerWidth: containerWidth,
+    containerHeight: containerHeight,
+    minRatio: minRatio,
+    maxRatio: maxRatio,
+    fixedRatio: fixedRatio
+  }, children.map(function (child) {
+    return getVideoRatio(child);
+  }));
 
-  var getBestDimensions = function getBestDimensions(minRatio, maxRatio) {
-    var maxArea, targetCols, targetRows, targetHeight, targetWidth, tWidth, tHeight, tRatio;
+  boxes.forEach(function (box, idx) {
+    var elem = children[idx];
+    css(elem, 'position', 'absolute');
+    var actualWidth = box.width - getCSSNumber(elem, 'paddingLeft') - getCSSNumber(elem, 'paddingRight') - getCSSNumber(elem, 'marginLeft') - getCSSNumber(elem, 'marginRight') - getCSSNumber(elem, 'borderLeft') - getCSSNumber(elem, 'borderRight');
 
-    // Iterate through every possible combination of rows and columns
-    // and see which one has the least amount of whitespace
-    for (var i = 1; i <= count; i++) {
-      var cols = i;
-      var rows = Math.ceil(count / cols);
+    var actualHeight = box.height - getCSSNumber(elem, 'paddingTop') - getCSSNumber(elem, 'paddingBottom') - getCSSNumber(elem, 'marginTop') - getCSSNumber(elem, 'marginBottom') - getCSSNumber(elem, 'borderTop') - getCSSNumber(elem, 'borderBottom');
 
-      // Try taking up the whole height and width
-      tHeight = Math.floor(Height / rows);
-      tWidth = Math.floor(Width / cols);
-
-      tRatio = tHeight / tWidth;
-      if (tRatio > maxRatio) {
-        // We went over decrease the height
-        tRatio = maxRatio;
-        tHeight = tWidth * tRatio;
-      } else if (tRatio < minRatio) {
-        // We went under decrease the width
-        tRatio = minRatio;
-        tWidth = tHeight / tRatio;
-      }
-
-      var area = tWidth * tHeight * count;
-
-      // If this width and height takes up the most space then we're going with that
-      if (maxArea === undefined || area > maxArea) {
-        maxArea = area;
-        targetHeight = tHeight;
-        targetWidth = tWidth;
-        targetCols = cols;
-        targetRows = rows;
-      }
-    }
-    return {
-      maxArea: maxArea,
-      targetCols: targetCols,
-      targetRows: targetRows,
-      targetHeight: targetHeight,
-      targetWidth: targetWidth,
-      ratio: targetHeight / targetWidth
-    };
-  };
-
-  if (!fixedRatio) {
-    dimensions = getBestDimensions(minRatio, maxRatio);
-  } else {
-    // Use the ratio of the first video element we find to approximate
-    var ratio = getVideoRatio(children.length > 0 ? children[0] : null);
-    dimensions = getBestDimensions(ratio, ratio);
-  }
-
-  // Loop through each stream in the container and place it inside
-  var x = 0,
-      y = 0,
-      rows = [],
-      row;
-  // Iterate through the children and create an array with a new item for each row
-  // and calculate the width of each row so that we know if we go over the size and need
-  // to adjust
-  for (var i = 0; i < children.length; i++) {
-    if (i % dimensions.targetCols === 0) {
-      // This is a new row
-      row = {
-        children: [],
-        width: 0,
-        height: 0
-      };
-      rows.push(row);
-    }
-    var elem = children[i];
-    row.children.push(elem);
-    var targetWidth = dimensions.targetWidth;
-    var targetHeight = dimensions.targetHeight;
-    // If we're using a fixedRatio then we need to set the correct ratio for this element
-    if (fixedRatio) {
-      targetWidth = targetHeight / getVideoRatio(elem);
-    }
-    row.width += targetWidth;
-    row.height = targetHeight;
-  }
-  // Calculate total row height adjusting if we go too wide
-  var totalRowHeight = 0;
-  var remainingShortRows = 0;
-  for (i = 0; i < rows.length; i++) {
-    var row = rows[i];
-    if (row.width > Width) {
-      // Went over on the width, need to adjust the height proportionally
-      row.height = Math.floor(row.height * (Width / row.width));
-      row.width = Width;
-    } else if (row.width < Width) {
-      remainingShortRows += 1;
-    }
-    totalRowHeight += row.height;
-  }
-  if (totalRowHeight < Height && remainingShortRows > 0) {
-    // We can grow some of the rows, we're not taking up the whole height
-    var remainingHeightDiff = Height - totalRowHeight;
-    totalRowHeight = 0;
-    for (i = 0; i < rows.length; i++) {
-      var row = rows[i];
-      if (row.width < Width) {
-        // Evenly distribute the extra height between the short rows
-        var extraHeight = remainingHeightDiff / remainingShortRows;
-        if (extraHeight / row.height > (Width - row.width) / row.width) {
-          // We can't go that big or we'll go too wide
-          extraHeight = Math.floor((Width - row.width) / row.width * row.height);
-        }
-        row.width += Math.floor(extraHeight / row.height * row.width);
-        row.height += extraHeight;
-        remainingHeightDiff -= extraHeight;
-        remainingShortRows -= 1;
-      }
-      totalRowHeight += row.height;
-    }
-  }
-  // vertical centering
-  y = (Height - totalRowHeight) / 2;
-  // Iterate through each row and place each child
-  for (i = 0; i < rows.length; i++) {
-    var row = rows[i];
-    // center the row
-    var rowMarginLeft = (Width - row.width) / 2;
-    x = rowMarginLeft;
-    for (var j = 0; j < row.children.length; j++) {
-      var elem = row.children[j];
-
-      var targetWidth = dimensions.targetWidth;
-      var targetHeight = row.height;
-      // If we're using a fixedRatio then we need to set the correct ratio for this element
-      if (fixedRatio) {
-        targetWidth = Math.floor(targetHeight / getVideoRatio(elem));
-      }
-      css(elem, 'position', 'absolute');
-      var actualWidth = targetWidth - getCSSNumber(elem, 'paddingLeft') - getCSSNumber(elem, 'paddingRight') - getCSSNumber(elem, 'marginLeft') - getCSSNumber(elem, 'marginRight') - getCSSNumber(elem, 'borderLeft') - getCSSNumber(elem, 'borderRight');
-
-      var actualHeight = targetHeight - getCSSNumber(elem, 'paddingTop') - getCSSNumber(elem, 'paddingBottom') - getCSSNumber(elem, 'marginTop') - getCSSNumber(elem, 'marginBottom') - getCSSNumber(elem, 'borderTop') - getCSSNumber(elem, 'borderBottom');
-
-      positionElement(elem, x + offsetLeft, y + offsetTop, actualWidth, actualHeight, animate);
-      x += targetWidth;
-    }
-    y += targetHeight;
-  }
+    positionElement(elem, box.left + offsetLeft, box.top + offsetTop, actualWidth, actualHeight, animate);
+  });
 };
 
-var filterDisplayNone = function filterDisplayNone(element) {
-  return css(element, 'display') !== 'none';
-};
+module.exports = function (container, opts) {
+  var _opts$maxRatio = opts.maxRatio,
+      maxRatio = _opts$maxRatio === undefined ? 3 / 2 : _opts$maxRatio,
+      _opts$minRatio = opts.minRatio,
+      minRatio = _opts$minRatio === undefined ? 9 / 16 : _opts$minRatio,
+      _opts$fixedRatio = opts.fixedRatio,
+      fixedRatio = _opts$fixedRatio === undefined ? false : _opts$fixedRatio,
+      _opts$animate = opts.animate,
+      animate = _opts$animate === undefined ? false : _opts$animate,
+      _opts$bigClass = opts.bigClass,
+      bigClass = _opts$bigClass === undefined ? 'OT_big' : _opts$bigClass,
+      _opts$bigPercentage = opts.bigPercentage,
+      bigPercentage = _opts$bigPercentage === undefined ? 0.8 : _opts$bigPercentage,
+      _opts$bigFixedRatio = opts.bigFixedRatio,
+      bigFixedRatio = _opts$bigFixedRatio === undefined ? false : _opts$bigFixedRatio,
+      _opts$bigMaxRatio = opts.bigMaxRatio,
+      bigMaxRatio = _opts$bigMaxRatio === undefined ? 3 / 2 : _opts$bigMaxRatio,
+      _opts$bigMinRatio = opts.bigMinRatio,
+      bigMinRatio = _opts$bigMinRatio === undefined ? 9 / 16 : _opts$bigMinRatio,
+      _opts$bigFirst = opts.bigFirst,
+      bigFirst = _opts$bigFirst === undefined ? true : _opts$bigFirst;
+  var _opts$containerWidth = opts.containerWidth,
+      containerWidth = _opts$containerWidth === undefined ? 640 : _opts$containerWidth,
+      _opts$containerHeight = opts.containerHeight,
+      containerHeight = _opts$containerHeight === undefined ? 480 : _opts$containerHeight;
 
-var layout = function layout(container, opts) {
+
   if (css(container, 'display') === 'none') {
     return;
   }
@@ -400,78 +497,49 @@ var layout = function layout(container, opts) {
     container.setAttribute('id', id);
   }
 
-  var Height = getHeight(container) - getCSSNumber(container, 'borderTop') - getCSSNumber(container, 'borderBottom'),
-      Width = getWidth(container) - getCSSNumber(container, 'borderLeft') - getCSSNumber(container, 'borderRight'),
-      availableRatio = Height / Width,
-      offsetLeft = 0,
-      offsetTop = 0,
-      bigOffsetTop = 0,
-      bigOffsetLeft = 0,
-      bigOnes = Array.prototype.filter.call(container.querySelectorAll('#' + id + '>.' + opts.bigClass), filterDisplayNone),
-      smallOnes = Array.prototype.filter.call(container.querySelectorAll('#' + id + '>*:not(.' + opts.bigClass + ')'), filterDisplayNone);
+  containerHeight = getHeight(container) - getCSSNumber(container, 'borderTop') - getCSSNumber(container, 'borderBottom');
+  containerWidth = getWidth(container) - getCSSNumber(container, 'borderLeft') - getCSSNumber(container, 'borderRight');
+  var availableRatio = containerHeight / containerWidth;
+  var offsetLeft = 0;
+  var offsetTop = 0;
+  var bigOffsetTop = 0;
+  var bigOffsetLeft = 0;
+  var bigOnes = Array.prototype.filter.call(container.querySelectorAll('#' + id + '>.' + bigClass), filterDisplayNone);
+  var smallOnes = Array.prototype.filter.call(container.querySelectorAll('#' + id + '>*:not(.' + bigClass + ')'), filterDisplayNone);
 
   if (bigOnes.length > 0 && smallOnes.length > 0) {
-    var bigWidth, bigHeight;
+    var bigWidth = void 0;
+    var bigHeight = void 0;
 
     if (availableRatio > getVideoRatio(bigOnes[0])) {
       // We are tall, going to take up the whole width and arrange small
       // guys at the bottom
-      bigWidth = Width;
-      bigHeight = Math.floor(Height * opts.bigPercentage);
+      bigWidth = containerWidth;
+      bigHeight = Math.floor(containerHeight * bigPercentage);
       offsetTop = bigHeight;
-      bigOffsetTop = Height - offsetTop;
+      bigOffsetTop = containerHeight - offsetTop;
     } else {
       // We are wide, going to take up the whole height and arrange the small
       // guys on the right
-      bigHeight = Height;
-      bigWidth = Math.floor(Width * opts.bigPercentage);
+      bigHeight = containerHeight;
+      bigWidth = Math.floor(containerWidth * bigPercentage);
       offsetLeft = bigWidth;
-      bigOffsetLeft = Width - offsetLeft;
+      bigOffsetLeft = containerWidth - offsetLeft;
     }
-    if (opts.bigFirst) {
-      arrange(bigOnes, bigWidth, bigHeight, 0, 0, opts.bigFixedRatio, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
-      arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
+    if (bigFirst) {
+      arrange(bigOnes, bigWidth, bigHeight, 0, 0, bigFixedRatio, bigMinRatio, bigMaxRatio, animate);
+      arrange(smallOnes, containerWidth - offsetLeft, containerHeight - offsetTop, offsetLeft, offsetTop, fixedRatio, minRatio, maxRatio, animate);
     } else {
-      arrange(smallOnes, Width - offsetLeft, Height - offsetTop, 0, 0, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
-      arrange(bigOnes, bigWidth, bigHeight, bigOffsetLeft, bigOffsetTop, opts.bigFixedRatio, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
+      arrange(smallOnes, containerWidth - offsetLeft, containerHeight - offsetTop, 0, 0, fixedRatio, minRatio, maxRatio, animate);
+      arrange(bigOnes, bigWidth, bigHeight, bigOffsetLeft, bigOffsetTop, bigFixedRatio, bigMinRatio, bigMaxRatio, animate);
     }
   } else if (bigOnes.length > 0 && smallOnes.length === 0) {
     // We only have one bigOne just center it
-    arrange(bigOnes, Width, Height, 0, 0, opts.bigFixedRatio, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
+    arrange(bigOnes, containerWidth, containerHeight, 0, 0, bigFixedRatio, bigMinRatio, bigMaxRatio, animate);
   } else {
-    arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
+    arrange(smallOnes, containerWidth - offsetLeft, containerHeight - offsetTop, offsetLeft, offsetTop, fixedRatio, minRatio, maxRatio, animate);
   }
 };
-
-var initLayoutContainer = function initLayoutContainer(container, opts) {
-  opts = defaults(opts || {}, {
-    maxRatio: 3 / 2,
-    minRatio: 9 / 16,
-    fixedRatio: false,
-    animate: false,
-    bigClass: 'OT_big',
-    bigPercentage: 0.8,
-    bigFixedRatio: false,
-    bigMaxRatio: 3 / 2,
-    bigMinRatio: 9 / 16,
-    bigFirst: true
-  });
-  container = typeof container === 'string' ? document.querySelector(container) : container;
-
-  if (document.readyState === 'complete') {
-    layout(container, opts);
-  } else {
-    window.addEventListener('load', function () {
-      layout(container, opts);
-    });
-  }
-
-  return {
-    layout: layout.bind(null, container, opts)
-  };
-};
-
-module.exports = initLayoutContainer;
 
 /***/ })
 /******/ ]);

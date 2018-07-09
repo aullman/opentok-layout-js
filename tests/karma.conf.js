@@ -1,16 +1,16 @@
 // Karma configuration
 // Generated on Wed Sep 03 2014 13:49:54 GMT+1000 (EST)
 
-module.exports = function(config) {
-  var sauceLaunchers = {
-    'Ie': {
+module.exports = (config) => {
+  const sauceLaunchers = {
+    Ie: {
       base: 'SauceLabs',
       browserName: 'internet explorer',
       platform: process.env.BVER === '10' ? 'Windows 8' : 'Windows 8.1',
-      version: process.env.BVER
-    }
+      version: process.env.BVER,
+    },
   };
-  var browser = process.env.BROWSER || 'chrome';
+  const browser = process.env.BROWSER || 'chrome';
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -23,7 +23,7 @@ module.exports = function(config) {
 
     files: [
       '../opentok-layout.js',
-      '**/*spec.js'
+      '**/*spec.js',
     ],
 
     // list of files to exclude
@@ -34,7 +34,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      'opentok-layout.js': 'coverage'
+      'opentok-layout.js': 'coverage',
     },
 
     // test results reporter to use
@@ -43,15 +43,15 @@ module.exports = function(config) {
     reporters: ['progress', 'coverage', 'saucelabs'],
 
     coverageReporter: {
-      type : 'lcov',
-      dir : '../coverage/'
+      type: 'lcov',
+      dir: '../coverage/',
     },
 
     customLaunchers: sauceLaunchers,
 
     sauceLabs: {
       startConnect: false,
-      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER
+      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
     },
 
     // web server port
@@ -74,6 +74,6 @@ module.exports = function(config) {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
+    singleRun: false,
   });
 };
