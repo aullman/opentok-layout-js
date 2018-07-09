@@ -1,108 +1,3 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else if(typeof exports === 'object')
-		exports["initLayoutContainer"] = factory();
-	else
-		root["initLayoutContainer"] = factory();
-})(window, function() {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = function(exports) {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/
-/******/ 	// create a fake namespace object
-/******/ 	// mode & 1: value is a module id, require it
-/******/ 	// mode & 2: merge all properties of value into the ns
-/******/ 	// mode & 4: return value when already ns object
-/******/ 	// mode & 8|1: behave like require
-/******/ 	__webpack_require__.t = function(value, mode) {
-/******/ 		if(mode & 1) value = __webpack_require__(value);
-/******/ 		if(mode & 8) return value;
-/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
-/******/ 		__webpack_require__.r(ns);
-/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
-/******/ 		return ns;
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 /*!
  *  opentok-layout-js (http://github.com/aullman/opentok-layout-js)
  *
@@ -123,9 +18,9 @@ function css(el, propertyName, value) {
   if (value) {
     // We are setting one css property
     el.style[propertyName] = value;
-  } else if ((typeof propertyName === 'undefined' ? 'undefined' : _typeof(propertyName)) === 'object') {
+  } else if (typeof propertyName === 'object') {
     // We are setting several CSS properties at once
-    Object.keys(propertyName).forEach(function (key) {
+    Object.keys(propertyName).forEach(function(key) {
       css(el, key, propertyName[key]);
     });
   } else {
@@ -157,7 +52,7 @@ function width(el) {
 
 function defaults(custom, defaults) {
   var res = {};
-  Object.keys(defaults).forEach(function (key) {
+  Object.keys(defaults).forEach(function(key) {
     if (custom.hasOwnProperty(key)) {
       res[key] = custom[key];
     } else {
@@ -175,7 +70,7 @@ var positionElement = function positionElement(elem, x, y, width, height, animat
     height: height + 'px'
   };
 
-  var fixAspectRatio = function fixAspectRatio() {
+  var fixAspectRatio = function() {
     var sub = elem.querySelector('.OT_root');
     if (sub) {
       // If this is the parent of a subscriber or publisher then we need
@@ -190,10 +85,11 @@ var positionElement = function positionElement(elem, x, y, width, height, animat
 
   if (animate && $) {
     $(elem).stop();
-    $(elem).animate(targetPosition, animate.duration || 200, animate.easing || 'swing', function () {
-      fixAspectRatio();
-      if (animate.complete) animate.complete.call(this);
-    });
+    $(elem).animate(targetPosition, animate.duration || 200, animate.easing || 'swing',
+      function() {
+        fixAspectRatio();
+        if (animate.complete) animate.complete.call(this);
+      });
   } else {
     css(elem, targetPosition);
     if (!elem.classList.contains('ot-layout')) {
@@ -203,7 +99,7 @@ var positionElement = function positionElement(elem, x, y, width, height, animat
   fixAspectRatio();
 };
 
-var getVideoRatio = function getVideoRatio(elem) {
+var getVideoRatio = function(elem) {
   if (!elem) {
     return 3 / 4;
   }
@@ -214,34 +110,42 @@ var getVideoRatio = function getVideoRatio(elem) {
     return elem.videoHeight / elem.videoWidth;
   }
   return 3 / 4;
-};
+}
 
-var getCSSNumber = function getCSSNumber(elem, prop) {
+var getCSSNumber = function(elem, prop) {
   var cssStr = css(elem, prop);
   return cssStr ? parseInt(cssStr, 10) : 0;
 };
 
 // Really cheap UUID function
-var cheapUUID = function cheapUUID() {
+var cheapUUID = function() {
   return (Math.random() * 100000000).toFixed(0);
 };
 
-var getHeight = function getHeight(elem) {
+var getHeight = function(elem) {
   var heightStr = height(elem);
   return heightStr ? parseInt(heightStr, 10) : 0;
 };
 
-var getWidth = function getWidth(elem) {
+var getWidth = function(elem) {
   var widthStr = width(elem);
   return widthStr ? parseInt(widthStr, 10) : 0;
 };
 
-var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, fixedRatio, minRatio, maxRatio, animate) {
+var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, fixedRatio,
+  minRatio, maxRatio, animate) {
   var count = children.length,
-      dimensions;
+    dimensions;
 
   var getBestDimensions = function getBestDimensions(minRatio, maxRatio) {
-    var maxArea, targetCols, targetRows, targetHeight, targetWidth, tWidth, tHeight, tRatio;
+    var maxArea,
+      targetCols,
+      targetRows,
+      targetHeight,
+      targetWidth,
+      tWidth,
+      tHeight,
+      tRatio;
 
     // Iterate through every possible combination of rows and columns
     // and see which one has the least amount of whitespace
@@ -264,10 +168,10 @@ var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, f
         tWidth = tHeight / tRatio;
       }
 
-      var area = tWidth * tHeight * count;
+      var area = (tWidth * tHeight) * count;
 
       // If this width and height takes up the most space then we're going with that
-      if (maxArea === undefined || area > maxArea) {
+      if (maxArea === undefined || (area > maxArea)) {
         maxArea = area;
         targetHeight = tHeight;
         targetWidth = tWidth;
@@ -295,9 +199,9 @@ var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, f
 
   // Loop through each stream in the container and place it inside
   var x = 0,
-      y = 0,
-      rows = [],
-      row;
+    y = 0,
+    rows = [],
+    row;
   // Iterate through the children and create an array with a new item for each row
   // and calculate the width of each row so that we know if we go over the size and need
   // to adjust
@@ -345,11 +249,11 @@ var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, f
       if (row.width < Width) {
         // Evenly distribute the extra height between the short rows
         var extraHeight = remainingHeightDiff / remainingShortRows;
-        if (extraHeight / row.height > (Width - row.width) / row.width) {
+        if ((extraHeight / row.height) > ((Width - row.width) / row.width)) {
           // We can't go that big or we'll go too wide
-          extraHeight = Math.floor((Width - row.width) / row.width * row.height);
+          extraHeight = Math.floor(((Width - row.width) / row.width) * row.height);
         }
-        row.width += Math.floor(extraHeight / row.height * row.width);
+        row.width += Math.floor((extraHeight / row.height) * row.width);
         row.height += extraHeight;
         remainingHeightDiff -= extraHeight;
         remainingShortRows -= 1;
@@ -358,12 +262,12 @@ var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, f
     }
   }
   // vertical centering
-  y = (Height - totalRowHeight) / 2;
+  y = ((Height - (totalRowHeight)) / 2);
   // Iterate through each row and place each child
   for (i = 0; i < rows.length; i++) {
     var row = rows[i];
     // center the row
-    var rowMarginLeft = (Width - row.width) / 2;
+    var rowMarginLeft = ((Width - row.width) / 2);
     x = rowMarginLeft;
     for (var j = 0; j < row.children.length; j++) {
       var elem = row.children[j];
@@ -375,9 +279,19 @@ var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, f
         targetWidth = Math.floor(targetHeight / getVideoRatio(elem));
       }
       css(elem, 'position', 'absolute');
-      var actualWidth = targetWidth - getCSSNumber(elem, 'paddingLeft') - getCSSNumber(elem, 'paddingRight') - getCSSNumber(elem, 'marginLeft') - getCSSNumber(elem, 'marginRight') - getCSSNumber(elem, 'borderLeft') - getCSSNumber(elem, 'borderRight');
+      var actualWidth = targetWidth - getCSSNumber(elem, 'paddingLeft') -
+        getCSSNumber(elem, 'paddingRight') -
+        getCSSNumber(elem, 'marginLeft') -
+        getCSSNumber(elem, 'marginRight') -
+        getCSSNumber(elem, 'borderLeft') -
+        getCSSNumber(elem, 'borderRight');
 
-      var actualHeight = targetHeight - getCSSNumber(elem, 'paddingTop') - getCSSNumber(elem, 'paddingBottom') - getCSSNumber(elem, 'marginTop') - getCSSNumber(elem, 'marginBottom') - getCSSNumber(elem, 'borderTop') - getCSSNumber(elem, 'borderBottom');
+      var actualHeight = targetHeight - getCSSNumber(elem, 'paddingTop') -
+        getCSSNumber(elem, 'paddingBottom') -
+        getCSSNumber(elem, 'marginTop') -
+        getCSSNumber(elem, 'marginBottom') -
+        getCSSNumber(elem, 'borderTop') -
+        getCSSNumber(elem, 'borderBottom');
 
       positionElement(elem, x + offsetLeft, y + offsetTop, actualWidth, actualHeight, animate);
       x += targetWidth;
@@ -386,7 +300,7 @@ var arrange = function arrange(children, Width, Height, offsetLeft, offsetTop, f
   }
 };
 
-var filterDisplayNone = function filterDisplayNone(element) {
+var filterDisplayNone = function(element) {
   return css(element, 'display') !== 'none';
 };
 
@@ -400,15 +314,23 @@ var layout = function layout(container, opts) {
     container.setAttribute('id', id);
   }
 
-  var Height = getHeight(container) - getCSSNumber(container, 'borderTop') - getCSSNumber(container, 'borderBottom'),
-      Width = getWidth(container) - getCSSNumber(container, 'borderLeft') - getCSSNumber(container, 'borderRight'),
-      availableRatio = Height / Width,
-      offsetLeft = 0,
-      offsetTop = 0,
-      bigOffsetTop = 0,
-      bigOffsetLeft = 0,
-      bigOnes = Array.prototype.filter.call(container.querySelectorAll('#' + id + '>.' + opts.bigClass), filterDisplayNone),
-      smallOnes = Array.prototype.filter.call(container.querySelectorAll('#' + id + '>*:not(.' + opts.bigClass + ')'), filterDisplayNone);
+  var Height = getHeight(container) -
+    getCSSNumber(container, 'borderTop') -
+    getCSSNumber(container, 'borderBottom'),
+    Width = getWidth(container) -
+    getCSSNumber(container, 'borderLeft') -
+    getCSSNumber(container, 'borderRight'),
+    availableRatio = Height / Width,
+    offsetLeft = 0,
+    offsetTop = 0,
+    bigOffsetTop = 0,
+    bigOffsetLeft = 0,
+    bigOnes = Array.prototype.filter.call(
+      container.querySelectorAll('#' + id + '>.' + opts.bigClass),
+      filterDisplayNone),
+    smallOnes = Array.prototype.filter.call(
+      container.querySelectorAll('#' + id + '>*:not(.' + opts.bigClass + ')'),
+      filterDisplayNone);
 
   if (bigOnes.length > 0 && smallOnes.length > 0) {
     var bigWidth, bigHeight;
@@ -429,21 +351,27 @@ var layout = function layout(container, opts) {
       bigOffsetLeft = Width - offsetLeft;
     }
     if (opts.bigFirst) {
-      arrange(bigOnes, bigWidth, bigHeight, 0, 0, opts.bigFixedRatio, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
-      arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
+      arrange(bigOnes, bigWidth, bigHeight, 0, 0, opts.bigFixedRatio, opts.bigMinRatio,
+        opts.bigMaxRatio, opts.animate);
+      arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop,
+        opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
     } else {
-      arrange(smallOnes, Width - offsetLeft, Height - offsetTop, 0, 0, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
-      arrange(bigOnes, bigWidth, bigHeight, bigOffsetLeft, bigOffsetTop, opts.bigFixedRatio, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
+      arrange(smallOnes, Width - offsetLeft, Height - offsetTop, 0, 0, opts.fixedRatio,
+        opts.minRatio, opts.maxRatio, opts.animate);
+      arrange(bigOnes, bigWidth, bigHeight, bigOffsetLeft, bigOffsetTop,
+        opts.bigFixedRatio, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
     }
   } else if (bigOnes.length > 0 && smallOnes.length === 0) {
     // We only have one bigOne just center it
-    arrange(bigOnes, Width, Height, 0, 0, opts.bigFixedRatio, opts.bigMinRatio, opts.bigMaxRatio, opts.animate);
+    arrange(bigOnes, Width, Height, 0, 0, opts.bigFixedRatio, opts.bigMinRatio,
+      opts.bigMaxRatio, opts.animate);
   } else {
-    arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop, opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
+    arrange(smallOnes, Width - offsetLeft, Height - offsetTop, offsetLeft, offsetTop,
+      opts.fixedRatio, opts.minRatio, opts.maxRatio, opts.animate);
   }
 };
 
-var initLayoutContainer = function initLayoutContainer(container, opts) {
+var initLayoutContainer = function(container, opts) {
   opts = defaults(opts || {}, {
     maxRatio: 3 / 2,
     minRatio: 9 / 16,
@@ -456,12 +384,12 @@ var initLayoutContainer = function initLayoutContainer(container, opts) {
     bigMinRatio: 9 / 16,
     bigFirst: true
   });
-  container = typeof container === 'string' ? document.querySelector(container) : container;
+  container = typeof(container) === 'string' ? document.querySelector(container) : container;
 
   if (document.readyState === 'complete') {
     layout(container, opts);
   } else {
-    window.addEventListener('load', function () {
+    window.addEventListener('load', function() {
       layout(container, opts);
     });
   }
@@ -472,7 +400,3 @@ var initLayoutContainer = function initLayoutContainer(container, opts) {
 };
 
 module.exports = initLayoutContainer;
-
-/***/ })
-/******/ ]);
-});

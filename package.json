@@ -5,11 +5,10 @@
   "main": "opentok-layout.js",
   "dependencies": {},
   "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
     "codeclimate-test-reporter": "0.0.4",
-    "gulp": "~3.5.5",
-    "gulp-jshint": "~1.5.0",
-    "gulp-rename": "~1.1.0",
-    "gulp-uglify": "~0.2.1",
     "http-server": "^0.8.0",
     "karma": "^0.13.0",
     "karma-chrome-launcher": "^0.1.4",
@@ -18,7 +17,10 @@
     "karma-jasmine": "~0.2.0",
     "karma-sauce-launcher": "^0.2.14",
     "opentok-test-scripts": "^1.0.1",
-    "travis-multirunner": "^3.0.0"
+    "travis-multirunner": "^3.0.0",
+    "unminified-webpack-plugin": "^2.0.0",
+    "webpack": "^4.15.1",
+    "webpack-command": "^0.4.1"
   },
   "scripts": {
     "test": "node ./tests/test-node.js && ./node_modules/.bin/run-tests",
