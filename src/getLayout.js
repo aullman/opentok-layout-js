@@ -174,7 +174,6 @@ const getLayout = (opts, elements) => {
 const getVideoRatio = element => element.height / element.width;
 
 module.exports = (opts, elements) => {
-  console.log('getLayout', opts, elements);
   const {
     maxRatio = 3 / 2,
     minRatio = 9 / 16,

@@ -321,7 +321,6 @@ var getVideoRatio = function getVideoRatio(element) {
 };
 
 module.exports = function (opts, elements) {
-  console.log('getLayout', opts, elements);
   var _opts$maxRatio = opts.maxRatio,
       maxRatio = _opts$maxRatio === undefined ? 3 / 2 : _opts$maxRatio,
       _opts$minRatio = opts.minRatio,
