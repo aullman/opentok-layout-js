@@ -193,19 +193,22 @@ var getBestDimensions = function getBestDimensions(minRatio, maxRatio, Width, He
   };
 };
 
-module.exports = function (opts, ratios) {
-  var _opts$maxRatio = opts.maxRatio,
-      maxRatio = _opts$maxRatio === undefined ? 3 / 2 : _opts$maxRatio,
-      _opts$minRatio = opts.minRatio,
-      minRatio = _opts$minRatio === undefined ? 9 / 16 : _opts$minRatio,
-      _opts$fixedRatio = opts.fixedRatio,
-      fixedRatio = _opts$fixedRatio === undefined ? false : _opts$fixedRatio,
-      _opts$containerWidth = opts.containerWidth,
-      containerWidth = _opts$containerWidth === undefined ? 640 : _opts$containerWidth,
-      _opts$containerHeight = opts.containerHeight,
-      containerHeight = _opts$containerHeight === undefined ? 480 : _opts$containerHeight;
+var getLayout = function getLayout(opts, elements) {
+  var maxRatio = opts.maxRatio,
+      minRatio = opts.minRatio,
+      fixedRatio = opts.fixedRatio,
+      containerWidth = opts.containerWidth,
+      containerHeight = opts.containerHeight,
+      _opts$offsetLeft = opts.offsetLeft,
+      offsetLeft = _opts$offsetLeft === undefined ? 0 : _opts$offsetLeft,
+      _opts$offsetTop = opts.offsetTop,
+      offsetTop = _opts$offsetTop === undefined ? 0 : _opts$offsetTop;
 
+  var ratios = elements.map(function (element) {
+    return element.height / element.width;
+  });
   var count = ratios.length;
+
   var dimensions = void 0;
 
   if (!fixedRatio) {
@@ -301,9 +304,8 @@ module.exports = function (opts, ratios) {
       }
 
       boxes.push({
-        aspectRatio: _ratio2,
-        left: x,
-        top: y,
+        left: x + offsetLeft,
+        top: y + offsetTop,
         width: _targetWidth,
         height: _targetHeight
       });
@@ -311,6 +313,146 @@ module.exports = function (opts, ratios) {
     }
     y += _targetHeight;
   }
+  return boxes;
+};
+
+var getVideoRatio = function getVideoRatio(element) {
+  return element.height / element.width;
+};
+
+module.exports = function (opts, elements) {
+  console.log('getLayout', opts, elements);
+  var _opts$maxRatio = opts.maxRatio,
+      maxRatio = _opts$maxRatio === undefined ? 3 / 2 : _opts$maxRatio,
+      _opts$minRatio = opts.minRatio,
+      minRatio = _opts$minRatio === undefined ? 9 / 16 : _opts$minRatio,
+      _opts$fixedRatio = opts.fixedRatio,
+      fixedRatio = _opts$fixedRatio === undefined ? false : _opts$fixedRatio,
+      _opts$bigPercentage = opts.bigPercentage,
+      bigPercentage = _opts$bigPercentage === undefined ? 0.8 : _opts$bigPercentage,
+      _opts$bigFixedRatio = opts.bigFixedRatio,
+      bigFixedRatio = _opts$bigFixedRatio === undefined ? false : _opts$bigFixedRatio,
+      _opts$bigMaxRatio = opts.bigMaxRatio,
+      bigMaxRatio = _opts$bigMaxRatio === undefined ? 3 / 2 : _opts$bigMaxRatio,
+      _opts$bigMinRatio = opts.bigMinRatio,
+      bigMinRatio = _opts$bigMinRatio === undefined ? 9 / 16 : _opts$bigMinRatio,
+      _opts$bigFirst = opts.bigFirst,
+      bigFirst = _opts$bigFirst === undefined ? true : _opts$bigFirst,
+      _opts$containerWidth = opts.containerWidth,
+      containerWidth = _opts$containerWidth === undefined ? 640 : _opts$containerWidth,
+      _opts$containerHeight = opts.containerHeight,
+      containerHeight = _opts$containerHeight === undefined ? 480 : _opts$containerHeight;
+
+
+  var availableRatio = containerHeight / containerWidth;
+  var offsetLeft = 0;
+  var offsetTop = 0;
+  var bigOffsetTop = 0;
+  var bigOffsetLeft = 0;
+  var bigIndices = [];
+  var bigOnes = elements.filter(function (element, idx) {
+    if (element.big) {
+      bigIndices.push(idx);
+      return true;
+    }
+    return false;
+  });
+  var smallOnes = elements.filter(function (element) {
+    return !element.big;
+  });
+  var bigBoxes = [];
+  var smallBoxes = [];
+  if (bigOnes.length > 0 && smallOnes.length > 0) {
+    var bigWidth = void 0;
+    var bigHeight = void 0;
+
+    if (availableRatio > getVideoRatio(bigOnes[0])) {
+      // We are tall, going to take up the whole width and arrange small
+      // guys at the bottom
+      bigWidth = containerWidth;
+      bigHeight = Math.floor(containerHeight * bigPercentage);
+      offsetTop = bigHeight;
+      bigOffsetTop = containerHeight - offsetTop;
+    } else {
+      // We are wide, going to take up the whole height and arrange the small
+      // guys on the right
+      bigHeight = containerHeight;
+      bigWidth = Math.floor(containerWidth * bigPercentage);
+      offsetLeft = bigWidth;
+      bigOffsetLeft = containerWidth - offsetLeft;
+    }
+    if (bigFirst) {
+      bigBoxes = getLayout({
+        containerWidth: bigWidth,
+        containerHeight: bigHeight,
+        offsetLeft: 0,
+        offsetTop: 0,
+        fixedRatio: bigFixedRatio,
+        minRatio: bigMinRatio,
+        maxRatio: bigMaxRatio
+      }, bigOnes);
+      smallBoxes = getLayout({
+        containerWidth: containerWidth - offsetLeft,
+        containerHeight: containerHeight - offsetTop,
+        offsetLeft: offsetLeft,
+        offsetTop: offsetTop,
+        fixedRatio: fixedRatio,
+        minRatio: minRatio,
+        maxRatio: maxRatio
+      }, smallOnes);
+    } else {
+      smallBoxes = getLayout({
+        containerWidth: containerWidth - offsetLeft,
+        containerHeight: containerHeight - offsetTop,
+        offsetLeft: 0,
+        offsetTop: 0,
+        fixedRatio: fixedRatio,
+        minRatio: minRatio,
+        maxRatio: maxRatio
+      }, smallOnes);
+      bigBoxes = getLayout({
+        containerWidth: bigWidth,
+        containerHeight: bigHeight,
+        offsetLeft: bigOffsetLeft,
+        offsetTop: bigOffsetTop,
+        fixedRatio: bigFixedRatio,
+        minRatio: bigMinRatio
+      }, bigOnes);
+    }
+  } else if (bigOnes.length > 0 && smallOnes.length === 0) {
+    // We only have one bigOne just center it
+    bigBoxes = getLayout({
+      containerWidth: containerWidth,
+      containerHeight: containerHeight,
+      fixedRatio: bigFixedRatio,
+      minRatio: bigMinRatio,
+      maxRatio: bigMaxRatio
+    }, bigOnes);
+  } else {
+    smallBoxes = getLayout({
+      containerWidth: containerWidth - offsetLeft,
+      containerHeight: containerHeight - offsetTop,
+      offsetLeft: offsetLeft,
+      offsetTop: offsetTop,
+      fixedRatio: fixedRatio,
+      minRatio: minRatio,
+      maxRatio: maxRatio
+    }, smallOnes);
+  }
+
+  var boxes = [];
+  var bigBoxesIdx = 0;
+  var smallBoxesIdx = 0;
+  // Rebuild the array in the right order based on where the bigIndices should be
+  elements.forEach(function (element, idx) {
+    if (bigIndices.indexOf(idx) > -1) {
+      boxes[idx] = bigBoxes[bigBoxesIdx];
+      bigBoxesIdx += 1;
+    } else {
+      boxes[idx] = smallBoxes[smallBoxesIdx];
+      smallBoxesIdx += 1;
+    }
+  });
   return boxes;
 };
 
@@ -405,18 +547,26 @@ var positionElement = function positionElement(elem, x, y, w, h, animate) {
   fixAspectRatio();
 };
 
-var getVideoRatio = function getVideoRatio(elem) {
-  if (!elem) {
-    return 3 / 4;
+var getChildDims = function getChildDims(child) {
+  if (child) {
+    var video = child.querySelector('video');
+    if (video && video.videoHeight && video.videoWidth) {
+      return {
+        height: video.videoHeight,
+        width: video.videoWidth
+      };
+    }
+    if (child.videoHeight && child.videoWidth) {
+      return {
+        height: child.videoHeight,
+        width: child.videoWidth
+      };
+    }
   }
-  var video = elem.querySelector('video');
-  if (video && video.videoHeight && video.videoWidth) {
-    return video.videoHeight / video.videoWidth;
-  }
-  if (elem.videoHeight && elem.videoWidth) {
-    return elem.videoHeight / elem.videoWidth;
-  }
-  return 3 / 4;
+  return {
+    height: 480,
+    width: 640
+  };
 };
 
 var getCSSNumber = function getCSSNumber(elem, prop) {
@@ -439,53 +589,11 @@ var getWidth = function getWidth(elem) {
   return widthStr ? parseInt(widthStr, 10) : 0;
 };
 
-var arrange = function arrange(children, containerWidth, containerHeight, offsetLeft, offsetTop, fixedRatio, minRatio, maxRatio, animate) {
-  var boxes = getLayout({
-    containerWidth: containerWidth,
-    containerHeight: containerHeight,
-    minRatio: minRatio,
-    maxRatio: maxRatio,
-    fixedRatio: fixedRatio
-  }, children.map(function (child) {
-    return getVideoRatio(child);
-  }));
-
-  boxes.forEach(function (box, idx) {
-    var elem = children[idx];
-    css(elem, 'position', 'absolute');
-    var actualWidth = box.width - getCSSNumber(elem, 'paddingLeft') - getCSSNumber(elem, 'paddingRight') - getCSSNumber(elem, 'marginLeft') - getCSSNumber(elem, 'marginRight') - getCSSNumber(elem, 'borderLeft') - getCSSNumber(elem, 'borderRight');
-
-    var actualHeight = box.height - getCSSNumber(elem, 'paddingTop') - getCSSNumber(elem, 'paddingBottom') - getCSSNumber(elem, 'marginTop') - getCSSNumber(elem, 'marginBottom') - getCSSNumber(elem, 'borderTop') - getCSSNumber(elem, 'borderBottom');
-
-    positionElement(elem, box.left + offsetLeft, box.top + offsetTop, actualWidth, actualHeight, animate);
-  });
-};
-
 module.exports = function (container, opts) {
-  var _opts$maxRatio = opts.maxRatio,
-      maxRatio = _opts$maxRatio === undefined ? 3 / 2 : _opts$maxRatio,
-      _opts$minRatio = opts.minRatio,
-      minRatio = _opts$minRatio === undefined ? 9 / 16 : _opts$minRatio,
-      _opts$fixedRatio = opts.fixedRatio,
-      fixedRatio = _opts$fixedRatio === undefined ? false : _opts$fixedRatio,
-      _opts$animate = opts.animate,
+  var _opts$animate = opts.animate,
       animate = _opts$animate === undefined ? false : _opts$animate,
       _opts$bigClass = opts.bigClass,
-      bigClass = _opts$bigClass === undefined ? 'OT_big' : _opts$bigClass,
-      _opts$bigPercentage = opts.bigPercentage,
-      bigPercentage = _opts$bigPercentage === undefined ? 0.8 : _opts$bigPercentage,
-      _opts$bigFixedRatio = opts.bigFixedRatio,
-      bigFixedRatio = _opts$bigFixedRatio === undefined ? false : _opts$bigFixedRatio,
-      _opts$bigMaxRatio = opts.bigMaxRatio,
-      bigMaxRatio = _opts$bigMaxRatio === undefined ? 3 / 2 : _opts$bigMaxRatio,
-      _opts$bigMinRatio = opts.bigMinRatio,
-      bigMinRatio = _opts$bigMinRatio === undefined ? 9 / 16 : _opts$bigMinRatio,
-      _opts$bigFirst = opts.bigFirst,
-      bigFirst = _opts$bigFirst === undefined ? true : _opts$bigFirst;
-  var _opts$containerWidth = opts.containerWidth,
-      containerWidth = _opts$containerWidth === undefined ? 640 : _opts$containerWidth,
-      _opts$containerHeight = opts.containerHeight,
-      containerHeight = _opts$containerHeight === undefined ? 480 : _opts$containerHeight;
+      bigClass = _opts$bigClass === undefined ? 'OT_big' : _opts$bigClass;
 
 
   if (css(container, 'display') === 'none') {
@@ -497,48 +605,26 @@ module.exports = function (container, opts) {
     container.setAttribute('id', id);
   }
 
-  containerHeight = getHeight(container) - getCSSNumber(container, 'borderTop') - getCSSNumber(container, 'borderBottom');
-  containerWidth = getWidth(container) - getCSSNumber(container, 'borderLeft') - getCSSNumber(container, 'borderRight');
-  var availableRatio = containerHeight / containerWidth;
-  var offsetLeft = 0;
-  var offsetTop = 0;
-  var bigOffsetTop = 0;
-  var bigOffsetLeft = 0;
-  var bigOnes = Array.prototype.filter.call(container.querySelectorAll('#' + id + '>.' + bigClass), filterDisplayNone);
-  var smallOnes = Array.prototype.filter.call(container.querySelectorAll('#' + id + '>*:not(.' + bigClass + ')'), filterDisplayNone);
+  opts.containerHeight = getHeight(container) - getCSSNumber(container, 'borderTop') - getCSSNumber(container, 'borderBottom');
+  opts.containerWidth = getWidth(container) - getCSSNumber(container, 'borderLeft') - getCSSNumber(container, 'borderRight');
 
-  if (bigOnes.length > 0 && smallOnes.length > 0) {
-    var bigWidth = void 0;
-    var bigHeight = void 0;
+  var children = Array.prototype.filter.call(container.querySelectorAll('#' + id + '>*'), filterDisplayNone);
+  var elements = children.map(function (element) {
+    var res = getChildDims(element);
+    res.big = element.classList.contains(bigClass);
+    return res;
+  });
 
-    if (availableRatio > getVideoRatio(bigOnes[0])) {
-      // We are tall, going to take up the whole width and arrange small
-      // guys at the bottom
-      bigWidth = containerWidth;
-      bigHeight = Math.floor(containerHeight * bigPercentage);
-      offsetTop = bigHeight;
-      bigOffsetTop = containerHeight - offsetTop;
-    } else {
-      // We are wide, going to take up the whole height and arrange the small
-      // guys on the right
-      bigHeight = containerHeight;
-      bigWidth = Math.floor(containerWidth * bigPercentage);
-      offsetLeft = bigWidth;
-      bigOffsetLeft = containerWidth - offsetLeft;
-    }
-    if (bigFirst) {
-      arrange(bigOnes, bigWidth, bigHeight, 0, 0, bigFixedRatio, bigMinRatio, bigMaxRatio, animate);
-      arrange(smallOnes, containerWidth - offsetLeft, containerHeight - offsetTop, offsetLeft, offsetTop, fixedRatio, minRatio, maxRatio, animate);
-    } else {
-      arrange(smallOnes, containerWidth - offsetLeft, containerHeight - offsetTop, 0, 0, fixedRatio, minRatio, maxRatio, animate);
-      arrange(bigOnes, bigWidth, bigHeight, bigOffsetLeft, bigOffsetTop, bigFixedRatio, bigMinRatio, bigMaxRatio, animate);
-    }
-  } else if (bigOnes.length > 0 && smallOnes.length === 0) {
-    // We only have one bigOne just center it
-    arrange(bigOnes, containerWidth, containerHeight, 0, 0, bigFixedRatio, bigMinRatio, bigMaxRatio, animate);
-  } else {
-    arrange(smallOnes, containerWidth - offsetLeft, containerHeight - offsetTop, offsetLeft, offsetTop, fixedRatio, minRatio, maxRatio, animate);
-  }
+  var boxes = getLayout(opts, elements);
+  boxes.forEach(function (box, idx) {
+    var elem = children[idx];
+    css(elem, 'position', 'absolute');
+    var actualWidth = box.width - getCSSNumber(elem, 'paddingLeft') - getCSSNumber(elem, 'paddingRight') - getCSSNumber(elem, 'marginLeft') - getCSSNumber(elem, 'marginRight') - getCSSNumber(elem, 'borderLeft') - getCSSNumber(elem, 'borderRight');
+
+    var actualHeight = box.height - getCSSNumber(elem, 'paddingTop') - getCSSNumber(elem, 'paddingBottom') - getCSSNumber(elem, 'marginTop') - getCSSNumber(elem, 'marginBottom') - getCSSNumber(elem, 'borderTop') - getCSSNumber(elem, 'borderBottom');
+
+    positionElement(elem, box.left, box.top, actualWidth, actualHeight, animate);
+  });
 };
 
 /***/ })

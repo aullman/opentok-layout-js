@@ -44,14 +44,12 @@ describe('opentok layout', () => {
       layoutDiv.appendChild(div2);
       children = [div1, div2];
       expectedLayout = [{
-        aspectRatio: 300 / 200,
         width: 200,
         height: 300,
         left: 0,
         top: 0,
       },
       {
-        aspectRatio: 300 / 200,
         width: 200,
         height: 300,
         left: 200,
@@ -71,7 +69,7 @@ describe('opentok layout', () => {
         containerWidth: 400,
         containerHeight: 300,
       });
-      expect(layoutContainer.getLayout(children.map(() => 300 / 200)))
+      expect(layoutContainer.getLayout(children.map(() => ({ width: 300, height: 200 }))))
         .toEqual(expectedLayout);
     });
 
@@ -147,21 +145,42 @@ describe('opentok layout', () => {
     describe('with a big element', () => {
       beforeEach(() => {
         div1.className = 'OT_big';
+        expectedLayout = [{
+          width: 320,
+          height: 300,
+          left: 0,
+          top: 0,
+        },
+        {
+          width: 80,
+          height: 120,
+          left: 320,
+          top: 90,
+        },
+        ];
+      });
+
+      it('handles default getLayout', () => {
+        const layoutContainer = initLayoutContainer({
+          containerWidth: 400,
+          containerHeight: 300,
+        });
+        expect(layoutContainer.getLayout(children.map(child => ({
+          width: 640,
+          height: 480,
+          big: child.className === 'OT_big',
+        })))).toEqual(expectedLayout);
       });
 
       it('handles default layout', () => {
         const layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
-        const div1Rect = div1.getBoundingClientRect();
-        const div2Rect = div2.getBoundingClientRect();
-        expect(div1Rect.width).toBe(320);
-        expect(div2Rect.width).toBe(80);
-        expect(div1Rect.height).toBe(300);
-        expect(div2Rect.height).toBe(120);
-        expect(div1Rect.left).toBe(0);
-        expect(div1Rect.top).toBe(0);
-        expect(div2Rect.left).toBe(320);
-        expect(div2Rect.top).toBe(90);
+        expectedLayout.forEach((box, idx) => {
+          const boundingRect = children[idx].getBoundingClientRect();
+          ['width', 'height', 'left', 'top'].forEach((val) => {
+            expect(boundingRect[val]).toEqual(expectedLayout[idx][val]);
+          });
+        });
       });
 
       it('handles bigFixedRatio:true', () => {
@@ -227,8 +246,9 @@ describe('opentok layout', () => {
   });
 
   describe('handling layout of 5 elements', () => {
-    let layoutDiv; let divs = []; const
-      divCount = 5;
+    let layoutDiv;
+    let divs = [];
+    const divCount = 5;
     beforeEach(() => {
       layoutDiv = document.createElement('div');
       layoutDiv.setAttribute('id', 'layoutDiv');

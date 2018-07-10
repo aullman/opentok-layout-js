@@ -35,6 +35,14 @@ module.exports = (config) => {
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
       'opentok-layout.js': 'coverage',
+      '**/*spec.js': 'babel',
+    },
+
+    babelPreprocessor: {
+      options: {
+        presets: ['env'],
+        sourceMap: 'inline',
+      },
     },
 
     // test results reporter to use

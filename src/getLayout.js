@@ -50,15 +50,20 @@ const getBestDimensions = (minRatio, maxRatio, Width, Height, count) => {
   };
 };
 
-module.exports = (opts, ratios) => {
+const getLayout = (opts, elements) => {
   const {
-    maxRatio = 3 / 2,
-    minRatio = 9 / 16,
-    fixedRatio = false,
-    containerWidth = 640,
-    containerHeight = 480,
+    maxRatio,
+    minRatio,
+    fixedRatio,
+    containerWidth,
+    containerHeight,
+    offsetLeft = 0,
+    offsetTop = 0,
   } = opts;
+  const ratios = elements.map(element => element.height / element.width);
   const count = ratios.length;
+
+
   let dimensions;
 
   if (!fixedRatio) {
@@ -154,9 +159,8 @@ module.exports = (opts, ratios) => {
       }
 
       boxes.push({
-        aspectRatio: ratio,
-        left: x,
-        top: y,
+        left: x + offsetLeft,
+        top: y + offsetTop,
         width: targetWidth,
         height: targetHeight,
       });
@@ -164,5 +168,132 @@ module.exports = (opts, ratios) => {
     }
     y += targetHeight;
   }
+  return boxes;
+};
+
+const getVideoRatio = element => element.height / element.width;
+
+module.exports = (opts, elements) => {
+  console.log('getLayout', opts, elements);
+  const {
+    maxRatio = 3 / 2,
+    minRatio = 9 / 16,
+    fixedRatio = false,
+    bigPercentage = 0.8,
+    bigFixedRatio = false,
+    bigMaxRatio = 3 / 2,
+    bigMinRatio = 9 / 16,
+    bigFirst = true,
+    containerWidth = 640,
+    containerHeight = 480,
+  } = opts;
+
+  const availableRatio = containerHeight / containerWidth;
+  let offsetLeft = 0;
+  let offsetTop = 0;
+  let bigOffsetTop = 0;
+  let bigOffsetLeft = 0;
+  const bigIndices = [];
+  const bigOnes = elements.filter((element, idx) => {
+    if (element.big) {
+      bigIndices.push(idx);
+      return true;
+    }
+    return false;
+  });
+  const smallOnes = elements.filter(element => !element.big);
+  let bigBoxes = [];
+  let smallBoxes = [];
+  if (bigOnes.length > 0 && smallOnes.length > 0) {
+    let bigWidth;
+    let bigHeight;
+
+    if (availableRatio > getVideoRatio(bigOnes[0])) {
+      // We are tall, going to take up the whole width and arrange small
+      // guys at the bottom
+      bigWidth = containerWidth;
+      bigHeight = Math.floor(containerHeight * bigPercentage);
+      offsetTop = bigHeight;
+      bigOffsetTop = containerHeight - offsetTop;
+    } else {
+      // We are wide, going to take up the whole height and arrange the small
+      // guys on the right
+      bigHeight = containerHeight;
+      bigWidth = Math.floor(containerWidth * bigPercentage);
+      offsetLeft = bigWidth;
+      bigOffsetLeft = containerWidth - offsetLeft;
+    }
+    if (bigFirst) {
+      bigBoxes = getLayout({
+        containerWidth: bigWidth,
+        containerHeight: bigHeight,
+        offsetLeft: 0,
+        offsetTop: 0,
+        fixedRatio: bigFixedRatio,
+        minRatio: bigMinRatio,
+        maxRatio: bigMaxRatio,
+      }, bigOnes);
+      smallBoxes = getLayout({
+        containerWidth: containerWidth - offsetLeft,
+        containerHeight: containerHeight - offsetTop,
+        offsetLeft,
+        offsetTop,
+        fixedRatio,
+        minRatio,
+        maxRatio,
+      }, smallOnes);
+    } else {
+      smallBoxes = getLayout({
+        containerWidth: containerWidth - offsetLeft,
+        containerHeight: containerHeight - offsetTop,
+        offsetLeft: 0,
+        offsetTop: 0,
+        fixedRatio,
+        minRatio,
+        maxRatio,
+      }, smallOnes);
+      bigBoxes = getLayout({
+        containerWidth: bigWidth,
+        containerHeight: bigHeight,
+        offsetLeft: bigOffsetLeft,
+        offsetTop: bigOffsetTop,
+        fixedRatio: bigFixedRatio,
+        minRatio: bigMinRatio,
+      }, bigOnes);
+    }
+  } else if (bigOnes.length > 0 && smallOnes.length === 0) {
+    // We only have one bigOne just center it
+    bigBoxes = getLayout({
+      containerWidth,
+      containerHeight,
+      fixedRatio: bigFixedRatio,
+      minRatio: bigMinRatio,
+      maxRatio: bigMaxRatio,
+    }, bigOnes);
+  } else {
+    smallBoxes = getLayout({
+      containerWidth: containerWidth - offsetLeft,
+      containerHeight: containerHeight - offsetTop,
+      offsetLeft,
+      offsetTop,
+      fixedRatio,
+      minRatio,
+      maxRatio,
+    }, smallOnes);
+  }
+
+  const boxes = [];
+  let bigBoxesIdx = 0;
+  let smallBoxesIdx = 0;
+  // Rebuild the array in the right order based on where the bigIndices should be
+  elements.forEach((element, idx) => {
+    if (bigIndices.indexOf(idx) > -1) {
+      boxes[idx] = bigBoxes[bigBoxesIdx];
+      bigBoxesIdx += 1;
+    } else {
+      boxes[idx] = smallBoxes[smallBoxesIdx];
+      smallBoxesIdx += 1;
+    }
+  });
   return boxes;
 };

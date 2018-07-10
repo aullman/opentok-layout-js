@@ -77,18 +77,26 @@ const positionElement = function positionElement(elem, x, y, w, h, animate) {
   fixAspectRatio();
 };
 
-const getVideoRatio = function getVideoRatio(elem) {
-  if (!elem) {
-    return 3 / 4;
+const getChildDims = function getChildDims(child) {
+  if (child) {
+    const video = child.querySelector('video');
+    if (video && video.videoHeight && video.videoWidth) {
+      return {
+        height: video.videoHeight,
+        width: video.videoWidth,
+      };
+    }
+    if (child.videoHeight && child.videoWidth) {
+      return {
+        height: child.videoHeight,
+        width: child.videoWidth,
+      };
+    }
   }
-  const video = elem.querySelector('video');
-  if (video && video.videoHeight && video.videoWidth) {
-    return video.videoHeight / video.videoWidth;
-  }
-  if (elem.videoHeight && elem.videoWidth) {
-    return elem.videoHeight / elem.videoWidth;
-  }
-  return 3 / 4;
+  return {
+    height: 480,
+    width: 640,
+  };
 };
 
 const getCSSNumber = function getCSSNumber(elem, prop) {
@@ -111,54 +119,10 @@ const getWidth = function getWidth(elem) {
   return widthStr ? parseInt(widthStr, 10) : 0;
 };
 
-const arrange = function arrange(children, containerWidth, containerHeight, offsetLeft, offsetTop,
-  fixedRatio, minRatio, maxRatio, animate) {
-  const boxes = getLayout({
-    containerWidth,
-    containerHeight,
-    minRatio,
-    maxRatio,
-    fixedRatio,
-  }, children.map(child => getVideoRatio(child)));
-
-  boxes.forEach((box, idx) => {
-    const elem = children[idx];
-    css(elem, 'position', 'absolute');
-    const actualWidth = box.width - getCSSNumber(elem, 'paddingLeft')
-      - getCSSNumber(elem, 'paddingRight')
-      - getCSSNumber(elem, 'marginLeft')
-      - getCSSNumber(elem, 'marginRight')
-      - getCSSNumber(elem, 'borderLeft')
-      - getCSSNumber(elem, 'borderRight');
-
-    const actualHeight = box.height - getCSSNumber(elem, 'paddingTop')
-      - getCSSNumber(elem, 'paddingBottom')
-      - getCSSNumber(elem, 'marginTop')
-      - getCSSNumber(elem, 'marginBottom')
-      - getCSSNumber(elem, 'borderTop')
-      - getCSSNumber(elem, 'borderBottom');
-
-    positionElement(elem, box.left + offsetLeft, box.top + offsetTop, actualWidth, actualHeight,
-      animate);
-  });
-};
-
 module.exports = (container, opts) => {
   const {
-    maxRatio = 3 / 2,
-    minRatio = 9 / 16,
-    fixedRatio = false,
     animate = false,
     bigClass = 'OT_big',
-    bigPercentage = 0.8,
-    bigFixedRatio = false,
-    bigMaxRatio = 3 / 2,
-    bigMinRatio = 9 / 16,
-    bigFirst = true,
-  } = opts;
-  let {
-    containerWidth = 640,
-    containerHeight = 480,
   } = opts;
 
   if (css(container, 'display') === 'none') {
@@ -170,63 +134,42 @@ module.exports = (container, opts) => {
     container.setAttribute('id', id);
   }
 
-  containerHeight = getHeight(container)
+  opts.containerHeight = getHeight(container)
     - getCSSNumber(container, 'borderTop')
     - getCSSNumber(container, 'borderBottom');
-  containerWidth = getWidth(container)
+  opts.containerWidth = getWidth(container)
     - getCSSNumber(container, 'borderLeft')
     - getCSSNumber(container, 'borderRight');
-  const availableRatio = containerHeight / containerWidth;
-  let offsetLeft = 0;
-  let offsetTop = 0;
-  let bigOffsetTop = 0;
-  let bigOffsetLeft = 0;
-  const bigOnes = Array.prototype.filter.call(
-    container.querySelectorAll(`#${id}>.${bigClass}`),
+
+  const children = Array.prototype.filter.call(
+    container.querySelectorAll(`#${id}>*`),
     filterDisplayNone
   );
-  const smallOnes = Array.prototype.filter.call(
-    container.querySelectorAll(`#${id}>*:not(.${bigClass})`),
-    filterDisplayNone
-  );
+  const elements = children.map((element) => {
+    const res = getChildDims(element);
+    res.big = element.classList.contains(bigClass);
+    return res;
+  });
 
-  if (bigOnes.length > 0 && smallOnes.length > 0) {
-    let bigWidth;
-    let
-      bigHeight;
+  const boxes = getLayout(opts, elements);
+  boxes.forEach((box, idx) => {
+    const elem = children[idx];
+    css(elem, 'position', 'absolute');
+    const actualWidth = box.width - getCSSNumber(elem, 'paddingLeft')
+        - getCSSNumber(elem, 'paddingRight')
+        - getCSSNumber(elem, 'marginLeft')
+        - getCSSNumber(elem, 'marginRight')
+        - getCSSNumber(elem, 'borderLeft')
+        - getCSSNumber(elem, 'borderRight');
 
-    if (availableRatio > getVideoRatio(bigOnes[0])) {
-      // We are tall, going to take up the whole width and arrange small
-      // guys at the bottom
-      bigWidth = containerWidth;
-      bigHeight = Math.floor(containerHeight * bigPercentage);
-      offsetTop = bigHeight;
-      bigOffsetTop = containerHeight - offsetTop;
-    } else {
-      // We are wide, going to take up the whole height and arrange the small
-      // guys on the right
-      bigHeight = containerHeight;
-      bigWidth = Math.floor(containerWidth * bigPercentage);
-      offsetLeft = bigWidth;
-      bigOffsetLeft = containerWidth - offsetLeft;
-    }
-    if (bigFirst) {
-      arrange(bigOnes, bigWidth, bigHeight, 0, 0, bigFixedRatio, bigMinRatio,
-        bigMaxRatio, animate);
-      arrange(smallOnes, containerWidth - offsetLeft, containerHeight - offsetTop, offsetLeft,
-        offsetTop, fixedRatio, minRatio, maxRatio, animate);
-    } else {
-      arrange(smallOnes, containerWidth - offsetLeft, containerHeight - offsetTop, 0, 0, fixedRatio,
-        minRatio, maxRatio, animate);
-      arrange(bigOnes, bigWidth, bigHeight, bigOffsetLeft, bigOffsetTop,
-        bigFixedRatio, bigMinRatio, bigMaxRatio, animate);
-    }
-  } else if (bigOnes.length > 0 && smallOnes.length === 0) {
-    // We only have one bigOne just center it
-    arrange(bigOnes, containerWidth, containerHeight, 0, 0, bigFixedRatio, bigMinRatio,
-      bigMaxRatio, animate);
-  } else {
-    arrange(smallOnes, containerWidth - offsetLeft, containerHeight - offsetTop, offsetLeft,
-      offsetTop, fixedRatio, minRatio, maxRatio, animate);
-  }
+    const actualHeight = box.height - getCSSNumber(elem, 'paddingTop')
+        - getCSSNumber(elem, 'paddingBottom')
+        - getCSSNumber(elem, 'marginTop')
+        - getCSSNumber(elem, 'marginBottom')
+        - getCSSNumber(elem, 'borderTop')
+        - getCSSNumber(elem, 'borderBottom');
+
+    positionElement(elem, box.left, box.top, actualWidth, actualHeight,
+      animate);
+  });
 };
