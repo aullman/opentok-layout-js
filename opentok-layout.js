@@ -91,51 +91,11 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/*!
- *  opentok-layout-js (http://github.com/aullman/opentok-layout-js)
- *
- *  Automatic layout of video elements (publisher and subscriber) minimising
- *  white-space for the OpenTok on WebRTC API.
- *
- *  @Author: Adam Ullman (http://github.com/aullman)
- *  @Copyright (c) 2014 Adam Ullman
- *  @License: Released under the MIT license (http://opensource.org/licenses/MIT)
- * */
-
-// in CommonJS context, this should be a `require()`d dependency.
-// in browser globals context, ...? (when using bower, there are dependencies that it has handled
-// for you, so these might be safe to assume)
-
-var getLayout = __webpack_require__(1);
-var layout = __webpack_require__(2);
-
-module.exports = function initLayoutContainer(container, opts) {
-  container = typeof container === 'string' ? document.querySelector(container) : container;
-  if (!(typeof HTMLElement === 'undefined' || container instanceof HTMLElement) && !opts) {
-    // container is actually the options
-    opts = container;
-  } else if (!opts) {
-    opts = {};
-  }
-
-  return {
-    layout: layout.bind(this, container, opts),
-    getLayout: getLayout.bind(this, opts)
-  };
-};
-
-/***/ }),
-/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -301,6 +261,9 @@ var getLayout = function getLayout(opts, elements) {
       // If we're using a fixedRatio then we need to set the correct ratio for this element
       if (fixedRatio) {
         _targetWidth = Math.floor(_targetHeight / _ratio2);
+      } else if (_targetHeight / _targetWidth !== dimensions.targetHeight / dimensions.targetWidth) {
+        // We grew this row, we need to adjust the width to account for the increase in height
+        _targetWidth = Math.floor(dimensions.targetWidth / dimensions.targetHeight * _targetHeight);
       }
 
       boxes.push({
@@ -456,7 +419,7 @@ module.exports = function (opts, elements) {
 };
 
 /***/ }),
-/* 2 */
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -464,7 +427,7 @@ module.exports = function (opts, elements) {
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var getLayout = __webpack_require__(1);
+var getLayout = __webpack_require__(0);
 
 function css(el, propertyName, value) {
   if (value) {
@@ -624,6 +587,46 @@ module.exports = function (container, opts) {
 
     positionElement(elem, box.left, box.top, actualWidth, actualHeight, animate);
   });
+};
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/*!
+ *  opentok-layout-js (http://github.com/aullman/opentok-layout-js)
+ *
+ *  Automatic layout of video elements (publisher and subscriber) minimising
+ *  white-space for the OpenTok on WebRTC API.
+ *
+ *  @Author: Adam Ullman (http://github.com/aullman)
+ *  @Copyright (c) 2014 Adam Ullman
+ *  @License: Released under the MIT license (http://opensource.org/licenses/MIT)
+ * */
+
+// in CommonJS context, this should be a `require()`d dependency.
+// in browser globals context, ...? (when using bower, there are dependencies that it has handled
+// for you, so these might be safe to assume)
+
+var getLayout = __webpack_require__(0);
+var layout = __webpack_require__(1);
+
+module.exports = function initLayoutContainer(container, opts) {
+  container = typeof container === 'string' ? document.querySelector(container) : container;
+  if (!(typeof HTMLElement === 'undefined' || container instanceof HTMLElement) && !opts) {
+    // container is actually the options
+    opts = container;
+  } else if (!opts) {
+    opts = {};
+  }
+
+  return {
+    layout: layout.bind(this, container, opts),
+    getLayout: getLayout.bind(this, opts)
+  };
 };
 
 /***/ })

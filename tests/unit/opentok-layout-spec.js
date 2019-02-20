@@ -315,6 +315,18 @@ describe('opentok layout', () => {
       expect(rect.top + rect.height).toBe(600);
     });
 
+    it('does not mess up the aspect ratio of the last row when it grows', () => {
+      layoutDiv.style.width = '600px';
+      layoutDiv.style.height = '500px';
+      const layoutContainer = initLayoutContainer(layoutDiv, {
+        minRatio: 1,
+        maxRatio: 1,
+      });
+      layoutContainer.layout();
+      const rect = divs[4].getBoundingClientRect();
+      expect(rect.width / rect.height).toBe(1);
+    });
+
     it('handles a big element', () => {
       divs[0].className = 'OT_big';
       const layoutContainer = initLayoutContainer(layoutDiv);
@@ -503,12 +515,13 @@ describe('opentok layout', () => {
         let rect;
         for (let i = 0; i < divs.length; i += 1) {
           rect = divs[i].getBoundingClientRect();
-          expect(rect.width).toBe(200);
           if (i > divs.length - 2) {
             // The last row grows a little bit to take up the extra space
             expect(rect.height).toBe(268);
+            expect(rect.width).toBe(201);
           } else {
             expect(rect.height).toBe(266);
+            expect(rect.width).toBe(200);
           }
         }
         rect = divs[0].getBoundingClientRect();

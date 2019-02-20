@@ -156,6 +156,10 @@ const getLayout = (opts, elements) => {
       // If we're using a fixedRatio then we need to set the correct ratio for this element
       if (fixedRatio) {
         targetWidth = Math.floor(targetHeight / ratio);
+      } else if ((targetHeight / targetWidth)
+        !== (dimensions.targetHeight / dimensions.targetWidth)) {
+        // We grew this row, we need to adjust the width to account for the increase in height
+        targetWidth = Math.floor((dimensions.targetWidth / dimensions.targetHeight) * targetHeight);
       }
 
       boxes.push({
