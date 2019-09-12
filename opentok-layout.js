@@ -615,8 +615,8 @@ var getLayout = __webpack_require__(0);
 var layout = __webpack_require__(1);
 
 module.exports = function initLayoutContainer(container, opts) {
-  container = typeof container === 'string' ? document.querySelector(container) : container;
-  if (!(typeof HTMLElement === 'undefined' || container instanceof HTMLElement) && !opts) {
+  container = typeof container === 'string' ? (opts.window || window).document.querySelector(container) : container;
+  if (!(typeof (opts.window || window).HTMLElement === 'undefined' || container instanceof (opts.window || window).HTMLElement) && !opts) {
     // container is actually the options
     opts = container;
   } else if (!opts) {
