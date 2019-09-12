@@ -17,8 +17,8 @@ const getLayout = require('./getLayout');
 const layout = require('./layout');
 
 module.exports = function initLayoutContainer(container, opts) {
-  container = typeof container === 'string' ? document.querySelector(container) : container;
-  if (!(typeof HTMLElement === 'undefined' || container instanceof HTMLElement) && !opts) {
+  container = typeof container === 'string' ? (opts.window || window).document.querySelector(container) : container;
+  if (!(typeof (opts.window || window).HTMLElement === 'undefined' || container instanceof (opts.window || window).HTMLElement) && !opts) {
     // container is actually the options
     opts = container;
   } else if (!opts) {
