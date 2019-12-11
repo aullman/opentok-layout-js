@@ -464,129 +464,129 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var getLayout = __webpack_require__(0);
 
-function css(el, propertyName, value) {
-  if (value) {
-    // We are setting one css property
-    el.style[propertyName] = value;
-    return NaN;
-  }
-  if ((typeof propertyName === 'undefined' ? 'undefined' : _typeof(propertyName)) === 'object') {
-    // We are setting several CSS properties at once
-    Object.keys(propertyName).forEach(function (key) {
-      css(el, key, propertyName[key]);
-    });
-    return NaN;
-  }
-  // We are getting the css property
-  var computedStyle = getComputedStyle(el);
-  var currentValue = computedStyle.getPropertyValue(propertyName);
-
-  if (currentValue === '') {
-    currentValue = el.style[propertyName];
-  }
-
-  return currentValue;
-}
-
-var filterDisplayNone = function filterDisplayNone(element) {
-  return css(element, 'display') !== 'none';
-};
-
-function height(el) {
-  if (el.offsetHeight > 0) {
-    return el.offsetHeight + 'px';
-  }
-  return css(el, 'height');
-}
-
-function width(el) {
-  if (el.offsetWidth > 0) {
-    return el.offsetWidth + 'px';
-  }
-  return css(el, 'width');
-}
-
-var positionElement = function positionElement(elem, x, y, w, h, animate) {
-  var _this = this;
-
-  var targetPosition = {
-    left: x + 'px',
-    top: y + 'px',
-    width: w + 'px',
-    height: h + 'px'
-  };
-
-  var fixAspectRatio = function fixAspectRatio() {
-    var sub = elem.querySelector('.OT_root');
-    if (sub) {
-      // If this is the parent of a subscriber or publisher then we need
-      // to force the mutation observer on the publisher or subscriber to
-      // trigger to get it to fix it's layout
-      var oldWidth = sub.style.width;
-      sub.style.width = w + 'px';
-      // sub.style.height = height + 'px';
-      sub.style.width = oldWidth || '';
-    }
-  };
-
-  if (animate && $) {
-    $(elem).stop();
-    $(elem).animate(targetPosition, animate.duration || 200, animate.easing || 'swing', function () {
-      fixAspectRatio();
-      if (animate.complete) animate.complete.call(_this);
-    });
-  } else {
-    css(elem, targetPosition);
-    if (!elem.classList.contains('ot-layout')) {
-      elem.classList.add('ot-layout');
-    }
-  }
-  fixAspectRatio();
-};
-
-var getChildDims = function getChildDims(child) {
-  if (child) {
-    var video = child.querySelector('video');
-    if (video && video.videoHeight && video.videoWidth) {
-      return {
-        height: video.videoHeight,
-        width: video.videoWidth
-      };
-    }
-    if (child.videoHeight && child.videoWidth) {
-      return {
-        height: child.videoHeight,
-        width: child.videoWidth
-      };
-    }
-  }
-  return {
-    height: 480,
-    width: 640
-  };
-};
-
-var getCSSNumber = function getCSSNumber(elem, prop) {
-  var cssStr = css(elem, prop);
-  return cssStr ? parseInt(cssStr, 10) : 0;
-};
-
-// Really cheap UUID function
-var cheapUUID = function cheapUUID() {
-  return (Math.random() * 100000000).toFixed(0);
-};
-
-var getHeight = function getHeight(elem) {
-  var heightStr = height(elem);
-  return heightStr ? parseInt(heightStr, 10) : 0;
-};
-
-var getWidth = function getWidth(elem) {
-  var widthStr = width(elem);
-  return widthStr ? parseInt(widthStr, 10) : 0;
-};
-
 module.exports = function (container, opts) {
+  function css(el, propertyName, value) {
+    if (value) {
+      // We are setting one css property
+      el.style[propertyName] = value;
+      return NaN;
+    }
+    if ((typeof propertyName === 'undefined' ? 'undefined' : _typeof(propertyName)) === 'object') {
+      // We are setting several CSS properties at once
+      Object.keys(propertyName).forEach(function (key) {
+        css(el, key, propertyName[key]);
+      });
+      return NaN;
+    }
+    // We are getting the css property
+    var computedStyle = (opts && opts.window || window).getComputedStyle(el);
+    var currentValue = computedStyle.getPropertyValue(propertyName);
+
+    if (currentValue === '') {
+      currentValue = el.style[propertyName];
+    }
+
+    return currentValue;
+  }
+
+  var filterDisplayNone = function filterDisplayNone(element) {
+    return css(element, 'display') !== 'none';
+  };
+
+  function height(el) {
+    if (el.offsetHeight > 0) {
+      return el.offsetHeight + 'px';
+    }
+    return css(el, 'height');
+  }
+
+  function width(el) {
+    if (el.offsetWidth > 0) {
+      return el.offsetWidth + 'px';
+    }
+    return css(el, 'width');
+  }
+
+  var positionElement = function positionElement(elem, x, y, w, h, animate) {
+    var _this = this;
+
+    var targetPosition = {
+      left: x + 'px',
+      top: y + 'px',
+      width: w + 'px',
+      height: h + 'px'
+    };
+
+    var fixAspectRatio = function fixAspectRatio() {
+      var sub = elem.querySelector('.OT_root');
+      if (sub) {
+        // If this is the parent of a subscriber or publisher then we need
+        // to force the mutation observer on the publisher or subscriber to
+        // trigger to get it to fix it's layout
+        var oldWidth = sub.style.width;
+        sub.style.width = w + 'px';
+        // sub.style.height = height + 'px';
+        sub.style.width = oldWidth || '';
+      }
+    };
+
+    if (animate && $) {
+      $(elem).stop();
+      $(elem).animate(targetPosition, animate.duration || 200, animate.easing || 'swing', function () {
+        fixAspectRatio();
+        if (animate.complete) animate.complete.call(_this);
+      });
+    } else {
+      css(elem, targetPosition);
+      if (!elem.classList.contains('ot-layout')) {
+        elem.classList.add('ot-layout');
+      }
+    }
+    fixAspectRatio();
+  };
+
+  var getChildDims = function getChildDims(child) {
+    if (child) {
+      var video = child.querySelector('video');
+      if (video && video.videoHeight && video.videoWidth) {
+        return {
+          height: video.videoHeight,
+          width: video.videoWidth
+        };
+      }
+      if (child.videoHeight && child.videoWidth) {
+        return {
+          height: child.videoHeight,
+          width: child.videoWidth
+        };
+      }
+    }
+    return {
+      height: 480,
+      width: 640
+    };
+  };
+
+  var getCSSNumber = function getCSSNumber(elem, prop) {
+    var cssStr = css(elem, prop);
+    return cssStr ? parseInt(cssStr, 10) : 0;
+  };
+
+  // Really cheap UUID function
+  var cheapUUID = function cheapUUID() {
+    return (Math.random() * 100000000).toFixed(0);
+  };
+
+  var getHeight = function getHeight(elem) {
+    var heightStr = height(elem);
+    return heightStr ? parseInt(heightStr, 10) : 0;
+  };
+
+  var getWidth = function getWidth(elem) {
+    var widthStr = width(elem);
+    return widthStr ? parseInt(widthStr, 10) : 0;
+  };
+
   var _opts$animate = opts.animate,
       animate = _opts$animate === undefined ? false : _opts$animate,
       _opts$bigClass = opts.bigClass,
@@ -650,8 +650,9 @@ var getLayout = __webpack_require__(0);
 var layout = __webpack_require__(1);
 
 module.exports = function initLayoutContainer(container, opts) {
-  container = typeof container === 'string' ? document.querySelector(container) : container;
-  if (!(typeof HTMLElement === 'undefined' || container instanceof HTMLElement) && !opts) {
+  var win = opts && opts.window || (typeof window === 'undefined' ? undefined : window);
+  container = typeof container === 'string' ? win.document.querySelector(container) : container;
+  if (!(typeof (win && win.HTMLElement) === 'undefined' || container instanceof win.HTMLElement) && !opts) {
     // container is actually the options
     opts = container;
   } else if (!opts) {
