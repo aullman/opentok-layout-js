@@ -142,6 +142,33 @@ describe('opentok layout', () => {
       expect(div1Rect.width / div1Rect.height).toBeCloseTo(16 / 9, 3);
     });
 
+    describe('alignItems', () => {
+      ['start', 'center', 'end'].forEach((alignItems) => {
+        it(`Handles ${alignItems}`, () => {
+          const layoutContainer = initLayoutContainer(layoutDiv, {
+            alignItems,
+            bigFixedRatio: true,
+            minRatio: 3 / 4,
+            maxRatio: 3 / 4,
+          });
+          layoutContainer.layout();
+          const boundingRect = div1.getBoundingClientRect();
+          switch (alignItems) {
+            case 'start':
+              expect(boundingRect.left).toEqual(0);
+              break;
+            case 'end':
+              expect(boundingRect.left).toEqual(200);
+              break;
+            case 'center':
+            default:
+              expect(boundingRect.left).toEqual(100);
+              break;
+          }
+        });
+      });
+    });
+
     describe('with a big element', () => {
       beforeEach(() => {
         div1.className = 'OT_big';
@@ -241,6 +268,53 @@ describe('opentok layout', () => {
         expect(div2.clientWidth).toBe(80);
         expect(div1.clientHeight).toBe(300);
         expect(div2.clientHeight).toBe(120);
+      });
+
+      describe('smallAlignItems', () => {
+        ['start', 'center', 'end'].forEach((smallAlignItems) => {
+          it(`Handles ${smallAlignItems}`, () => {
+            const layoutContainer = initLayoutContainer(layoutDiv, { smallAlignItems });
+            layoutContainer.layout();
+            const boundingRect = children[1].getBoundingClientRect();
+            switch (smallAlignItems) {
+              case 'start':
+                expect(boundingRect.top).toEqual(0);
+                break;
+              case 'end':
+                expect(boundingRect.top).toEqual(180);
+                break;
+              case 'center':
+              default:
+                expect(boundingRect.top).toEqual(90);
+                break;
+            }
+          });
+        });
+      });
+
+      describe('bigAlignItems', () => {
+        ['start', 'center', 'end'].forEach((bigAlignItems) => {
+          it(`Handles ${bigAlignItems}`, () => {
+            const layoutContainer = initLayoutContainer(layoutDiv, {
+              bigAlignItems,
+              bigFixedRatio: true,
+            });
+            layoutContainer.layout();
+            const boundingRect = children[0].getBoundingClientRect();
+            switch (bigAlignItems) {
+              case 'start':
+                expect(boundingRect.top).toEqual(0);
+                break;
+              case 'end':
+                expect(boundingRect.top).toEqual(60);
+                break;
+              case 'center':
+              default:
+                expect(boundingRect.top).toEqual(30);
+                break;
+            }
+          });
+        });
       });
     });
   });

@@ -162,7 +162,9 @@ var getLayout = function getLayout(opts, elements) {
       _opts$offsetLeft = opts.offsetLeft,
       offsetLeft = _opts$offsetLeft === undefined ? 0 : _opts$offsetLeft,
       _opts$offsetTop = opts.offsetTop,
-      offsetTop = _opts$offsetTop === undefined ? 0 : _opts$offsetTop;
+      offsetTop = _opts$offsetTop === undefined ? 0 : _opts$offsetTop,
+      _opts$alignItems = opts.alignItems,
+      alignItems = _opts$alignItems === undefined ? 'center' : _opts$alignItems;
 
   var ratios = elements.map(function (element) {
     return element.height / element.width;
@@ -244,13 +246,34 @@ var getLayout = function getLayout(opts, elements) {
       totalRowHeight += row.height;
     }
   }
-  // vertical centering
-  y = (containerHeight - totalRowHeight) / 2;
+  switch (alignItems) {
+    case 'start':
+      y = 0;
+      break;
+    case 'end':
+      y = containerHeight - totalRowHeight;
+      break;
+    case 'center':
+    default:
+      y = (containerHeight - totalRowHeight) / 2;
+      break;
+  }
   // Iterate through each row and place each child
   for (var _i3 = 0; _i3 < rows.length; _i3 += 1) {
     row = rows[_i3];
-    // center the row
-    var rowMarginLeft = (containerWidth - row.width) / 2;
+    var rowMarginLeft = void 0;
+    switch (alignItems) {
+      case 'start':
+        rowMarginLeft = 0;
+        break;
+      case 'end':
+        rowMarginLeft = containerWidth - row.width;
+        break;
+      case 'center':
+      default:
+        rowMarginLeft = (containerWidth - row.width) / 2;
+        break;
+    }
     x = rowMarginLeft;
     var _targetHeight = void 0;
     for (var j = 0; j < row.ratios.length; j += 1) {
@@ -303,7 +326,13 @@ module.exports = function (opts, elements) {
       _opts$containerWidth = opts.containerWidth,
       containerWidth = _opts$containerWidth === undefined ? 640 : _opts$containerWidth,
       _opts$containerHeight = opts.containerHeight,
-      containerHeight = _opts$containerHeight === undefined ? 480 : _opts$containerHeight;
+      containerHeight = _opts$containerHeight === undefined ? 480 : _opts$containerHeight,
+      _opts$alignItems2 = opts.alignItems,
+      alignItems = _opts$alignItems2 === undefined ? 'center' : _opts$alignItems2,
+      _opts$bigAlignItems = opts.bigAlignItems,
+      bigAlignItems = _opts$bigAlignItems === undefined ? 'center' : _opts$bigAlignItems,
+      _opts$smallAlignItems = opts.smallAlignItems,
+      smallAlignItems = _opts$smallAlignItems === undefined ? 'center' : _opts$smallAlignItems;
 
 
   var availableRatio = containerHeight / containerWidth;
@@ -351,7 +380,8 @@ module.exports = function (opts, elements) {
         offsetTop: 0,
         fixedRatio: bigFixedRatio,
         minRatio: bigMinRatio,
-        maxRatio: bigMaxRatio
+        maxRatio: bigMaxRatio,
+        alignItems: bigAlignItems
       }, bigOnes);
       smallBoxes = getLayout({
         containerWidth: containerWidth - offsetLeft,
@@ -360,7 +390,8 @@ module.exports = function (opts, elements) {
         offsetTop: offsetTop,
         fixedRatio: fixedRatio,
         minRatio: minRatio,
-        maxRatio: maxRatio
+        maxRatio: maxRatio,
+        alignItems: smallAlignItems
       }, smallOnes);
     } else {
       smallBoxes = getLayout({
@@ -370,7 +401,8 @@ module.exports = function (opts, elements) {
         offsetTop: 0,
         fixedRatio: fixedRatio,
         minRatio: minRatio,
-        maxRatio: maxRatio
+        maxRatio: maxRatio,
+        alignItems: smallAlignItems
       }, smallOnes);
       bigBoxes = getLayout({
         containerWidth: bigWidth,
@@ -378,7 +410,8 @@ module.exports = function (opts, elements) {
         offsetLeft: bigOffsetLeft,
         offsetTop: bigOffsetTop,
         fixedRatio: bigFixedRatio,
-        minRatio: bigMinRatio
+        minRatio: bigMinRatio,
+        alignItems: bigAlignItems
       }, bigOnes);
     }
   } else if (bigOnes.length > 0 && smallOnes.length === 0) {
@@ -388,7 +421,8 @@ module.exports = function (opts, elements) {
       containerHeight: containerHeight,
       fixedRatio: bigFixedRatio,
       minRatio: bigMinRatio,
-      maxRatio: bigMaxRatio
+      maxRatio: bigMaxRatio,
+      alignItems: bigAlignItems
     }, bigOnes);
   } else {
     smallBoxes = getLayout({
@@ -398,7 +432,8 @@ module.exports = function (opts, elements) {
       offsetTop: offsetTop,
       fixedRatio: fixedRatio,
       minRatio: minRatio,
-      maxRatio: maxRatio
+      maxRatio: maxRatio,
+      alignItems: alignItems
     }, smallOnes);
   }
 
