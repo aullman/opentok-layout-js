@@ -15,7 +15,7 @@ module.exports = (container, opts) => {
       return NaN;
     }
     // We are getting the css property
-    const computedStyle = (opts.window || window).getComputedStyle(el);
+    const computedStyle = ((opts && opts.window) || window).getComputedStyle(el);
     let currentValue = computedStyle.getPropertyValue(propertyName);
 
     if (currentValue === '') {

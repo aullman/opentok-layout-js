@@ -479,7 +479,7 @@ module.exports = function (container, opts) {
       return NaN;
     }
     // We are getting the css property
-    var computedStyle = (opts.window || window).getComputedStyle(el);
+    var computedStyle = (opts && opts.window || window).getComputedStyle(el);
     var currentValue = computedStyle.getPropertyValue(propertyName);
 
     if (currentValue === '') {
@@ -650,8 +650,8 @@ var getLayout = __webpack_require__(0);
 var layout = __webpack_require__(1);
 
 module.exports = function initLayoutContainer(container, opts) {
-  container = typeof container === 'string' ? (opts.window || window).document.querySelector(container) : container;
-  if (!(typeof (opts.window || window).HTMLElement === 'undefined' || container instanceof (opts.window || window).HTMLElement) && !opts) {
+  container = typeof container === 'string' ? (opts && opts.window || window).document.querySelector(container) : container;
+  if (!(typeof (opts && opts.window || window).HTMLElement === 'undefined' || container instanceof (opts && opts.window || window).HTMLElement) && !opts) {
     // container is actually the options
     opts = container;
   } else if (!opts) {
