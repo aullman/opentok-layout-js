@@ -140,13 +140,13 @@ const getLayout = (opts, elements) => {
       totalRowHeight += row.height;
     }
   }
-  switch(alignItems) {
+  switch (alignItems) {
     case 'start':
       y = 0;
-    break;
+      break;
     case 'end':
       y = containerHeight - totalRowHeight;
-    break;
+      break;
     case 'center':
     default:
       y = ((containerHeight - (totalRowHeight)) / 2);
