@@ -27,7 +27,8 @@
   },
   "scripts": {
     "test": "npx eslint . && node ./tests/test-node.js && npx run-tests",
-    "start": "http-server"
+    "start": "http-server",
+    "dev": "npx webpack -w & npm start"
   },
   "repository": {
     "type": "git",

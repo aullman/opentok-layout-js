@@ -29,16 +29,19 @@ Call `initLayoutContainer` and pass it the element you want it to layout. It wor
 ```javascript
 const initLayoutContainer = require('opentok-layout-js');
 const options = {
-    maxRatio: 3/2,          // The narrowest ratio that will be used (default 2x3)
-    minRatio: 9/16,         // The widest ratio that will be used (default 16x9)
-    fixedRatio: false,      // If this is true then the aspect ratio of the video is maintained and minRatio and maxRatio are ignored (default false)
-    bigClass: "OT_big",     // The class to add to elements that should be sized bigger
-    bigPercentage: 0.8      // The maximum percentage of space the big ones should take up
-    bigFixedRatio: false,   // fixedRatio for the big ones
-    bigMaxRatio: 3/2,       // The narrowest ratio to use for the big elements (default 2x3)
-    bigMinRatio: 9/16,      // The widest ratio to use for the big elements (default 16x9)
-    bigFirst: true,         // Whether to place the big one in the top left (true) or bottom right
-    animate: true           // Whether you want to animate the transitions
+    maxRatio: 3/2,             // The narrowest ratio that will be used (default 2x3)
+    minRatio: 9/16,            // The widest ratio that will be used (default 16x9)
+    fixedRatio: false,         // If this is true then the aspect ratio of the video is maintained and minRatio and maxRatio are ignored (default false)
+    alignItems: 'center',      // Can be 'start', 'center' or 'end'. Determines where to place items when on a row or column that is not full
+    bigClass: "OT_big",        // The class to add to elements that should be sized bigger
+    bigPercentage: 0.8         // The maximum percentage of space the big ones should take up
+    bigFixedRatio: false,      // fixedRatio for the big ones
+    bigAlignItems: 'center',   // How to align the big items
+    smallAlignItems: 'center', // How to align the small row or column of items if there is a big one
+    bigMaxRatio: 3/2,          // The narrowest ratio to use for the big elements (default 2x3)
+    bigMinRatio: 9/16,         // The widest ratio to use for the big elements (default 16x9)
+    bigFirst: true,            // Whether to place the big one in the top left (true) or bottom right
+    animate: true              // Whether you want to animate the transitions
 };
 const layout = initLayoutContainer(document.getElementById("layout"), options);
 layout.layout();
