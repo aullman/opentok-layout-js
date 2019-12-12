@@ -123,6 +123,7 @@ module.exports = (container, opts) => {
   const {
     animate = false,
     bigClass = 'OT_big',
+    ignoreClass = 'OT_ignore',
   } = opts;
 
   if (css(container, 'display') === 'none') {
@@ -142,7 +143,7 @@ module.exports = (container, opts) => {
     - getCSSNumber(container, 'borderRight');
 
   const children = Array.prototype.filter.call(
-    container.querySelectorAll(`#${id}>*`),
+    container.querySelectorAll(`#${id}>*:not(.${ignoreClass})`),
     filterDisplayNone
   );
   const elements = children.map((element) => {

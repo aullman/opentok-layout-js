@@ -169,6 +169,30 @@ describe('opentok layout', () => {
       });
     });
 
+    describe('ignoreClass', () => {
+      it('does not position items that are ignored', () => {
+        div1.className = 'OT_ignore';
+        div1.style.position = 'absolute';
+        div1.style.top = '0px';
+        div1.style.left = '0px';
+        div1.style.width = '100px';
+        div1.style.height = '100px';
+        div1.style.zIndex = 1;
+        const layoutContainer = initLayoutContainer(layoutDiv);
+        layoutContainer.layout();
+        const div1Rect = div1.getBoundingClientRect();
+        expect(div1Rect.width).toBe(100);
+        expect(div1Rect.height).toBe(100);
+        expect(div1Rect.top).toBe(0);
+        expect(div1Rect.left).toBe(0);
+        const div2Rect = div2.getBoundingClientRect();
+        expect(div2Rect.width).toBe(400);
+        expect(div2Rect.height).toBe(300);
+        expect(div2Rect.top).toBe(0);
+        expect(div2Rect.left).toBe(0);
+      });
+    });
+
     describe('with a big element', () => {
       beforeEach(() => {
         div1.className = 'OT_big';

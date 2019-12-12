@@ -590,7 +590,9 @@ module.exports = function (container, opts) {
   var _opts$animate = opts.animate,
       animate = _opts$animate === undefined ? false : _opts$animate,
       _opts$bigClass = opts.bigClass,
-      bigClass = _opts$bigClass === undefined ? 'OT_big' : _opts$bigClass;
+      bigClass = _opts$bigClass === undefined ? 'OT_big' : _opts$bigClass,
+      _opts$ignoreClass = opts.ignoreClass,
+      ignoreClass = _opts$ignoreClass === undefined ? 'OT_ignore' : _opts$ignoreClass;
 
 
   if (css(container, 'display') === 'none') {
@@ -605,7 +607,7 @@ module.exports = function (container, opts) {
   opts.containerHeight = getHeight(container) - getCSSNumber(container, 'borderTop') - getCSSNumber(container, 'borderBottom');
   opts.containerWidth = getWidth(container) - getCSSNumber(container, 'borderLeft') - getCSSNumber(container, 'borderRight');
 
-  var children = Array.prototype.filter.call(container.querySelectorAll('#' + id + '>*'), filterDisplayNone);
+  var children = Array.prototype.filter.call(container.querySelectorAll('#' + id + '>*:not(.' + ignoreClass + ')'), filterDisplayNone);
   var elements = children.map(function (element) {
     var res = getChildDims(element);
     res.big = element.classList.contains(bigClass);
