@@ -1,4 +1,4 @@
-const getBestDimensions = (minRatio, maxRatio, Width, Height, count) => {
+const getBestDimensions = (minRatio, maxRatio, Width, Height, count, maxWidth, maxHeight) => {
   let maxArea;
   let targetCols;
   let targetRows;
@@ -29,10 +29,13 @@ const getBestDimensions = (minRatio, maxRatio, Width, Height, count) => {
       tWidth = tHeight / tRatio;
     }
 
+    tWidth = Math.min(maxWidth, tWidth);
+    tHeight = Math.min(maxHeight, tHeight);
+
     const area = (tWidth * tHeight) * count;
 
     // If this width and height takes up the most space then we're going with that
-    if (maxArea === undefined || (area > maxArea)) {
+    if (maxArea === undefined || (area >= maxArea)) {
       maxArea = area;
       targetHeight = tHeight;
       targetWidth = tWidth;
@@ -60,6 +63,8 @@ const getLayout = (opts, elements) => {
     offsetLeft = 0,
     offsetTop = 0,
     alignItems = 'center',
+    maxWidth = Infinity,
+    maxHeight = Infinity,
   } = opts;
   const ratios = elements.map(element => element.height / element.width);
   const count = ratios.length;
@@ -68,11 +73,13 @@ const getLayout = (opts, elements) => {
   let dimensions;
 
   if (!fixedRatio) {
-    dimensions = getBestDimensions(minRatio, maxRatio, containerWidth, containerHeight, count);
+    dimensions = getBestDimensions(minRatio, maxRatio, containerWidth, containerHeight, count,
+      maxWidth, maxHeight);
   } else {
     // Use the ratio of the first video element we find to approximate
     const ratio = ratios.length > 0 ? ratios[0] : null;
-    dimensions = getBestDimensions(ratio, ratio, containerWidth, containerHeight, count);
+    dimensions = getBestDimensions(ratio, ratio, containerWidth, containerHeight, count,
+      maxWidth, maxHeight);
   }
 
   // Loop through each stream in the container and place it inside
@@ -114,7 +121,7 @@ const getLayout = (opts, elements) => {
       // Went over on the width, need to adjust the height proportionally
       row.height = Math.floor(row.height * (containerWidth / row.width));
       row.width = containerWidth;
-    } else if (row.width < containerWidth) {
+    } else if (row.width < containerWidth && row.height < maxHeight) {
       remainingShortRows += 1;
     }
     totalRowHeight += row.height;
@@ -214,6 +221,10 @@ module.exports = (opts, elements) => {
     alignItems = 'center',
     bigAlignItems = 'center',
     smallAlignItems = 'center',
+    smallMaxWidth = Infinity,
+    smallMaxHeight = Infinity,
+    bigMaxWidth = Infinity,
+    bigMaxHeight = Infinity,
   } = opts;
 
   const availableRatio = containerHeight / containerWidth;
@@ -261,6 +272,8 @@ module.exports = (opts, elements) => {
         minRatio: bigMinRatio,
         maxRatio: bigMaxRatio,
         alignItems: bigAlignItems,
+        maxWidth: bigMaxWidth,
+        maxHeight: bigMaxHeight,
       }, bigOnes);
       smallBoxes = getLayout({
         containerWidth: containerWidth - offsetLeft,
@@ -271,6 +284,8 @@ module.exports = (opts, elements) => {
         minRatio,
         maxRatio,
         alignItems: smallAlignItems,
+        maxWidth: smallMaxWidth,
+        maxHeight: smallMaxHeight,
       }, smallOnes);
     } else {
       smallBoxes = getLayout({
@@ -282,6 +297,8 @@ module.exports = (opts, elements) => {
         minRatio,
         maxRatio,
         alignItems: smallAlignItems,
+        maxWidth: smallMaxWidth,
+        maxHeight: smallMaxHeight,
       }, smallOnes);
       bigBoxes = getLayout({
         containerWidth: bigWidth,
@@ -291,6 +308,8 @@ module.exports = (opts, elements) => {
         fixedRatio: bigFixedRatio,
         minRatio: bigMinRatio,
         alignItems: bigAlignItems,
+        maxWidth: bigMaxWidth,
+        maxHeight: bigMaxHeight,
       }, bigOnes);
     }
   } else if (bigOnes.length > 0 && smallOnes.length === 0) {
@@ -302,6 +321,8 @@ module.exports = (opts, elements) => {
       minRatio: bigMinRatio,
       maxRatio: bigMaxRatio,
       alignItems: bigAlignItems,
+      maxWidth: bigMaxWidth,
+      maxHeight: bigMaxHeight,
     }, bigOnes);
   } else {
     smallBoxes = getLayout({
@@ -313,6 +334,8 @@ module.exports = (opts, elements) => {
       minRatio,
       maxRatio,
       alignItems,
+      maxWidth: smallMaxWidth,
+      maxHeight: smallMaxHeight,
     }, smallOnes);
   }
 

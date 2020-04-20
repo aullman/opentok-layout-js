@@ -38,6 +38,10 @@ const options = {
     bigFixedRatio: false,      // fixedRatio for the big ones
     bigAlignItems: 'center',   // How to align the big items
     smallAlignItems: 'center', // How to align the small row or column of items if there is a big one
+    smallMaxWidth: Infinity,   // The maximum width of the small elements 
+    smallMaxHeight: Infinity,  // The maximum height of the small elements
+    bigMaxWidth: Infinity,     // The maximum width of the big elements
+    bigMaxHeight: Infinity,    // The maximum height of the big elements
     bigMaxRatio: 3/2,          // The narrowest ratio to use for the big elements (default 2x3)
     bigMinRatio: 9/16,         // The widest ratio to use for the big elements (default 16x9)
     bigFirst: true,            // Whether to place the big one in the top left (true) or bottom right

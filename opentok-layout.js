@@ -101,7 +101,7 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 
 
-var getBestDimensions = function getBestDimensions(minRatio, maxRatio, Width, Height, count) {
+var getBestDimensions = function getBestDimensions(minRatio, maxRatio, Width, Height, count, maxWidth, maxHeight) {
   var maxArea = void 0;
   var targetCols = void 0;
   var targetRows = void 0;
@@ -132,10 +132,13 @@ var getBestDimensions = function getBestDimensions(minRatio, maxRatio, Width, He
       tWidth = tHeight / tRatio;
     }
 
+    tWidth = Math.min(maxWidth, tWidth);
+    tHeight = Math.min(maxHeight, tHeight);
+
     var area = tWidth * tHeight * count;
 
     // If this width and height takes up the most space then we're going with that
-    if (maxArea === undefined || area > maxArea) {
+    if (maxArea === undefined || area >= maxArea) {
       maxArea = area;
       targetHeight = tHeight;
       targetWidth = tWidth;
@@ -164,7 +167,11 @@ var getLayout = function getLayout(opts, elements) {
       _opts$offsetTop = opts.offsetTop,
       offsetTop = _opts$offsetTop === undefined ? 0 : _opts$offsetTop,
       _opts$alignItems = opts.alignItems,
-      alignItems = _opts$alignItems === undefined ? 'center' : _opts$alignItems;
+      alignItems = _opts$alignItems === undefined ? 'center' : _opts$alignItems,
+      _opts$maxWidth = opts.maxWidth,
+      maxWidth = _opts$maxWidth === undefined ? Infinity : _opts$maxWidth,
+      _opts$maxHeight = opts.maxHeight,
+      maxHeight = _opts$maxHeight === undefined ? Infinity : _opts$maxHeight;
 
   var ratios = elements.map(function (element) {
     return element.height / element.width;
@@ -174,11 +181,11 @@ var getLayout = function getLayout(opts, elements) {
   var dimensions = void 0;
 
   if (!fixedRatio) {
-    dimensions = getBestDimensions(minRatio, maxRatio, containerWidth, containerHeight, count);
+    dimensions = getBestDimensions(minRatio, maxRatio, containerWidth, containerHeight, count, maxWidth, maxHeight);
   } else {
     // Use the ratio of the first video element we find to approximate
     var ratio = ratios.length > 0 ? ratios[0] : null;
-    dimensions = getBestDimensions(ratio, ratio, containerWidth, containerHeight, count);
+    dimensions = getBestDimensions(ratio, ratio, containerWidth, containerHeight, count, maxWidth, maxHeight);
   }
 
   // Loop through each stream in the container and place it inside
@@ -220,7 +227,7 @@ var getLayout = function getLayout(opts, elements) {
       // Went over on the width, need to adjust the height proportionally
       row.height = Math.floor(row.height * (containerWidth / row.width));
       row.width = containerWidth;
-    } else if (row.width < containerWidth) {
+    } else if (row.width < containerWidth && row.height < maxHeight) {
       remainingShortRows += 1;
     }
     totalRowHeight += row.height;
@@ -332,7 +339,15 @@ module.exports = function (opts, elements) {
       _opts$bigAlignItems = opts.bigAlignItems,
       bigAlignItems = _opts$bigAlignItems === undefined ? 'center' : _opts$bigAlignItems,
       _opts$smallAlignItems = opts.smallAlignItems,
-      smallAlignItems = _opts$smallAlignItems === undefined ? 'center' : _opts$smallAlignItems;
+      smallAlignItems = _opts$smallAlignItems === undefined ? 'center' : _opts$smallAlignItems,
+      _opts$smallMaxWidth = opts.smallMaxWidth,
+      smallMaxWidth = _opts$smallMaxWidth === undefined ? Infinity : _opts$smallMaxWidth,
+      _opts$smallMaxHeight = opts.smallMaxHeight,
+      smallMaxHeight = _opts$smallMaxHeight === undefined ? Infinity : _opts$smallMaxHeight,
+      _opts$bigMaxWidth = opts.bigMaxWidth,
+      bigMaxWidth = _opts$bigMaxWidth === undefined ? Infinity : _opts$bigMaxWidth,
+      _opts$bigMaxHeight = opts.bigMaxHeight,
+      bigMaxHeight = _opts$bigMaxHeight === undefined ? Infinity : _opts$bigMaxHeight;
 
 
   var availableRatio = containerHeight / containerWidth;
@@ -381,7 +396,9 @@ module.exports = function (opts, elements) {
         fixedRatio: bigFixedRatio,
         minRatio: bigMinRatio,
         maxRatio: bigMaxRatio,
-        alignItems: bigAlignItems
+        alignItems: bigAlignItems,
+        maxWidth: bigMaxWidth,
+        maxHeight: bigMaxHeight
       }, bigOnes);
       smallBoxes = getLayout({
         containerWidth: containerWidth - offsetLeft,
@@ -391,7 +408,9 @@ module.exports = function (opts, elements) {
         fixedRatio: fixedRatio,
         minRatio: minRatio,
         maxRatio: maxRatio,
-        alignItems: smallAlignItems
+        alignItems: smallAlignItems,
+        maxWidth: smallMaxWidth,
+        maxHeight: smallMaxHeight
       }, smallOnes);
     } else {
       smallBoxes = getLayout({
@@ -402,7 +421,9 @@ module.exports = function (opts, elements) {
         fixedRatio: fixedRatio,
         minRatio: minRatio,
         maxRatio: maxRatio,
-        alignItems: smallAlignItems
+        alignItems: smallAlignItems,
+        maxWidth: smallMaxWidth,
+        maxHeight: smallMaxHeight
       }, smallOnes);
       bigBoxes = getLayout({
         containerWidth: bigWidth,
@@ -411,7 +432,9 @@ module.exports = function (opts, elements) {
         offsetTop: bigOffsetTop,
         fixedRatio: bigFixedRatio,
         minRatio: bigMinRatio,
-        alignItems: bigAlignItems
+        alignItems: bigAlignItems,
+        maxWidth: bigMaxWidth,
+        maxHeight: bigMaxHeight
       }, bigOnes);
     }
   } else if (bigOnes.length > 0 && smallOnes.length === 0) {
@@ -422,7 +445,9 @@ module.exports = function (opts, elements) {
       fixedRatio: bigFixedRatio,
       minRatio: bigMinRatio,
       maxRatio: bigMaxRatio,
-      alignItems: bigAlignItems
+      alignItems: bigAlignItems,
+      maxWidth: bigMaxWidth,
+      maxHeight: bigMaxHeight
     }, bigOnes);
   } else {
     smallBoxes = getLayout({
@@ -433,7 +458,9 @@ module.exports = function (opts, elements) {
       fixedRatio: fixedRatio,
       minRatio: minRatio,
       maxRatio: maxRatio,
-      alignItems: alignItems
+      alignItems: alignItems,
+      maxWidth: smallMaxWidth,
+      maxHeight: smallMaxHeight
     }, smallOnes);
   }
 

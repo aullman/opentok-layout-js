@@ -147,9 +147,8 @@ describe('opentok layout', () => {
         it(`Handles ${alignItems}`, () => {
           const layoutContainer = initLayoutContainer(layoutDiv, {
             alignItems,
-            bigFixedRatio: true,
-            minRatio: 3 / 4,
-            maxRatio: 3 / 4,
+            minRatio: 10 / 16,
+            maxRatio: 10 / 16,
           });
           layoutContainer.layout();
           const boundingRect = div1.getBoundingClientRect();
@@ -158,14 +157,34 @@ describe('opentok layout', () => {
               expect(boundingRect.left).toEqual(0);
               break;
             case 'end':
-              expect(boundingRect.left).toEqual(200);
+              expect(boundingRect.left).toEqual(160);
               break;
             case 'center':
             default:
-              expect(boundingRect.left).toEqual(100);
+              expect(boundingRect.left).toEqual(80);
               break;
           }
         });
+      });
+    });
+
+    describe('smallMaxWidth and smallMaxHeight', () => {
+      it('does not go over the smallMaxWidth and smallMaxHeight and stays centered', () => {
+        const layoutContainer = initLayoutContainer(layoutDiv, {
+          smallMaxWidth: 160,
+          smallMaxHeight: 100,
+        });
+        layoutContainer.layout();
+        const div1Rect = div1.getBoundingClientRect();
+        expect(div1Rect.width).toEqual(160);
+        expect(div1Rect.height).toEqual(100);
+        expect(div1Rect.left).toEqual(40);
+        expect(div1Rect.top).toEqual(100);
+        const div2Rect = div2.getBoundingClientRect();
+        expect(div2Rect.width).toEqual(160);
+        expect(div2Rect.height).toEqual(100);
+        expect(div2Rect.left).toEqual(200);
+        expect(div2Rect.top).toEqual(100);
       });
     });
 
@@ -338,6 +357,26 @@ describe('opentok layout', () => {
                 break;
             }
           });
+        });
+      });
+
+      describe('bigMaxWidth and bigMaxHeight', () => {
+        it('does not go over the bigMaxWidth and bigMaxHeight and stays centered', () => {
+          const layoutContainer = initLayoutContainer(layoutDiv, {
+            bigMaxWidth: 200,
+            bigMaxHeight: 220,
+          });
+          layoutContainer.layout();
+          const div1Rect = div1.getBoundingClientRect();
+          expect(div1Rect.width).toEqual(200);
+          expect(div1Rect.height).toEqual(220);
+          expect(div1Rect.left).toEqual(60);
+          expect(div1Rect.top).toEqual(40);
+          const div2Rect = div2.getBoundingClientRect();
+          expect(div2Rect.width).toEqual(80);
+          expect(div2Rect.height).toEqual(120);
+          expect(div2Rect.left).toEqual(320);
+          expect(div2Rect.top).toEqual(90);
         });
       });
     });
