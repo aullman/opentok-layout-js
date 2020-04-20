@@ -24,23 +24,57 @@ The <a href="http://www.tokbox.com/opentok">OpenTok for WebRTC JS API</a> is req
 Usage
 -----
 
-Call `initLayoutContainer` and pass it the element you want it to layout. It works best if you set the position of the element to be absolute or relative. You will then be returned an object with a layout method that you can call to layout the page.
+Call `initLayoutContainer` and pass it the element you want it to layout. It works best if you set the position of the element to be absolute or relative. You will then be returned an object with a layout method that you can call to layout the elements inside.
 
 ```javascript
-var initLayoutContainer = require('opentok-layout-js');
-var layout = initLayoutContainer(document.getElementById("layout"), {
-    maxRatio: 3/2,     // The narrowest ratio that will be used (default 2x3)
-    minRatio: 9/16,      // The widest ratio that will be used (default 16x9)
-    fixedRatio: false,  // If this is true then the aspect ratio of the video is maintained and minRatio and maxRatio are ignored (default false)
-    bigClass: "OT_big", // The class to add to elements that should be sized bigger
-    bigPercentage: 0.8  // The maximum percentage of space the big ones should take up
-    bigFixedRatio: false, // fixedRatio for the big ones
-    bigMaxRatio: 3/2,     // The narrowest ratio to use for the big elements (default 2x3)
-    bigMinRatio: 9/16,     // The widest ratio to use for the big elements (default 16x9)
-    bigFirst: true,        // Whether to place the big one in the top left (true) or bottom right
-    animate: true         // Whether you want to animate the transitions
-});
-layout.layout()
+const initLayoutContainer = require('opentok-layout-js');
+const options = {
+    maxRatio: 3/2,             // The narrowest ratio that will be used (default 2x3)
+    minRatio: 9/16,            // The widest ratio that will be used (default 16x9)
+    fixedRatio: false,         // If this is true then the aspect ratio of the video is maintained and minRatio and maxRatio are ignored (default false)
+    alignItems: 'center',      // Can be 'start', 'center' or 'end'. Determines where to place items when on a row or column that is not full
+    bigClass: "OT_big",        // The class to add to elements that should be sized bigger
+    bigPercentage: 0.8         // The maximum percentage of space the big ones should take up
+    bigFixedRatio: false,      // fixedRatio for the big ones
+    bigAlignItems: 'center',   // How to align the big items
+    smallAlignItems: 'center', // How to align the small row or column of items if there is a big one
+    smallMaxWidth: Infinity,   // The maximum width of the small elements 
+    smallMaxHeight: Infinity,  // The maximum height of the small elements
+    bigMaxWidth: Infinity,     // The maximum width of the big elements
+    bigMaxHeight: Infinity,    // The maximum height of the big elements
+    bigMaxRatio: 3/2,          // The narrowest ratio to use for the big elements (default 2x3)
+    bigMinRatio: 9/16,         // The widest ratio to use for the big elements (default 16x9)
+    bigFirst: true,            // Whether to place the big one in the top left (true) or bottom right
+    animate: true              // Whether you want to animate the transitions
+    window: window,            // Lets you pass in your own window object which should be the same window that the element is in
+    ignoreClass: 'OT_ignore',  // Elements with this class will be ignored and not positioned. This lets you do things like picture-in-picture
+};
+const layout = initLayoutContainer(document.getElementById("layout"), options);
+layout.layout();
+```
+
+The other way to use this library is to just use the `getLayout()` method to get the layout data and position the elements yourself. `getLayout()` takes an array of objects with a width and height property along with a `big` property indicating whether it should be treated as a bigger element. eg.
+
+```javascript
+const layout = initLayoutContainer(options);
+const boxes = layout.getLayout([
+    {
+        width: 640,     // The native width of this element (eg. subscriber.videoWidth())
+        height: 480,    // The native height of this element (eg. subscriber.videoHeight())
+        big: false      // Whether to treat this element as a bigger element 
+    }
+]);
+```
+
+It will return an array of boxes which will be in the same order as the array you passed in. Each element in the array will look like:
+
+```javascript
+{
+    width,
+    height,
+    top,
+    left
+}
 ```
 
 Examples

@@ -14,7 +14,7 @@
             }
             #layout {
                 position: absolute;
-                top: 120px;
+                top: 140px;
                 left: 0;
                 right: 0;
                 bottom: 0;
@@ -95,12 +95,19 @@
           <div id="advanced">
             <label>maxRatio</label><input id="maxRatio" type="text" name="maxRatio" value="3/2">
             <label>minRatio</label><input id="minRatio" type="text" name="minRatio" value="9/16">
+            <label>alignItems</label><input id="alignItems" type="text" name="alignItems" value="center">
             <label>fixedRatio</label><input id="fixedRatio" type="text" name="fixedRatio" value="false">
             <label>bigPercentage</label><input id="bigPercentage" type="text" name="bigPercentage" value="0.8">
             <label>bigFixedRatio</label><input id="bigFixedRatio" type="text" name="bigFixedRatio" value="false">
+            <label>bigAlignItems</label><input id="bigAlignItems" type="text" name="bigAlignItems" value="center">
+            <label>smallAlignItems</label><input id="smallAlignItems" type="text" name="smallAlignItems" value="center">
             <label>bigMaxRatio</label><input id="bigMaxRatio" type="text" name="bigMaxRatio" value="3/2">
             <label>bigMinRatio</label><input id="bigMinRatio" type="text" name="bigMinRatio" value="9/16">
             <label>bigFirst</label><input id="bigFirst" type="text" name="bigFirst" value="true">
+            <label>smallMaxWidth</label><input id="smallMaxWidth" type="text" name="smallMaxWidth" value="Infinity">
+            <label>smallMaxHeight</label><input id="smallMaxHeight" type="text" name="smallMaxHeight" value="Infinity">
+            <label>bigMaxWidth</label><input id="bigMaxWidth" type="text" name="bigMaxWidth" value="Infinity">
+            <label>bigMaxHeight</label><input id="bigMaxHeight" type="text" name="bigMaxHeight" value="Infinity">
             <label>animateDuration</label><input id="animateDuration" type="text" name="animateDuration" value="200">
             <label>animateEasing</label><input id="animateEasing" type="text" name="animateEasing" value="swing">
             <label>add live video</label><input type="checkbox" id="useLiveVideo" checked>
@@ -119,11 +126,18 @@
               maxRatio: eval(maxRatio.value),
               minRatio: eval(minRatio.value),
               fixedRatio: eval(fixedRatio.value),
+              alignItems: alignItems.value,
               bigPercentage: eval(bigPercentage.value),
               bigFixedRatio: eval(bigFixedRatio.value),
               bigMaxRatio: eval(bigMaxRatio.value),
               bigMinRatio: eval(bigMinRatio.value),
               bigFirst: eval(bigFirst.value),
+              smallMaxWidth: eval(smallMaxWidth.value),
+              smallMaxHeight: eval(smallMaxHeight.value),
+              bigMaxWidth: eval(bigMaxWidth.value),
+              bigMaxHeight: eval(bigMaxHeight.value),
+              bigAlignItems: bigAlignItems.value,
+              smallAlignItems: smallAlignItems.value,
           }).layout;
         }
         updateLayoutValues();

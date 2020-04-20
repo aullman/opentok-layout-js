@@ -1,28 +1,34 @@
 {
   "name": "opentok-layout-js",
-  "version": "2.1.0",
+  "version": "3.5.0",
   "description": "Automatic layout of video elements (publisher and subscriber) minimising white-space for the OpenTok on WebRTC API. This is intended for use with the OpenTok on WebRTC JS API.",
   "main": "opentok-layout.js",
   "dependencies": {},
   "devDependencies": {
-    "codeclimate-test-reporter": "0.0.4",
-    "gulp": "~3.5.5",
-    "gulp-jshint": "~1.5.0",
-    "gulp-rename": "~1.1.0",
-    "gulp-uglify": "~0.2.1",
-    "http-server": "^0.8.0",
-    "karma": "^0.13.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.5",
+    "babel-preset-env": "^1.7.0",
+    "eslint": "^5.1.0",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "http-server": "^0.11.1",
+    "karma": "^3.1.1",
+    "karma-babel-preprocessor": "^7.0.0",
     "karma-chrome-launcher": "^0.1.4",
-    "karma-coverage": "^0.2.7",
+    "karma-coverage": "^1.1.2",
     "karma-firefox-launcher": "^0.1.3",
     "karma-jasmine": "~0.2.0",
-    "karma-sauce-launcher": "^0.2.14",
+    "karma-sauce-launcher": "^1.2.0",
     "opentok-test-scripts": "^1.0.1",
-    "travis-multirunner": "^3.0.0"
+    "travis-multirunner": "^4.5.0",
+    "unminified-webpack-plugin": "^2.0.0",
+    "webpack": "^4.15.1",
+    "webpack-command": "^0.4.1"
   },
   "scripts": {
-    "test": "node ./tests/test-node.js && ./node_modules/.bin/run-tests",
-    "start": "http-server"
+    "test": "npx eslint . && node ./tests/test-node.js && npx run-tests",
+    "start": "http-server",
+    "dev": "npx webpack -w & npm start"
   },
   "repository": {
     "type": "git",
