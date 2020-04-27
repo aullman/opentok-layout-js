@@ -371,6 +371,7 @@ module.exports = function (opts, elements) {
   if (bigOnes.length > 0 && smallOnes.length > 0) {
     var bigWidth = void 0;
     var bigHeight = void 0;
+    var showBigFirst = bigFirst === true;
 
     if (availableRatio > getVideoRatio(bigOnes[0])) {
       // We are tall, going to take up the whole width and arrange small
@@ -379,6 +380,11 @@ module.exports = function (opts, elements) {
       bigHeight = Math.floor(containerHeight * bigPercentage);
       offsetTop = bigHeight;
       bigOffsetTop = containerHeight - offsetTop;
+      if (bigFirst === 'column') {
+        showBigFirst = false;
+      } else if (bigFirst === 'row') {
+        showBigFirst = true;
+      }
     } else {
       // We are wide, going to take up the whole height and arrange the small
       // guys on the right
@@ -386,8 +392,13 @@ module.exports = function (opts, elements) {
       bigWidth = Math.floor(containerWidth * bigPercentage);
       offsetLeft = bigWidth;
       bigOffsetLeft = containerWidth - offsetLeft;
+      if (bigFirst === 'column') {
+        showBigFirst = true;
+      } else if (bigFirst === 'row') {
+        showBigFirst = false;
+      }
     }
-    if (bigFirst) {
+    if (showBigFirst) {
       bigBoxes = getLayout({
         containerWidth: bigWidth,
         containerHeight: bigHeight,

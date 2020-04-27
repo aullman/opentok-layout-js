@@ -279,7 +279,7 @@ describe('opentok layout', () => {
         expect(div2Rect.height).toBe(60);
       });
 
-      it('handles bigFirst', () => {
+      it('handles bigFirst false', () => {
         const layoutContainer = initLayoutContainer(layoutDiv, { bigFirst: false });
         layoutContainer.layout();
         const div1Rect = div1.getBoundingClientRect();
@@ -604,6 +604,23 @@ describe('opentok layout', () => {
         expect(rect.top).toBe(150);
       });
 
+      it('handles bigFirst "column" and "row"', () => {
+        divs[0].className = 'OT_big';
+        let layoutContainer = initLayoutContainer(layoutDiv, { bigFirst: 'column' });
+        layoutContainer.layout();
+        // Big element is displayed on the left because we are in a column layout
+        let bigDivRect = divs[0].getBoundingClientRect();
+        expect(bigDivRect.left).toBeCloseTo(133.33);
+        expect(bigDivRect.top).toBe(0);
+
+        layoutContainer = initLayoutContainer(layoutDiv, { bigFirst: 'row' });
+        layoutContainer.layout();
+        // Big element is displayed on the right because we are in a column layout
+        bigDivRect = divs[0].getBoundingClientRect();
+        expect(bigDivRect.left).toBeCloseTo(333.33);
+        expect(bigDivRect.top).toBe(0);
+      });
+
       it('handles two big elements', () => {
         divs[0].className = 'OT_big';
         divs[1].className = 'OT_big';
@@ -707,6 +724,23 @@ describe('opentok layout', () => {
         rect = divs[4].getBoundingClientRect();
         expect(rect.left).toBe(300);
         expect(rect.top).toBe(645);
+      });
+
+      it('handles bigFirst "column" and "row"', () => {
+        divs[0].className = 'OT_big';
+        let layoutContainer = initLayoutContainer(layoutDiv, { bigFirst: 'column' });
+        layoutContainer.layout();
+        // Big element is displayed at the bottom because we are in a row layout
+        let bigDivRect = divs[0].getBoundingClientRect();
+        expect(bigDivRect.left).toBe(0);
+        expect(bigDivRect.top).toBe(160);
+
+        layoutContainer = initLayoutContainer(layoutDiv, { bigFirst: 'row' });
+        layoutContainer.layout();
+        // Big element is displayed at the top because we are in a row layout
+        bigDivRect = divs[0].getBoundingClientRect();
+        expect(bigDivRect.left).toBe(0);
+        expect(bigDivRect.top).toBe(20);
       });
 
       it('handles two big elements', () => {
