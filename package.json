@@ -1,6 +1,6 @@
 {
   "name": "opentok-layout-js",
-  "version": "3.6.0",
+  "version": "3.7.0",
   "description": "Automatic layout of video elements (publisher and subscriber) minimising white-space for the OpenTok on WebRTC API. This is intended for use with the OpenTok on WebRTC JS API.",
   "main": "opentok-layout.js",
   "dependencies": {},
