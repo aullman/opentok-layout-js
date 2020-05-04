@@ -168,11 +168,11 @@ describe('opentok layout', () => {
       });
     });
 
-    describe('smallMaxWidth and smallMaxHeight', () => {
-      it('does not go over the smallMaxWidth and smallMaxHeight and stays centered', () => {
+    describe('maxWidth and maxHeight', () => {
+      it('does not go over the maxWidth and maxHeight and stays centered', () => {
         const layoutContainer = initLayoutContainer(layoutDiv, {
-          smallMaxWidth: 160,
-          smallMaxHeight: 100,
+          maxWidth: 160,
+          maxHeight: 100,
         });
         layoutContainer.layout();
         const div1Rect = div1.getBoundingClientRect();
@@ -360,7 +360,7 @@ describe('opentok layout', () => {
         });
       });
 
-      describe('bigMaxWidth and bigMaxHeight', () => {
+      describe('small and big maxWidth and maxHeight', () => {
         it('does not go over the bigMaxWidth and bigMaxHeight and stays centered', () => {
           const layoutContainer = initLayoutContainer(layoutDiv, {
             bigMaxWidth: 200,
@@ -377,6 +377,24 @@ describe('opentok layout', () => {
           expect(div2Rect.height).toEqual(120);
           expect(div2Rect.left).toEqual(320);
           expect(div2Rect.top).toEqual(90);
+        });
+
+        it('does not go over the smallMaxWidth and smallMaxHeight and stays centered', () => {
+          const layoutContainer = initLayoutContainer(layoutDiv, {
+            smallMaxWidth: 50,
+            smallMaxHeight: 50,
+          });
+          layoutContainer.layout();
+          const div1Rect = div1.getBoundingClientRect();
+          expect(div1Rect.width).toEqual(320);
+          expect(div1Rect.height).toEqual(300);
+          expect(div1Rect.left).toEqual(0);
+          expect(div1Rect.top).toEqual(0);
+          const div2Rect = div2.getBoundingClientRect();
+          expect(div2Rect.width).toEqual(50);
+          expect(div2Rect.height).toEqual(50);
+          expect(div2Rect.left).toEqual(335);
+          expect(div2Rect.top).toEqual(125);
         });
       });
     });

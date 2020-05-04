@@ -340,6 +340,10 @@ module.exports = function (opts, elements) {
       bigAlignItems = _opts$bigAlignItems === undefined ? 'center' : _opts$bigAlignItems,
       _opts$smallAlignItems = opts.smallAlignItems,
       smallAlignItems = _opts$smallAlignItems === undefined ? 'center' : _opts$smallAlignItems,
+      _opts$maxWidth2 = opts.maxWidth,
+      maxWidth = _opts$maxWidth2 === undefined ? Infinity : _opts$maxWidth2,
+      _opts$maxHeight2 = opts.maxHeight,
+      maxHeight = _opts$maxHeight2 === undefined ? Infinity : _opts$maxHeight2,
       _opts$smallMaxWidth = opts.smallMaxWidth,
       smallMaxWidth = _opts$smallMaxWidth === undefined ? Infinity : _opts$smallMaxWidth,
       _opts$smallMaxHeight = opts.smallMaxHeight,
@@ -470,8 +474,8 @@ module.exports = function (opts, elements) {
       minRatio: minRatio,
       maxRatio: maxRatio,
       alignItems: alignItems,
-      maxWidth: smallMaxWidth,
-      maxHeight: smallMaxHeight
+      maxWidth: maxWidth,
+      maxHeight: maxHeight
     }, smallOnes);
   }
 

@@ -221,6 +221,8 @@ module.exports = (opts, elements) => {
     alignItems = 'center',
     bigAlignItems = 'center',
     smallAlignItems = 'center',
+    maxWidth = Infinity,
+    maxHeight = Infinity,
     smallMaxWidth = Infinity,
     smallMaxHeight = Infinity,
     bigMaxWidth = Infinity,
@@ -345,8 +347,8 @@ module.exports = (opts, elements) => {
       minRatio,
       maxRatio,
       alignItems,
-      maxWidth: smallMaxWidth,
-      maxHeight: smallMaxHeight,
+      maxWidth,
+      maxHeight,
     }, smallOnes);
   }
 
