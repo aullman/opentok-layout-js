@@ -589,17 +589,17 @@ module.exports = function (container, opts) {
 
   var getChildDims = function getChildDims(child) {
     if (child) {
+      if (child.videoHeight && child.videoWidth) {
+        return {
+          height: child.videoHeight,
+          width: child.videoWidth
+        };
+      }
       var video = child.querySelector('video');
       if (video && video.videoHeight && video.videoWidth) {
         return {
           height: video.videoHeight,
           width: video.videoWidth
-        };
-      }
-      if (child.videoHeight && child.videoWidth) {
-        return {
-          height: child.videoHeight,
-          width: child.videoWidth
         };
       }
     }

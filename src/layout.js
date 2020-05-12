@@ -80,17 +80,17 @@ module.exports = (container, opts) => {
 
   const getChildDims = function getChildDims(child) {
     if (child) {
+      if (child.videoHeight && child.videoWidth) {
+        return {
+          height: child.videoHeight,
+          width: child.videoWidth,
+        };
+      }
       const video = child.querySelector('video');
       if (video && video.videoHeight && video.videoWidth) {
         return {
           height: video.videoHeight,
           width: video.videoWidth,
-        };
-      }
-      if (child.videoHeight && child.videoWidth) {
-        return {
-          height: child.videoHeight,
-          width: child.videoWidth,
         };
       }
     }
