@@ -308,7 +308,7 @@ describe('opentok layout', () => {
         const layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
         expect(div1.clientWidth).toBeCloseTo(320, 1);
-        expect(div2.clientWidth).toBeCloseTo(80, 0);
+        expect(div2.clientWidth).toBeCloseTo(80, -1);
         expect(div1.clientHeight).toBeCloseTo(300, 1);
         expect(div2.clientHeight).toBeCloseTo(120, 1);
       });
