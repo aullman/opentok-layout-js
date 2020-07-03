@@ -437,24 +437,24 @@ describe('opentok layout', () => {
       let rect;
       for (let i = 0; i < divs.length; i += 1) {
         rect = divs[i].getBoundingClientRect();
-        expect(rect.width).toBeCloseTo(133, 2);
-        expect(rect.height).toBeCloseTo(150, 2);
+        expect(rect.width).toBeCloseTo(133, 1);
+        expect(rect.height).toBeCloseTo(150, 1);
       }
       rect = divs[0].getBoundingClientRect();
-      expect(rect.left).toBeCloseTo(0.5, 2);
-      expect(rect.top).toBeCloseTo(0, 2);
+      expect(rect.left).toBeCloseTo(0.5, 1);
+      expect(rect.top).toBeCloseTo(0, 1);
       rect = divs[1].getBoundingClientRect();
-      expect(rect.left).toBeCloseTo(133.5, 2);
-      expect(rect.top).toBeCloseTo(0, 2);
+      expect(rect.left).toBeCloseTo(133.5, 1);
+      expect(rect.top).toBeCloseTo(0, 1);
       rect = divs[2].getBoundingClientRect();
-      expect(rect.left).toBeCloseTo(266.5, 2);
-      expect(rect.top).toBeCloseTo(0, 2);
+      expect(rect.left).toBeCloseTo(266.5, 1);
+      expect(rect.top).toBeCloseTo(0, 1);
       rect = divs[3].getBoundingClientRect();
-      expect(rect.left).toBeCloseTo(67, 2);
-      expect(rect.top).toBeCloseTo(150, 2);
+      expect(rect.left).toBeCloseTo(67, 1);
+      expect(rect.top).toBeCloseTo(150, 1);
       rect = divs[4].getBoundingClientRect();
-      expect(rect.left).toBeCloseTo(200, 2);
-      expect(rect.top).toBeCloseTo(150, 2);
+      expect(rect.left).toBeCloseTo(200, 1);
+      expect(rect.top).toBeCloseTo(150, 1);
     });
 
     it('grows to takes up the whole height if there are narrow elements', () => {
