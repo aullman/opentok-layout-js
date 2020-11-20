@@ -572,7 +572,7 @@ module.exports = function (container, opts) {
       }
     };
 
-    if (animate && $) {
+    if (animate && typeof $ !== 'undefined') {
       $(elem).stop();
       $(elem).animate(targetPosition, animate.duration || 200, animate.easing || 'swing', function () {
         fixAspectRatio();
