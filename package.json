@@ -3,6 +3,7 @@
   "version": "3.7.2",
   "description": "Automatic layout of video elements (publisher and subscriber) minimising white-space for the OpenTok on WebRTC API. This is intended for use with the OpenTok on WebRTC JS API.",
   "main": "opentok-layout.js",
+  "types": "types/opentok-layout-js.d.ts",
   "dependencies": {},
   "devDependencies": {
     "babel-core": "^6.26.3",
@@ -27,6 +28,7 @@
   },
   "scripts": {
     "test": "npx eslint . && node ./tests/test-node.js && npx run-tests",
+    "type-test": "npx --package typescript tsc types/test.ts --noEmit --noErrorTruncation",
     "start": "http-server",
     "dev": "npx webpack -w & npm start"
   },
