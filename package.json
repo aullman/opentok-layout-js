@@ -27,7 +27,7 @@
     "webpack-command": "^0.4.1"
   },
   "scripts": {
-    "test": "npx eslint . && node ./tests/test-node.js && npx run-tests",
+    "test": "npx eslint . && node ./tests/test-node.js && npx run-tests && npm run type-test",
     "type-test": "npx --package typescript tsc types/test.ts --noEmit --noErrorTruncation",
     "start": "http-server",
     "dev": "npx webpack -w & npm start"
