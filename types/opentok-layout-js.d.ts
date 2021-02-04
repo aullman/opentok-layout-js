@@ -2,27 +2,27 @@ declare module 'opentok-layout-js' {
   type alignOptions = 'start' | 'center' | 'end';
 
   export type Options = {
-    alignItems: alignOptions;
-    animate: boolean;
-    bigAlignItems: alignOptions;
-    bigClass: string;
-    bigFirst: boolean;
-    bigFixedRatio: false;
-    bigMaxHeight: number;
-    bigMaxRatio: number;
-    bigMaxWidth: number;
-    bigMinRatio: number;
-    bigPercentage: number;
-    fixedRatio: boolean;
-    ignoreClass: string;
-    maxHeight: number;
-    maxRatio: number;
-    maxWidth: number;
-    minRatio: number;
-    smallAlignItems: alignOptions;
-    smallMaxHeight: number;
-    smallMaxWidth: number;
-    window: Window;
+    alignItems?: alignOptions;
+    animate?: boolean;
+    bigAlignItems?: alignOptions;
+    bigClass?: string;
+    bigFirst?: boolean;
+    bigFixedRatio?: false;
+    bigMaxHeight?: number;
+    bigMaxRatio?: number;
+    bigMaxWidth?: number;
+    bigMinRatio?: number;
+    bigPercentage?: number;
+    fixedRatio?: boolean;
+    ignoreClass?: string;
+    maxHeight?: number;
+    maxRatio?: number;
+    maxWidth?: number;
+    minRatio?: number;
+    smallAlignItems?: alignOptions;
+    smallMaxHeight?: number;
+    smallMaxWidth?: number;
+    window?: Window;
   };
 
   type Element = {
