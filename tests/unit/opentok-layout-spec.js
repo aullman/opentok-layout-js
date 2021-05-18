@@ -73,6 +73,19 @@ describe('opentok layout', () => {
         .toEqual(expectedLayout);
     });
 
+    it('triggers the onLayout method', () => {
+      const layoutContainer = initLayoutContainer(layoutDiv, {
+        onLayout: (elem, position) => {
+          ['width', 'height', 'top', 'left'].forEach((key) => {
+            expect(
+              position[key] === expectedLayout[0][key] || position[key] === expectedLayout[1][key]
+            ).toBe(true);
+          });
+        },
+      });
+      layoutContainer.layout();
+    });
+
     it('handles default layout', () => {
       const layoutContainer = initLayoutContainer(layoutDiv);
       layoutContainer.layout();
@@ -468,6 +481,22 @@ describe('opentok layout', () => {
       layoutContainer.layout();
       const rect = divs[4].getBoundingClientRect();
       expect(rect.top + rect.height).toBeCloseTo(600, 1);
+    });
+
+    it('does not grows to take up the whole height if you pass scaleLastRow=false', () => {
+      divs[1].videoWidth = 480;
+      divs[1].videoHeight = 640;
+      divs[2].videoWidth = 1280;
+      divs[2].videoHeight = 720;
+      layoutDiv.style.width = '400px';
+      layoutDiv.style.height = '600px';
+      const layoutContainer = initLayoutContainer(layoutDiv, {
+        fixedRatio: true,
+        scaleLastRow: false,
+      });
+      layoutContainer.layout();
+      const rect = divs[4].getBoundingClientRect();
+      expect(rect.top + rect.height).toBeCloseTo(514, 1);
     });
 
     it('does not mess up the aspect ratio of the last row when it grows', () => {

@@ -76,9 +76,9 @@
             }
 
             #buttons {
-                margin-top: 10px;
-                width: 100%;
-                text-align: center;
+              margin-top: 10px;
+              width: 100%;
+              text-align: center;
             }
 
             #advanced {
@@ -97,8 +97,10 @@
             <label>minRatio</label><input id="minRatio" type="text" name="minRatio" value="9/16">
             <label>alignItems</label><input id="alignItems" type="text" name="alignItems" value="center">
             <label>fixedRatio</label><input id="fixedRatio" type="text" name="fixedRatio" value="false">
+            <label>scaleLastRow</label><input id="scaleLastRow" type="text" name="scaleLastRow" value="true">
             <label>bigPercentage</label><input id="bigPercentage" type="text" name="bigPercentage" value="0.8">
             <label>bigFixedRatio</label><input id="bigFixedRatio" type="text" name="bigFixedRatio" value="false">
+            <label>bigScaleLastRow</label><input id="bigScaleLastRow" type="text" name="bigScaleLastRow" value="true">
             <label>bigAlignItems</label><input id="bigAlignItems" type="text" name="bigAlignItems" value="center">
             <label>smallAlignItems</label><input id="smallAlignItems" type="text" name="smallAlignItems" value="center">
             <label>bigMaxRatio</label><input id="bigMaxRatio" type="text" name="bigMaxRatio" value="3/2">
@@ -138,6 +140,8 @@
               bigMaxHeight: eval(bigMaxHeight.value),
               bigAlignItems: bigAlignItems.value,
               smallAlignItems: smallAlignItems.value,
+              scaleLastRow: eval(scaleLastRow.value),
+              bigScaleLastRow: eval(bigScaleLastRow.value),
           }).layout;
         }
         updateLayoutValues();

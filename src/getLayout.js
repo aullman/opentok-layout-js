@@ -65,6 +65,7 @@ const getLayout = (opts, elements) => {
     alignItems = 'center',
     maxWidth = Infinity,
     maxHeight = Infinity,
+    scaleLastRow = true,
   } = opts;
   const ratios = elements.map(element => element.height / element.width);
   const count = ratios.length;
@@ -126,7 +127,7 @@ const getLayout = (opts, elements) => {
     }
     totalRowHeight += row.height;
   }
-  if (totalRowHeight < containerHeight && remainingShortRows > 0) {
+  if (scaleLastRow && totalRowHeight < containerHeight && remainingShortRows > 0) {
     // We can grow some of the rows, we're not taking up the whole height
     let remainingHeightDiff = containerHeight - totalRowHeight;
     totalRowHeight = 0;
@@ -227,6 +228,8 @@ module.exports = (opts, elements) => {
     smallMaxHeight = Infinity,
     bigMaxWidth = Infinity,
     bigMaxHeight = Infinity,
+    scaleLastRow = true,
+    bigScaleLastRow = true,
   } = opts;
 
   const availableRatio = containerHeight / containerWidth;
@@ -287,6 +290,7 @@ module.exports = (opts, elements) => {
         alignItems: bigAlignItems,
         maxWidth: bigMaxWidth,
         maxHeight: bigMaxHeight,
+        scaleLastRow: bigScaleLastRow,
       }, bigOnes);
       smallBoxes = getLayout({
         containerWidth: containerWidth - offsetLeft,
@@ -299,6 +303,7 @@ module.exports = (opts, elements) => {
         alignItems: smallAlignItems,
         maxWidth: smallMaxWidth,
         maxHeight: smallMaxHeight,
+        scaleLastRow,
       }, smallOnes);
     } else {
       smallBoxes = getLayout({
@@ -312,6 +317,7 @@ module.exports = (opts, elements) => {
         alignItems: smallAlignItems,
         maxWidth: smallMaxWidth,
         maxHeight: smallMaxHeight,
+        scaleLastRow,
       }, smallOnes);
       bigBoxes = getLayout({
         containerWidth: bigWidth,
@@ -323,6 +329,7 @@ module.exports = (opts, elements) => {
         alignItems: bigAlignItems,
         maxWidth: bigMaxWidth,
         maxHeight: bigMaxHeight,
+        scaleLastRow: bigScaleLastRow,
       }, bigOnes);
     }
   } else if (bigOnes.length > 0 && smallOnes.length === 0) {
@@ -336,6 +343,7 @@ module.exports = (opts, elements) => {
       alignItems: bigAlignItems,
       maxWidth: bigMaxWidth,
       maxHeight: bigMaxHeight,
+      scaleLastRow: bigScaleLastRow,
     }, bigOnes);
   } else {
     smallBoxes = getLayout({
@@ -349,6 +357,7 @@ module.exports = (opts, elements) => {
       alignItems,
       maxWidth,
       maxHeight,
+      scaleLastRow,
     }, smallOnes);
   }
 
