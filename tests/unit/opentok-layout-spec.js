@@ -73,6 +73,19 @@ describe('opentok layout', () => {
         .toEqual(expectedLayout);
     });
 
+    it('triggers the onLayout method', () => {
+      const layoutContainer = initLayoutContainer(layoutDiv, {
+        onLayout: (elem, position) => {
+          ['width', 'height', 'top', 'left'].forEach((key) => {
+            expect(
+              position[key] === expectedLayout[0][key] || position[key] === expectedLayout[1][key]
+            ).toBe(true);
+          });
+        },
+      });
+      layoutContainer.layout();
+    });
+
     it('handles default layout', () => {
       const layoutContainer = initLayoutContainer(layoutDiv);
       layoutContainer.layout();

@@ -41,7 +41,7 @@ module.exports = (container, opts) => {
     return css(el, 'width');
   }
 
-  const positionElement = function positionElement(elem, x, y, w, h, animate) {
+  const positionElement = function positionElement(elem, x, y, w, h, animate, onLayout) {
     const targetPosition = {
       left: `${x}px`,
       top: `${y}px`,
@@ -68,11 +68,27 @@ module.exports = (container, opts) => {
         () => {
           fixAspectRatio();
           if (animate.complete) animate.complete.call(this);
+          if (onLayout) {
+            onLayout(elem, {
+              left: x,
+              top: y,
+              width: w,
+              height: h,
+            });
+          }
         });
     } else {
       css(elem, targetPosition);
       if (!elem.classList.contains('ot-layout')) {
         elem.classList.add('ot-layout');
+      }
+      if (onLayout) {
+        onLayout(elem, {
+          left: x,
+          top: y,
+          width: w,
+          height: h,
+        });
       }
     }
     fixAspectRatio();
@@ -157,20 +173,20 @@ module.exports = (container, opts) => {
     const elem = children[idx];
     css(elem, 'position', 'absolute');
     const actualWidth = box.width - getCSSNumber(elem, 'paddingLeft')
-        - getCSSNumber(elem, 'paddingRight')
-        - getCSSNumber(elem, 'marginLeft')
-        - getCSSNumber(elem, 'marginRight')
-        - getCSSNumber(elem, 'borderLeft')
-        - getCSSNumber(elem, 'borderRight');
+      - getCSSNumber(elem, 'paddingRight')
+      - getCSSNumber(elem, 'marginLeft')
+      - getCSSNumber(elem, 'marginRight')
+      - getCSSNumber(elem, 'borderLeft')
+      - getCSSNumber(elem, 'borderRight');
 
     const actualHeight = box.height - getCSSNumber(elem, 'paddingTop')
-        - getCSSNumber(elem, 'paddingBottom')
-        - getCSSNumber(elem, 'marginTop')
-        - getCSSNumber(elem, 'marginBottom')
-        - getCSSNumber(elem, 'borderTop')
-        - getCSSNumber(elem, 'borderBottom');
+      - getCSSNumber(elem, 'paddingBottom')
+      - getCSSNumber(elem, 'marginTop')
+      - getCSSNumber(elem, 'marginBottom')
+      - getCSSNumber(elem, 'borderTop')
+      - getCSSNumber(elem, 'borderBottom');
 
     positionElement(elem, box.left, box.top, actualWidth, actualHeight,
-      animate);
+      animate, opts.onLayout);
   });
 };

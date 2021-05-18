@@ -561,7 +561,7 @@ module.exports = function (container, opts) {
     return css(el, 'width');
   }
 
-  var positionElement = function positionElement(elem, x, y, w, h, animate) {
+  var positionElement = function positionElement(elem, x, y, w, h, animate, onLayout) {
     var _this = this;
 
     var targetPosition = {
@@ -589,11 +589,27 @@ module.exports = function (container, opts) {
       $(elem).animate(targetPosition, animate.duration || 200, animate.easing || 'swing', function () {
         fixAspectRatio();
         if (animate.complete) animate.complete.call(_this);
+        if (onLayout) {
+          onLayout(elem, {
+            left: x,
+            top: y,
+            width: w,
+            height: h
+          });
+        }
       });
     } else {
       css(elem, targetPosition);
       if (!elem.classList.contains('ot-layout')) {
         elem.classList.add('ot-layout');
+      }
+      if (onLayout) {
+        onLayout(elem, {
+          left: x,
+          top: y,
+          width: w,
+          height: h
+        });
       }
     }
     fixAspectRatio();
@@ -676,7 +692,7 @@ module.exports = function (container, opts) {
 
     var actualHeight = box.height - getCSSNumber(elem, 'paddingTop') - getCSSNumber(elem, 'paddingBottom') - getCSSNumber(elem, 'marginTop') - getCSSNumber(elem, 'marginBottom') - getCSSNumber(elem, 'borderTop') - getCSSNumber(elem, 'borderBottom');
 
-    positionElement(elem, box.left, box.top, actualWidth, actualHeight, animate);
+    positionElement(elem, box.left, box.top, actualWidth, actualHeight, animate, opts.onLayout);
   });
 };
 

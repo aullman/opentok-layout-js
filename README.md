@@ -53,6 +53,7 @@ const options = {
     animate: true,             // Whether you want to animate the transitions using jQuery (not recommended, use CSS transitions instead)
     window: window,            // Lets you pass in your own window object which should be the same window that the element is in
     ignoreClass: 'OT_ignore',  // Elements with this class will be ignored and not positioned. This lets you do things like picture-in-picture
+    onLayout: null,            // A function that gets called every time an element is moved or resized, (element, { left, top, width, height }) => {} 
 };
 const layout = initLayoutContainer(document.getElementById("layout"), options);
 layout.layout();
