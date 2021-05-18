@@ -7,7 +7,7 @@ before_install:
 - export DISPLAY=:99.0
 - sh -e /etc/init.d/xvfb start
 before_script:
-- sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157
+- sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 6B05F25D762E3157 78BD65473CB3BD13
 - sudo apt-get update && sudo apt-get -y install dpkg;
 addons:
   code_climate:
