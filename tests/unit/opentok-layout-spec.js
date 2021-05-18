@@ -470,6 +470,22 @@ describe('opentok layout', () => {
       expect(rect.top + rect.height).toBeCloseTo(600, 1);
     });
 
+    it('does not grows to take up the whole height if you pass scaleLastRow=false', () => {
+      divs[1].videoWidth = 480;
+      divs[1].videoHeight = 640;
+      divs[2].videoWidth = 1280;
+      divs[2].videoHeight = 720;
+      layoutDiv.style.width = '400px';
+      layoutDiv.style.height = '600px';
+      const layoutContainer = initLayoutContainer(layoutDiv, {
+        fixedRatio: true,
+        scaleLastRow: false,
+      });
+      layoutContainer.layout();
+      const rect = divs[4].getBoundingClientRect();
+      expect(rect.top + rect.height).toBeCloseTo(514, 1);
+    });
+
     it('does not mess up the aspect ratio of the last row when it grows', () => {
       layoutDiv.style.width = '600px';
       layoutDiv.style.height = '500px';

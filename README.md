@@ -32,10 +32,12 @@ const options = {
     maxRatio: 3/2,             // The narrowest ratio that will be used (default 2x3)
     minRatio: 9/16,            // The widest ratio that will be used (default 16x9)
     fixedRatio: false,         // If this is true then the aspect ratio of the video is maintained and minRatio and maxRatio are ignored (default false)
+    scaleLastRow: true,        // If there are less elements on the last row then we can scale them up to take up more space
     alignItems: 'center',      // Can be 'start', 'center' or 'end'. Determines where to place items when on a row or column that is not full
     bigClass: "OT_big",        // The class to add to elements that should be sized bigger
     bigPercentage: 0.8,        // The maximum percentage of space the big ones should take up
     bigFixedRatio: false,      // fixedRatio for the big ones
+    bigScaleLastRow: true,     // scale last row for the big elements
     bigAlignItems: 'center',   // How to align the big items
     smallAlignItems: 'center', // How to align the small row or column of items if there is a big one
     maxWidth: Infinity,        // The maximum width of the elements
