@@ -171,7 +171,9 @@ var getLayout = function getLayout(opts, elements) {
       _opts$maxWidth = opts.maxWidth,
       maxWidth = _opts$maxWidth === undefined ? Infinity : _opts$maxWidth,
       _opts$maxHeight = opts.maxHeight,
-      maxHeight = _opts$maxHeight === undefined ? Infinity : _opts$maxHeight;
+      maxHeight = _opts$maxHeight === undefined ? Infinity : _opts$maxHeight,
+      _opts$scaleLastRow = opts.scaleLastRow,
+      scaleLastRow = _opts$scaleLastRow === undefined ? true : _opts$scaleLastRow;
 
   var ratios = elements.map(function (element) {
     return element.height / element.width;
@@ -232,7 +234,7 @@ var getLayout = function getLayout(opts, elements) {
     }
     totalRowHeight += row.height;
   }
-  if (totalRowHeight < containerHeight && remainingShortRows > 0) {
+  if (scaleLastRow && totalRowHeight < containerHeight && remainingShortRows > 0) {
     // We can grow some of the rows, we're not taking up the whole height
     var remainingHeightDiff = containerHeight - totalRowHeight;
     totalRowHeight = 0;
@@ -351,7 +353,11 @@ module.exports = function (opts, elements) {
       _opts$bigMaxWidth = opts.bigMaxWidth,
       bigMaxWidth = _opts$bigMaxWidth === undefined ? Infinity : _opts$bigMaxWidth,
       _opts$bigMaxHeight = opts.bigMaxHeight,
-      bigMaxHeight = _opts$bigMaxHeight === undefined ? Infinity : _opts$bigMaxHeight;
+      bigMaxHeight = _opts$bigMaxHeight === undefined ? Infinity : _opts$bigMaxHeight,
+      _opts$scaleLastRow2 = opts.scaleLastRow,
+      scaleLastRow = _opts$scaleLastRow2 === undefined ? true : _opts$scaleLastRow2,
+      _opts$bigScaleLastRow = opts.bigScaleLastRow,
+      bigScaleLastRow = _opts$bigScaleLastRow === undefined ? true : _opts$bigScaleLastRow;
 
 
   var availableRatio = containerHeight / containerWidth;
@@ -413,7 +419,8 @@ module.exports = function (opts, elements) {
         maxRatio: bigMaxRatio,
         alignItems: bigAlignItems,
         maxWidth: bigMaxWidth,
-        maxHeight: bigMaxHeight
+        maxHeight: bigMaxHeight,
+        scaleLastRow: bigScaleLastRow
       }, bigOnes);
       smallBoxes = getLayout({
         containerWidth: containerWidth - offsetLeft,
@@ -425,7 +432,8 @@ module.exports = function (opts, elements) {
         maxRatio: maxRatio,
         alignItems: smallAlignItems,
         maxWidth: smallMaxWidth,
-        maxHeight: smallMaxHeight
+        maxHeight: smallMaxHeight,
+        scaleLastRow: scaleLastRow
       }, smallOnes);
     } else {
       smallBoxes = getLayout({
@@ -438,7 +446,8 @@ module.exports = function (opts, elements) {
         maxRatio: maxRatio,
         alignItems: smallAlignItems,
         maxWidth: smallMaxWidth,
-        maxHeight: smallMaxHeight
+        maxHeight: smallMaxHeight,
+        scaleLastRow: scaleLastRow
       }, smallOnes);
       bigBoxes = getLayout({
         containerWidth: bigWidth,
@@ -449,7 +458,8 @@ module.exports = function (opts, elements) {
         minRatio: bigMinRatio,
         alignItems: bigAlignItems,
         maxWidth: bigMaxWidth,
-        maxHeight: bigMaxHeight
+        maxHeight: bigMaxHeight,
+        scaleLastRow: bigScaleLastRow
       }, bigOnes);
     }
   } else if (bigOnes.length > 0 && smallOnes.length === 0) {
@@ -462,7 +472,8 @@ module.exports = function (opts, elements) {
       maxRatio: bigMaxRatio,
       alignItems: bigAlignItems,
       maxWidth: bigMaxWidth,
-      maxHeight: bigMaxHeight
+      maxHeight: bigMaxHeight,
+      scaleLastRow: bigScaleLastRow
     }, bigOnes);
   } else {
     smallBoxes = getLayout({
@@ -475,7 +486,8 @@ module.exports = function (opts, elements) {
       maxRatio: maxRatio,
       alignItems: alignItems,
       maxWidth: maxWidth,
-      maxHeight: maxHeight
+      maxHeight: maxHeight,
+      scaleLastRow: scaleLastRow
     }, smallOnes);
   }
 
@@ -549,7 +561,7 @@ module.exports = function (container, opts) {
     return css(el, 'width');
   }
 
-  var positionElement = function positionElement(elem, x, y, w, h, animate) {
+  var positionElement = function positionElement(elem, x, y, w, h, animate, onLayout) {
     var _this = this;
 
     var targetPosition = {
@@ -577,11 +589,27 @@ module.exports = function (container, opts) {
       $(elem).animate(targetPosition, animate.duration || 200, animate.easing || 'swing', function () {
         fixAspectRatio();
         if (animate.complete) animate.complete.call(_this);
+        if (onLayout) {
+          onLayout(elem, {
+            left: x,
+            top: y,
+            width: w,
+            height: h
+          });
+        }
       });
     } else {
       css(elem, targetPosition);
       if (!elem.classList.contains('ot-layout')) {
         elem.classList.add('ot-layout');
+      }
+      if (onLayout) {
+        onLayout(elem, {
+          left: x,
+          top: y,
+          width: w,
+          height: h
+        });
       }
     }
     fixAspectRatio();
@@ -664,7 +692,7 @@ module.exports = function (container, opts) {
 
     var actualHeight = box.height - getCSSNumber(elem, 'paddingTop') - getCSSNumber(elem, 'paddingBottom') - getCSSNumber(elem, 'marginTop') - getCSSNumber(elem, 'marginBottom') - getCSSNumber(elem, 'borderTop') - getCSSNumber(elem, 'borderBottom');
 
-    positionElement(elem, box.left, box.top, actualWidth, actualHeight, animate);
+    positionElement(elem, box.left, box.top, actualWidth, actualHeight, animate, opts.onLayout);
   });
 };
 

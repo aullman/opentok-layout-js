@@ -27,6 +27,8 @@ const options: Options = {
   animate: true,
   window: window,
   ignoreClass: 'OT_ignore',
+  scaleLastRow: true,
+  bigScaleLastRow: true,
 };
 
 const target = document.createElement('div');

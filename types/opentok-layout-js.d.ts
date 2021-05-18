@@ -22,6 +22,9 @@ declare module 'opentok-layout-js' {
     smallAlignItems?: alignOptions;
     smallMaxHeight?: number;
     smallMaxWidth?: number;
+    scaleLastRow?: boolean;
+    bigScaleLastRow?: boolean;
+    onLayout?: Function,
     window?: Window;
   };
 
