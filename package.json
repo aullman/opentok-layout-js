@@ -12,7 +12,7 @@
     "eslint": "^5.1.0",
     "eslint-config-airbnb-base": "^13.0.0",
     "eslint-plugin-import": "^2.13.0",
-    "http-server": "^0.11.1",
+    "http-server": "^0.12.3",
     "karma": "^3.1.1",
     "karma-babel-preprocessor": "^7.0.0",
     "karma-chrome-launcher": "^0.1.4",
