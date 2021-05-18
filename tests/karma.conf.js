@@ -2,15 +2,7 @@
 // Generated on Wed Sep 03 2014 13:49:54 GMT+1000 (EST)
 
 module.exports = (config) => {
-  const sauceLaunchers = {
-    Ie: {
-      base: 'SauceLabs',
-      browserName: 'internet explorer',
-      platform: process.env.BVER === '10' ? 'Windows 8' : 'Windows 8.1',
-      version: process.env.BVER,
-    },
-  };
-  const browser = process.env.BROWSER || 'chrome';
+  const browser = 'chrome';
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -54,8 +46,6 @@ module.exports = (config) => {
       type: 'lcov',
       dir: '../coverage/',
     },
-
-    customLaunchers: sauceLaunchers,
 
     sauceLabs: {
       startConnect: false,
