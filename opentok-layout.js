@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -179,14 +179,17 @@ var getLayout = function getLayout(opts, elements) {
     return element.height / element.width;
   });
   var count = ratios.length;
+  var avgRatio = count > 0 ? ratios.reduce(function (acc, r) {
+    return acc + r;
+  }, 0) / count : 1;
 
   var dimensions = void 0;
 
   if (!fixedRatio) {
     dimensions = getBestDimensions(minRatio, maxRatio, containerWidth, containerHeight, count, maxWidth, maxHeight);
   } else {
-    // Use the ratio of the first video element we find to approximate
-    var ratio = ratios.length > 0 ? ratios[0] : null;
+    // Use the average ratio to approximate
+    var ratio = count > 0 ? avgRatio : null;
     dimensions = getBestDimensions(ratio, ratio, containerWidth, containerHeight, count, maxWidth, maxHeight);
   }
 
@@ -215,7 +218,7 @@ var getLayout = function getLayout(opts, elements) {
     var targetHeight = dimensions.targetHeight;
     // If we're using a fixedRatio then we need to set the correct ratio for this element
     if (fixedRatio) {
-      targetWidth = targetHeight / _ratio;
+      targetWidth = targetHeight / avgRatio;
     }
     row.width += targetWidth;
     row.height = targetHeight;
@@ -292,7 +295,7 @@ var getLayout = function getLayout(opts, elements) {
       _targetHeight = row.height;
       // If we're using a fixedRatio then we need to set the correct ratio for this element
       if (fixedRatio) {
-        _targetWidth = Math.floor(_targetHeight / _ratio2);
+        _targetWidth = Math.floor(_targetHeight / avgRatio);
       } else if (_targetHeight / _targetWidth !== dimensions.targetHeight / dimensions.targetWidth) {
         // We grew this row, we need to adjust the width to account for the increase in height
         _targetWidth = Math.floor(dimensions.targetWidth / dimensions.targetHeight * _targetHeight);
@@ -514,6 +517,47 @@ module.exports = function (opts, elements) {
 "use strict";
 
 
+/*!
+ *  opentok-layout-js (http://github.com/aullman/opentok-layout-js)
+ *
+ *  Automatic layout of video elements (publisher and subscriber) minimising
+ *  white-space for the OpenTok on WebRTC API.
+ *
+ *  @Author: Adam Ullman (http://github.com/aullman)
+ *  @Copyright (c) 2014 Adam Ullman
+ *  @License: Released under the MIT license (http://opensource.org/licenses/MIT)
+ * */
+
+// in CommonJS context, this should be a `require()`d dependency.
+// in browser globals context, ...? (when using bower, there are dependencies that it has handled
+// for you, so these might be safe to assume)
+
+var getLayout = __webpack_require__(0);
+var layout = __webpack_require__(2);
+
+module.exports = function initLayoutContainer(container, opts) {
+  var win = opts && opts.window || (typeof window === 'undefined' ? undefined : window);
+  container = typeof container === 'string' ? win.document.querySelector(container) : container;
+  if (!(typeof (win && win.HTMLElement) === 'undefined' || container instanceof win.HTMLElement) && !opts) {
+    // container is actually the options
+    opts = container;
+  } else if (!opts) {
+    opts = {};
+  }
+
+  return {
+    layout: layout.bind(this, container, opts),
+    getLayout: getLayout.bind(this, opts)
+  };
+};
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var getLayout = __webpack_require__(0);
@@ -694,47 +738,6 @@ module.exports = function (container, opts) {
 
     positionElement(elem, box.left, box.top, actualWidth, actualHeight, animate, opts.onLayout);
   });
-};
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/*!
- *  opentok-layout-js (http://github.com/aullman/opentok-layout-js)
- *
- *  Automatic layout of video elements (publisher and subscriber) minimising
- *  white-space for the OpenTok on WebRTC API.
- *
- *  @Author: Adam Ullman (http://github.com/aullman)
- *  @Copyright (c) 2014 Adam Ullman
- *  @License: Released under the MIT license (http://opensource.org/licenses/MIT)
- * */
-
-// in CommonJS context, this should be a `require()`d dependency.
-// in browser globals context, ...? (when using bower, there are dependencies that it has handled
-// for you, so these might be safe to assume)
-
-var getLayout = __webpack_require__(0);
-var layout = __webpack_require__(1);
-
-module.exports = function initLayoutContainer(container, opts) {
-  var win = opts && opts.window || (typeof window === 'undefined' ? undefined : window);
-  container = typeof container === 'string' ? win.document.querySelector(container) : container;
-  if (!(typeof (win && win.HTMLElement) === 'undefined' || container instanceof win.HTMLElement) && !opts) {
-    // container is actually the options
-    opts = container;
-  } else if (!opts) {
-    opts = {};
-  }
-
-  return {
-    layout: layout.bind(this, container, opts),
-    getLayout: getLayout.bind(this, opts)
-  };
 };
 
 /***/ })

@@ -21,7 +21,7 @@
     "karma-jasmine": "~0.2.0",
     "karma-sauce-launcher": "^1.2.0",
     "unminified-webpack-plugin": "^2.0.0",
-    "webpack": "^5.37.0",
+    "webpack": "^4.0.0",
     "webpack-command": "^0.4.1"
   },
   "scripts": {

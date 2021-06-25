@@ -69,7 +69,7 @@ const getLayout = (opts, elements) => {
   } = opts;
   const ratios = elements.map(element => element.height / element.width);
   const count = ratios.length;
-
+  const avgRatio = count > 0 ? ratios.reduce((acc, r) => acc + r, 0) / count : 1;
 
   let dimensions;
 
@@ -77,8 +77,8 @@ const getLayout = (opts, elements) => {
     dimensions = getBestDimensions(minRatio, maxRatio, containerWidth, containerHeight, count,
       maxWidth, maxHeight);
   } else {
-    // Use the ratio of the first video element we find to approximate
-    const ratio = ratios.length > 0 ? ratios[0] : null;
+    // Use the average ratio to approximate
+    const ratio = count > 0 ? avgRatio : null;
     dimensions = getBestDimensions(ratio, ratio, containerWidth, containerHeight, count,
       maxWidth, maxHeight);
   }
@@ -108,7 +108,7 @@ const getLayout = (opts, elements) => {
     const targetHeight = dimensions.targetHeight;
     // If we're using a fixedRatio then we need to set the correct ratio for this element
     if (fixedRatio) {
-      targetWidth = targetHeight / ratio;
+      targetWidth = targetHeight / avgRatio;
     }
     row.width += targetWidth;
     row.height = targetHeight;
@@ -179,13 +179,11 @@ const getLayout = (opts, elements) => {
     x = rowMarginLeft;
     let targetHeight;
     for (let j = 0; j < row.ratios.length; j += 1) {
-      const ratio = row.ratios[j];
-
       let targetWidth = dimensions.targetWidth;
       targetHeight = row.height;
       // If we're using a fixedRatio then we need to set the correct ratio for this element
       if (fixedRatio) {
-        targetWidth = Math.floor(targetHeight / ratio);
+        targetWidth = Math.floor(targetHeight / avgRatio);
       } else if ((targetHeight / targetWidth)
         !== (dimensions.targetHeight / dimensions.targetWidth)) {
         // We grew this row, we need to adjust the width to account for the increase in height
