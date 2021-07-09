@@ -6,7 +6,7 @@ declare module 'opentok-layout-js' {
     animate?: boolean;
     bigAlignItems?: alignOptions;
     bigClass?: string;
-    bigFirst?: boolean;
+    bigFirst?: boolean | 'column' | 'row';
     bigFixedRatio?: false;
     bigMaxHeight?: number;
     bigMaxRatio?: number;
