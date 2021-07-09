@@ -7,7 +7,7 @@ declare module 'opentok-layout-js' {
     bigAlignItems?: alignOptions;
     bigClass?: string;
     bigFirst?: boolean | 'column' | 'row';
-    bigFixedRatio?: false;
+    bigFixedRatio?: boolean;
     bigMaxHeight?: number;
     bigMaxRatio?: number;
     bigMaxWidth?: number;
