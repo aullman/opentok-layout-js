@@ -347,10 +347,8 @@ module.exports = (opts, elements) => {
     }, bigOnes);
   } else {
     smallBoxes = getLayout({
-      containerWidth: containerWidth - offsetLeft,
-      containerHeight: containerHeight - offsetTop,
-      offsetLeft,
-      offsetTop,
+      containerWidth,
+      containerHeight,
       fixedRatio,
       minRatio,
       maxRatio,
