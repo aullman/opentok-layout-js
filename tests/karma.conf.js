@@ -1,8 +1,9 @@
 // Karma configuration
 // Generated on Wed Sep 03 2014 13:49:54 GMT+1000 (EST)
 
+process.env.CHROME_BIN = require('puppeteer').executablePath();
+
 module.exports = (config) => {
-  const browser = 'chrome';
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -40,16 +41,11 @@ module.exports = (config) => {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://npmjs.org/browse/keyword/karma-reporter
-    reporters: ['progress', 'coverage', 'saucelabs'],
+    reporters: ['progress', 'coverage'],
 
     coverageReporter: {
       type: 'lcov',
       dir: '../coverage/',
-    },
-
-    sauceLabs: {
-      startConnect: false,
-      tunnelIdentifier: process.env.TRAVIS_JOB_NUMBER,
     },
 
     // web server port
@@ -67,7 +63,7 @@ module.exports = (config) => {
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: true,
 
-    browsers: [browser[0].toUpperCase() + browser.substr(1)],
+    browsers: ['ChromeHeadless'],
 
 
     // Continuous Integration mode
