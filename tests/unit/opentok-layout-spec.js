@@ -314,6 +314,24 @@ describe('opentok layout', () => {
         expect(div2Rect.height).toBeCloseTo(110, 1);
       });
 
+      it('takes margin CSS styles into account', () => {
+        const style = document.createElement('style');
+        style.innerHTML = '.div { margin: 5px; }';
+        document.head.appendChild(style);
+
+        div1.classList.add('div');
+        div2.classList.add('div');
+
+        const layoutContainer = initLayoutContainer(layoutDiv);
+        layoutContainer.layout();
+        const div1Rect = div1.getBoundingClientRect();
+        const div2Rect = div2.getBoundingClientRect();
+        expect(div1Rect.width).toBeCloseTo(310, 1);
+        expect(div2Rect.width).toBeCloseTo(70, 1);
+        expect(div1Rect.height).toBeCloseTo(290, 1);
+        expect(div2Rect.height).toBeCloseTo(110, 1);
+      });
+
       it('takes padding into account', () => {
         div1.style.padding = '5px';
         div2.style.padding = '5px';
