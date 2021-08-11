@@ -1,7 +1,7 @@
 // Karma configuration
 // Generated on Wed Sep 03 2014 13:49:54 GMT+1000 (EST)
 
-process.env.CHROME_BIN = require('puppeteer').executablePath()
+process.env.CHROME_BIN = require('puppeteer').executablePath();
 
 module.exports = (config) => {
   config.set({
