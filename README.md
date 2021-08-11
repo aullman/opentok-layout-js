@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/aullman/opentok-layout-js.svg?branch=master)](https://travis-ci.org/aullman/opentok-layout-js)
-
 [![Demo of Layout Container](https://github.com/aullman/opentok-layout-js/raw/master/layout-demo.gif)](https://aullman.github.io/opentok-layout-js/ "Layout-container Demo")
 
 opentok-layout-js
