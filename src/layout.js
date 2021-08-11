@@ -152,11 +152,11 @@ module.exports = (container, opts) => {
   }
 
   opts.containerHeight = getHeight(container)
-    - getCSSNumber(container, 'borderTop')
-    - getCSSNumber(container, 'borderBottom');
+    - getCSSNumber(container, 'border-top')
+    - getCSSNumber(container, 'border-bottom');
   opts.containerWidth = getWidth(container)
-    - getCSSNumber(container, 'borderLeft')
-    - getCSSNumber(container, 'borderRight');
+    - getCSSNumber(container, 'border-left')
+    - getCSSNumber(container, 'border-right');
 
   const children = Array.prototype.filter.call(
     container.querySelectorAll(`#${id}>*:not(.${ignoreClass})`),
@@ -172,19 +172,19 @@ module.exports = (container, opts) => {
   boxes.forEach((box, idx) => {
     const elem = children[idx];
     css(elem, 'position', 'absolute');
-    const actualWidth = box.width - getCSSNumber(elem, 'paddingLeft')
-      - getCSSNumber(elem, 'paddingRight')
-      - getCSSNumber(elem, 'marginLeft')
-      - getCSSNumber(elem, 'marginRight')
-      - getCSSNumber(elem, 'borderLeft')
-      - getCSSNumber(elem, 'borderRight');
+    const actualWidth = box.width - getCSSNumber(elem, 'padding-left')
+      - getCSSNumber(elem, 'padding-right')
+      - getCSSNumber(elem, 'margin-left')
+      - getCSSNumber(elem, 'margin-right')
+      - getCSSNumber(elem, 'border-left')
+      - getCSSNumber(elem, 'border-right');
 
-    const actualHeight = box.height - getCSSNumber(elem, 'paddingTop')
-      - getCSSNumber(elem, 'paddingBottom')
-      - getCSSNumber(elem, 'marginTop')
-      - getCSSNumber(elem, 'marginBottom')
-      - getCSSNumber(elem, 'borderTop')
-      - getCSSNumber(elem, 'borderBottom');
+    const actualHeight = box.height - getCSSNumber(elem, 'padding-top')
+      - getCSSNumber(elem, 'padding-bottom')
+      - getCSSNumber(elem, 'margin-top')
+      - getCSSNumber(elem, 'margin-bottom')
+      - getCSSNumber(elem, 'border-top')
+      - getCSSNumber(elem, 'border-bottom');
 
     positionElement(elem, box.left, box.top, actualWidth, actualHeight,
       animate, opts.onLayout);
