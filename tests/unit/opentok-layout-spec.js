@@ -316,11 +316,11 @@ describe('opentok layout', () => {
 
       it('takes margin CSS styles into account', () => {
         const style = document.createElement('style');
-        style.innerHTML = '.div { margin: 5px; }';
+        style.innerHTML = '.margin { margin: 5px; }';
         document.head.appendChild(style);
 
-        div1.classList.add('div');
-        div2.classList.add('div');
+        div1.classList.add('margin');
+        div2.classList.add('margin');
 
         const layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
@@ -335,6 +335,38 @@ describe('opentok layout', () => {
       it('takes padding into account', () => {
         div1.style.padding = '5px';
         div2.style.padding = '5px';
+
+        const layoutContainer = initLayoutContainer(layoutDiv);
+        layoutContainer.layout();
+        expect(div1.clientWidth).toBeCloseTo(320, 1);
+        expect(div2.clientWidth).toBeCloseTo(80, -1);
+        expect(div1.clientHeight).toBeCloseTo(300, 1);
+        expect(div2.clientHeight).toBeCloseTo(120, 1);
+      });
+
+      it('takes border into account', () => {
+        const style = document.createElement('style');
+        style.innerHTML = '.border { border: 1px solid blue; }';
+        document.head.appendChild(style);
+
+        div1.classList.add('border');
+        div2.classList.add('border');
+
+        const layoutContainer = initLayoutContainer(layoutDiv);
+        layoutContainer.layout();
+        expect(div1.clientWidth).toBeCloseTo(318, 1);
+        expect(div2.clientWidth).toBeCloseTo(78, -1);
+        expect(div1.clientHeight).toBeCloseTo(298, 1);
+        expect(div2.clientHeight).toBeCloseTo(118, 1);
+      });
+
+      it('takes box-sizing into account', () => {
+        const style = document.createElement('style');
+        style.innerHTML = '.box-sizing { padding: 5px; box-sizing: border-box; }';
+        document.head.appendChild(style);
+
+        div1.classList.add('box-sizing');
+        div2.classList.add('box-sizing');
 
         const layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
