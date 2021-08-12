@@ -729,9 +729,9 @@ module.exports = function (container, opts) {
   boxes.forEach(function (box, idx) {
     var elem = children[idx];
     css(elem, 'position', 'absolute');
-    var actualWidth = box.width - getCSSNumber(elem, 'padding-left') - getCSSNumber(elem, 'padding-right') - getCSSNumber(elem, 'margin-left') - getCSSNumber(elem, 'margin-right') - getCSSNumber(elem, 'border-left') - getCSSNumber(elem, 'border-right');
+    var actualWidth = box.width - getCSSNumber(elem, 'margin-left') - getCSSNumber(elem, 'margin-right') - (css(elem, 'box-sizing') !== 'border-box' ? getCSSNumber(elem, 'padding-left') + getCSSNumber(elem, 'padding-right') + getCSSNumber(elem, 'border-left') + getCSSNumber(elem, 'border-right') : 0);
 
-    var actualHeight = box.height - getCSSNumber(elem, 'padding-top') - getCSSNumber(elem, 'padding-bottom') - getCSSNumber(elem, 'margin-top') - getCSSNumber(elem, 'margin-bottom') - getCSSNumber(elem, 'border-top') - getCSSNumber(elem, 'border-bottom');
+    var actualHeight = box.height - getCSSNumber(elem, 'margin-top') - getCSSNumber(elem, 'margin-bottom') - (css(elem, 'box-sizing') !== 'border-box' ? getCSSNumber(elem, 'padding-top') + getCSSNumber(elem, 'padding-bottom') + getCSSNumber(elem, 'border-top') + getCSSNumber(elem, 'border-bottom') : 0);
 
     positionElement(elem, box.left, box.top, actualWidth, actualHeight, animate, opts.onLayout);
   });

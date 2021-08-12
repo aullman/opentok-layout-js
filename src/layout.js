@@ -172,19 +172,25 @@ module.exports = (container, opts) => {
   boxes.forEach((box, idx) => {
     const elem = children[idx];
     css(elem, 'position', 'absolute');
-    const actualWidth = box.width - getCSSNumber(elem, 'padding-left')
-      - getCSSNumber(elem, 'padding-right')
+    const actualWidth = box.width
       - getCSSNumber(elem, 'margin-left')
       - getCSSNumber(elem, 'margin-right')
-      - getCSSNumber(elem, 'border-left')
-      - getCSSNumber(elem, 'border-right');
+      - (css(elem, 'box-sizing') !== 'border-box'
+        ? (getCSSNumber(elem, 'padding-left')
+          + getCSSNumber(elem, 'padding-right')
+          + getCSSNumber(elem, 'border-left')
+          + getCSSNumber(elem, 'border-right'))
+        : 0);
 
-    const actualHeight = box.height - getCSSNumber(elem, 'padding-top')
-      - getCSSNumber(elem, 'padding-bottom')
+    const actualHeight = box.height
       - getCSSNumber(elem, 'margin-top')
       - getCSSNumber(elem, 'margin-bottom')
-      - getCSSNumber(elem, 'border-top')
-      - getCSSNumber(elem, 'border-bottom');
+      - (css(elem, 'box-sizing') !== 'border-box'
+        ? (getCSSNumber(elem, 'padding-top')
+          + getCSSNumber(elem, 'padding-bottom')
+          + getCSSNumber(elem, 'border-top')
+          + getCSSNumber(elem, 'border-bottom'))
+        : 0);
 
     positionElement(elem, box.left, box.top, actualWidth, actualHeight,
       animate, opts.onLayout);
