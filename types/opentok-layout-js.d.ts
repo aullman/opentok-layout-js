@@ -13,6 +13,7 @@ declare module 'opentok-layout-js' {
     bigMaxWidth?: number;
     bigMinRatio?: number;
     bigPercentage?: number;
+    minBigPercentage?: number;
     fixedRatio?: boolean;
     ignoreClass?: string;
     maxHeight?: number;
