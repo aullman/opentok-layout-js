@@ -34,6 +34,7 @@ const options = {
     alignItems: 'center',      // Can be 'start', 'center' or 'end'. Determines where to place items when on a row or column that is not full
     bigClass: "OT_big",        // The class to add to elements that should be sized bigger
     bigPercentage: 0.8,        // The maximum percentage of space the big ones should take up
+    minBigPercentage: 0,       // If this is set then it will scale down the big space if there is left over whitespace down to this minimum size
     bigFixedRatio: false,      // fixedRatio for the big ones
     bigScaleLastRow: true,     // scale last row for the big elements
     bigAlignItems: 'center',   // How to align the big items

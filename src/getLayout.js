@@ -213,6 +213,7 @@ module.exports = (opts, elements) => {
     minRatio = 9 / 16,
     fixedRatio = false,
     bigPercentage = 0.8,
+    minBigPercentage = 0,
     bigFixedRatio = false,
     bigMaxRatio = 3 / 2,
     bigMinRatio = 9 / 16,
@@ -258,6 +259,27 @@ module.exports = (opts, elements) => {
       // guys at the bottom
       bigWidth = containerWidth;
       bigHeight = Math.floor(containerHeight * bigPercentage);
+      if (minBigPercentage > 0) {
+        // Find the best size for the big area
+        let bigDimensions;
+        if (!bigFixedRatio) {
+          bigDimensions = getBestDimensions(bigMinRatio, bigMaxRatio, bigWidth,
+            bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight);
+        } else {
+          // Use the ratio of the first video element we find to approximate
+          const ratio = bigOnes[0].height / bigOnes[0].width;
+          bigDimensions = getBestDimensions(ratio, ratio, bigWidth, bigHeight,
+            bigOnes.length, bigMaxWidth, bigMaxHeight);
+        }
+        bigHeight = Math.max(containerHeight * minBigPercentage,
+          Math.min(bigHeight, bigDimensions.targetHeight * bigDimensions.targetRows));
+        // Don't awkwardly scale the small area bigger than we need to and end up with floating
+        // videos in the middle
+        const smallDimensions = getBestDimensions(minRatio, maxRatio, containerWidth,
+          containerHeight - bigHeight, smallOnes.length, smallMaxWidth, smallMaxHeight);
+        bigHeight = Math.max(bigHeight, containerHeight
+          - (smallDimensions.targetRows * smallDimensions.targetHeight));
+      }
       offsetTop = bigHeight;
       bigOffsetTop = containerHeight - offsetTop;
       if (bigFirst === 'column') {
@@ -270,6 +292,27 @@ module.exports = (opts, elements) => {
       // guys on the right
       bigHeight = containerHeight;
       bigWidth = Math.floor(containerWidth * bigPercentage);
+      if (minBigPercentage > 0) {
+        // Find the best size for the big area
+        let bigDimensions;
+        if (!bigFixedRatio) {
+          bigDimensions = getBestDimensions(bigMinRatio, bigMaxRatio, bigWidth,
+            bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight);
+        } else {
+          // Use the ratio of the first video element we find to approximate
+          const ratio = bigOnes[0].height / bigOnes[0].width;
+          bigDimensions = getBestDimensions(ratio, ratio, bigWidth, bigHeight,
+            bigOnes.length, bigMaxWidth, bigMaxHeight);
+        }
+        bigWidth = Math.max(containerWidth * minBigPercentage,
+          Math.min(bigWidth, bigDimensions.targetWidth * bigDimensions.targetCols));
+        // Don't awkwardly scale the small area bigger than we need to and end up with floating
+        // videos in the middle
+        const smallDimensions = getBestDimensions(minRatio, maxRatio, containerWidth - bigWidth,
+          containerHeight, smallOnes.length, smallMaxWidth, smallMaxHeight);
+        bigWidth = Math.max(bigWidth, containerWidth
+          - (smallDimensions.targetCols * smallDimensions.targetWidth));
+      }
       offsetLeft = bigWidth;
       bigOffsetLeft = containerWidth - offsetLeft;
       if (bigFirst === 'column') {
