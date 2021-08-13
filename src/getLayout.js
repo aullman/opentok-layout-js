@@ -272,7 +272,13 @@ module.exports = (opts, elements) => {
             bigOnes.length, bigMaxWidth, bigMaxHeight);
         }
         bigHeight = Math.max(containerHeight * minBigPercentage,
-          Math.min(bigHeight, bigDimensions.targetHeight));
+          Math.min(bigHeight, bigDimensions.targetHeight * bigDimensions.targetRows));
+        // Don't awkwardly scale the small area bigger than we need to and end up with floating
+        // videos in the middle
+        const smallDimensions = getBestDimensions(minRatio, maxRatio, containerWidth,
+          containerHeight - bigHeight, smallOnes.length, smallMaxWidth, smallMaxHeight);
+        bigHeight = Math.max(bigHeight, containerHeight
+          - (smallDimensions.targetRows * smallDimensions.targetHeight));
       }
       offsetTop = bigHeight;
       bigOffsetTop = containerHeight - offsetTop;
@@ -299,7 +305,13 @@ module.exports = (opts, elements) => {
             bigOnes.length, bigMaxWidth, bigMaxHeight);
         }
         bigWidth = Math.max(containerWidth * minBigPercentage,
-          Math.min(bigWidth, bigDimensions.targetWidth));
+          Math.min(bigWidth, bigDimensions.targetWidth * bigDimensions.targetCols));
+        // Don't awkwardly scale the small area bigger than we need to and end up with floating
+        // videos in the middle
+        const smallDimensions = getBestDimensions(minRatio, maxRatio, containerWidth - bigWidth,
+          containerHeight, smallOnes.length, smallMaxWidth, smallMaxHeight);
+        bigWidth = Math.max(bigWidth, containerWidth
+          - (smallDimensions.targetCols * smallDimensions.targetWidth));
       }
       offsetLeft = bigWidth;
       bigOffsetLeft = containerWidth - offsetLeft;

@@ -400,7 +400,11 @@ module.exports = function (opts, elements) {
           var ratio = bigOnes[0].height / bigOnes[0].width;
           bigDimensions = getBestDimensions(ratio, ratio, bigWidth, bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight);
         }
-        bigHeight = Math.max(containerHeight * minBigPercentage, Math.min(bigHeight, bigDimensions.targetHeight));
+        bigHeight = Math.max(containerHeight * minBigPercentage, Math.min(bigHeight, bigDimensions.targetHeight * bigDimensions.targetRows));
+        // Don't awkwardly scale the small area bigger than we need to and end up with floating
+        // videos in the middle
+        var smallDimensions = getBestDimensions(minRatio, maxRatio, containerWidth, containerHeight - bigHeight, smallOnes.length, smallMaxWidth, smallMaxHeight);
+        bigHeight = Math.max(bigHeight, containerHeight - smallDimensions.targetRows * smallDimensions.targetHeight);
       }
       offsetTop = bigHeight;
       bigOffsetTop = containerHeight - offsetTop;
@@ -424,7 +428,11 @@ module.exports = function (opts, elements) {
           var _ratio3 = bigOnes[0].height / bigOnes[0].width;
           _bigDimensions = getBestDimensions(_ratio3, _ratio3, bigWidth, bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight);
         }
-        bigWidth = Math.max(containerWidth * minBigPercentage, Math.min(bigWidth, _bigDimensions.targetWidth));
+        bigWidth = Math.max(containerWidth * minBigPercentage, Math.min(bigWidth, _bigDimensions.targetWidth * _bigDimensions.targetCols));
+        // Don't awkwardly scale the small area bigger than we need to and end up with floating
+        // videos in the middle
+        var _smallDimensions = getBestDimensions(minRatio, maxRatio, containerWidth - bigWidth, containerHeight, smallOnes.length, smallMaxWidth, smallMaxHeight);
+        bigWidth = Math.max(bigWidth, containerWidth - _smallDimensions.targetCols * _smallDimensions.targetWidth);
       }
       offsetLeft = bigWidth;
       bigOffsetLeft = containerWidth - offsetLeft;

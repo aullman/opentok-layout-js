@@ -319,6 +319,25 @@ describe('opentok layout', () => {
         expect(div2Rect.height).toBeCloseTo(300, 1);
       });
 
+      it('does not scale the big percentage down too small and leave floating elements', () => {
+        // If you set the width to be wide
+        layoutDiv.style.width = '1000px';
+        const layoutContainer = initLayoutContainer(layoutDiv, {
+          bigPercentage: 0.9,
+          minBigPercentage: 0.6,
+          smallMaxWidth: 300,
+          smallMaxHeight: 300,
+        });
+        layoutContainer.layout();
+        const div1Rect = div1.getBoundingClientRect();
+        const div2Rect = div2.getBoundingClientRect();
+        expect(div1Rect.width).toBeCloseTo(533, -1);
+        expect(div2Rect.width).toBeCloseTo(300, 1);
+        expect(div1Rect.height).toBeCloseTo(300, 1);
+        expect(div2Rect.height).toBeCloseTo(300, 1);
+        expect(div2Rect.left).toBeCloseTo(700, 1);
+      });
+
       it('handles bigFirst false', () => {
         const layoutContainer = initLayoutContainer(layoutDiv, { bigFirst: false });
         layoutContainer.layout();
