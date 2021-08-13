@@ -292,6 +292,33 @@ describe('opentok layout', () => {
         expect(div2Rect.height).toBeCloseTo(60, 1);
       });
 
+      it('handles minBigPercentage', () => {
+        layoutDiv.style.width = '800px';
+        let layoutContainer = initLayoutContainer(layoutDiv, {
+          bigPercentage: 0.9,
+          minBigPercentage: 0.8,
+        });
+        layoutContainer.layout();
+        let div1Rect = div1.getBoundingClientRect();
+        let div2Rect = div2.getBoundingClientRect();
+        expect(div1Rect.width).toBeCloseTo(533, -1);
+        expect(div2Rect.width).toBeCloseTo(160, 1);
+        expect(div1Rect.height).toBeCloseTo(300, 1);
+        expect(div2Rect.height).toBeCloseTo(240, 1);
+
+        layoutContainer = initLayoutContainer(layoutDiv, {
+          bigPercentage: 0.9,
+          minBigPercentage: 0.6,
+        });
+        layoutContainer.layout();
+        div1Rect = div1.getBoundingClientRect();
+        div2Rect = div2.getBoundingClientRect();
+        expect(div1Rect.width).toBeCloseTo(533, -1);
+        expect(div2Rect.width).toBeCloseTo(266, 1);
+        expect(div1Rect.height).toBeCloseTo(300, 1);
+        expect(div2Rect.height).toBeCloseTo(300, 1);
+      });
+
       it('handles bigFirst false', () => {
         const layoutContainer = initLayoutContainer(layoutDiv, { bigFirst: false });
         layoutContainer.layout();
