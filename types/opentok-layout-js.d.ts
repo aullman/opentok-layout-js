@@ -20,12 +20,14 @@ declare module 'opentok-layout-js' {
     maxRatio?: number;
     maxWidth?: number;
     minRatio?: number;
+    containerWidth?: number;
+    containerHeight?: number;
     smallAlignItems?: alignOptions;
     smallMaxHeight?: number;
     smallMaxWidth?: number;
     scaleLastRow?: boolean;
     bigScaleLastRow?: boolean;
-    onLayout?: Function,
+    onLayout?: (element: HTMLElement, dimensions: { width: number, height: number, top: number, left: number }) => void,
     window?: Window;
   };
 
@@ -49,8 +51,5 @@ declare module 'opentok-layout-js' {
     layout: () => void;
   };
 
-  export default function initLayoutContainer(
-    container: HTMLElement | string,
-    opts: Options
-  ): LayoutContainer;
+  export default function initLayoutContainer(...args: [HTMLElement | string, Options] | [Options]): LayoutContainer;
 }
