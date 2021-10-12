@@ -44,7 +44,7 @@ declare module 'opentok-layout-js' {
     width: number;
   };
 
-  type GetLayout = (elements: Array<Element>) => { boxes: Array<Box>, areas: { small: Box, big: Box } };
+  type GetLayout = (elements: Array<Element>) => { boxes: Array<Box>, areas: { small?: Box, big?: Box } };
 
   export type LayoutContainer = {
     getLayout: GetLayout;
