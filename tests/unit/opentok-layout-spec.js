@@ -70,7 +70,14 @@ describe('opentok layout', () => {
         containerHeight: 300,
       });
       expect(layoutContainer.getLayout(children.map(() => ({ width: 300, height: 200 }))))
-        .toEqual(expectedLayout);
+        .toEqual({
+          boxes: expectedLayout,
+          areas: {
+            small: {
+              top: 0, left: 0, width: 400, height: 300,
+            },
+          },
+        });
     });
 
     it('triggers the onLayout method', () => {
@@ -252,7 +259,17 @@ describe('opentok layout', () => {
           width: 640,
           height: 480,
           big: child.className === 'OT_big',
-        })))).toEqual(expectedLayout);
+        })))).toEqual({
+          boxes: expectedLayout,
+          areas: {
+            big: {
+              top: 0, left: 0, width: 320, height: 300,
+            },
+            small: {
+              top: 0, left: 320, width: 80, height: 300,
+            },
+          },
+        });
       });
 
       it('handles default layout', () => {
@@ -876,7 +893,7 @@ describe('opentok layout', () => {
         // Big element is displayed at the bottom because we are in a row layout
         let bigDivRect = divs[0].getBoundingClientRect();
         expect(bigDivRect.left).toBeCloseTo(0, 1);
-        expect(bigDivRect.top).toBeCloseTo(160, 1);
+        expect(bigDivRect.top).toBeCloseTo(180, 1);
 
         layoutContainer = initLayoutContainer(layoutDiv, { bigFirst: 'row' });
         layoutContainer.layout();

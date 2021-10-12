@@ -380,6 +380,7 @@ module.exports = function (opts, elements) {
   });
   var bigBoxes = [];
   var smallBoxes = [];
+  var areas = {};
   if (bigOnes.length > 0 && smallOnes.length > 0) {
     var bigWidth = void 0;
     var bigHeight = void 0;
@@ -443,64 +444,55 @@ module.exports = function (opts, elements) {
       }
     }
     if (showBigFirst) {
-      bigBoxes = getLayout({
-        containerWidth: bigWidth,
-        containerHeight: bigHeight,
-        offsetLeft: 0,
-        offsetTop: 0,
-        fixedRatio: bigFixedRatio,
-        minRatio: bigMinRatio,
-        maxRatio: bigMaxRatio,
-        alignItems: bigAlignItems,
-        maxWidth: bigMaxWidth,
-        maxHeight: bigMaxHeight,
-        scaleLastRow: bigScaleLastRow
-      }, bigOnes);
-      smallBoxes = getLayout({
-        containerWidth: containerWidth - offsetLeft,
-        containerHeight: containerHeight - offsetTop,
-        offsetLeft: offsetLeft,
-        offsetTop: offsetTop,
-        fixedRatio: fixedRatio,
-        minRatio: minRatio,
-        maxRatio: maxRatio,
-        alignItems: smallAlignItems,
-        maxWidth: smallMaxWidth,
-        maxHeight: smallMaxHeight,
-        scaleLastRow: scaleLastRow
-      }, smallOnes);
+      areas.big = {
+        top: 0,
+        left: 0,
+        width: bigWidth,
+        height: bigHeight
+      };
+      areas.small = {
+        top: offsetTop,
+        left: offsetLeft,
+        width: containerWidth - offsetLeft,
+        height: containerHeight - offsetTop
+      };
     } else {
-      smallBoxes = getLayout({
-        containerWidth: containerWidth - offsetLeft,
-        containerHeight: containerHeight - offsetTop,
-        offsetLeft: 0,
-        offsetTop: 0,
-        fixedRatio: fixedRatio,
-        minRatio: minRatio,
-        maxRatio: maxRatio,
-        alignItems: smallAlignItems,
-        maxWidth: smallMaxWidth,
-        maxHeight: smallMaxHeight,
-        scaleLastRow: scaleLastRow
-      }, smallOnes);
-      bigBoxes = getLayout({
-        containerWidth: bigWidth,
-        containerHeight: bigHeight,
-        offsetLeft: bigOffsetLeft,
-        offsetTop: bigOffsetTop,
-        fixedRatio: bigFixedRatio,
-        minRatio: bigMinRatio,
-        alignItems: bigAlignItems,
-        maxWidth: bigMaxWidth,
-        maxHeight: bigMaxHeight,
-        scaleLastRow: bigScaleLastRow
-      }, bigOnes);
+      areas.big = {
+        left: bigOffsetLeft,
+        top: bigOffsetTop,
+        width: bigWidth,
+        height: bigHeight
+      };
+      areas.small = {
+        top: 0,
+        left: 0,
+        width: containerWidth - offsetLeft,
+        height: containerHeight - offsetTop
+      };
     }
   } else if (bigOnes.length > 0 && smallOnes.length === 0) {
     // We only have one bigOne just center it
+    areas.big = {
+      top: 0,
+      left: 0,
+      width: containerWidth,
+      height: containerHeight
+    };
+  } else {
+    areas.small = {
+      top: offsetTop,
+      left: offsetLeft,
+      width: containerWidth - offsetLeft,
+      height: containerHeight - offsetTop
+    };
+  }
+
+  if (areas.big) {
     bigBoxes = getLayout({
-      containerWidth: containerWidth,
-      containerHeight: containerHeight,
+      containerWidth: areas.big.width,
+      containerHeight: areas.big.height,
+      offsetLeft: areas.big.left,
+      offsetTop: areas.big.top,
       fixedRatio: bigFixedRatio,
       minRatio: bigMinRatio,
       maxRatio: bigMaxRatio,
@@ -509,18 +501,19 @@ module.exports = function (opts, elements) {
       maxHeight: bigMaxHeight,
       scaleLastRow: bigScaleLastRow
     }, bigOnes);
-  } else {
+  }
+  if (areas.small) {
     smallBoxes = getLayout({
-      containerWidth: containerWidth - offsetLeft,
-      containerHeight: containerHeight - offsetTop,
-      offsetLeft: offsetLeft,
-      offsetTop: offsetTop,
+      containerWidth: areas.small.width,
+      containerHeight: areas.small.height,
+      offsetLeft: areas.small.left,
+      offsetTop: areas.small.top,
       fixedRatio: fixedRatio,
       minRatio: minRatio,
       maxRatio: maxRatio,
-      alignItems: alignItems,
-      maxWidth: maxWidth,
-      maxHeight: maxHeight,
+      alignItems: areas.big ? smallAlignItems : alignItems,
+      maxWidth: areas.big ? smallMaxWidth : maxWidth,
+      maxHeight: areas.big ? smallMaxHeight : maxHeight,
       scaleLastRow: scaleLastRow
     }, smallOnes);
   }
@@ -538,7 +531,7 @@ module.exports = function (opts, elements) {
       smallBoxesIdx += 1;
     }
   });
-  return boxes;
+  return { boxes: boxes, areas: areas };
 };
 
 /***/ }),
@@ -759,8 +752,8 @@ module.exports = function (container, opts) {
     return res;
   });
 
-  var boxes = getLayout(opts, elements);
-  boxes.forEach(function (box, idx) {
+  var layout = getLayout(opts, elements);
+  layout.boxes.forEach(function (box, idx) {
     var elem = children[idx];
     css(elem, 'position', 'absolute');
     var actualWidth = box.width - getCSSNumber(elem, 'margin-left') - getCSSNumber(elem, 'margin-right') - (css(elem, 'box-sizing') !== 'border-box' ? getCSSNumber(elem, 'padding-left') + getCSSNumber(elem, 'padding-right') + getCSSNumber(elem, 'border-left') + getCSSNumber(elem, 'border-right') : 0);

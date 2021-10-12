@@ -71,7 +71,7 @@ const boxes = layout.getLayout([
 ]);
 ```
 
-It will return an array of boxes which will be in the same order as the array you passed in. Each element in the array will look like:
+It will return an object `{ boxes: Box[], areas: { small: Box, big: Box } }`. This object includes an array of boxes which will be in the same order as the array you passed in. It will also contain an areas property which tells you about the dimensions of the small and big areas. Each Box in the array and in the areas will look like:
 
 ```javascript
 {

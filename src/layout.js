@@ -168,8 +168,8 @@ module.exports = (container, opts) => {
     return res;
   });
 
-  const boxes = getLayout(opts, elements);
-  boxes.forEach((box, idx) => {
+  const layout = getLayout(opts, elements);
+  layout.boxes.forEach((box, idx) => {
     const elem = children[idx];
     css(elem, 'position', 'absolute');
     const actualWidth = box.width

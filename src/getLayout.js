@@ -249,6 +249,7 @@ module.exports = (opts, elements) => {
   const smallOnes = elements.filter(element => !element.big);
   let bigBoxes = [];
   let smallBoxes = [];
+  const areas = {};
   if (bigOnes.length > 0 && smallOnes.length > 0) {
     let bigWidth;
     let bigHeight;
@@ -322,64 +323,55 @@ module.exports = (opts, elements) => {
       }
     }
     if (showBigFirst) {
-      bigBoxes = getLayout({
-        containerWidth: bigWidth,
-        containerHeight: bigHeight,
-        offsetLeft: 0,
-        offsetTop: 0,
-        fixedRatio: bigFixedRatio,
-        minRatio: bigMinRatio,
-        maxRatio: bigMaxRatio,
-        alignItems: bigAlignItems,
-        maxWidth: bigMaxWidth,
-        maxHeight: bigMaxHeight,
-        scaleLastRow: bigScaleLastRow,
-      }, bigOnes);
-      smallBoxes = getLayout({
-        containerWidth: containerWidth - offsetLeft,
-        containerHeight: containerHeight - offsetTop,
-        offsetLeft,
-        offsetTop,
-        fixedRatio,
-        minRatio,
-        maxRatio,
-        alignItems: smallAlignItems,
-        maxWidth: smallMaxWidth,
-        maxHeight: smallMaxHeight,
-        scaleLastRow,
-      }, smallOnes);
+      areas.big = {
+        top: 0,
+        left: 0,
+        width: bigWidth,
+        height: bigHeight,
+      };
+      areas.small = {
+        top: offsetTop,
+        left: offsetLeft,
+        width: containerWidth - offsetLeft,
+        height: containerHeight - offsetTop,
+      };
     } else {
-      smallBoxes = getLayout({
-        containerWidth: containerWidth - offsetLeft,
-        containerHeight: containerHeight - offsetTop,
-        offsetLeft: 0,
-        offsetTop: 0,
-        fixedRatio,
-        minRatio,
-        maxRatio,
-        alignItems: smallAlignItems,
-        maxWidth: smallMaxWidth,
-        maxHeight: smallMaxHeight,
-        scaleLastRow,
-      }, smallOnes);
-      bigBoxes = getLayout({
-        containerWidth: bigWidth,
-        containerHeight: bigHeight,
-        offsetLeft: bigOffsetLeft,
-        offsetTop: bigOffsetTop,
-        fixedRatio: bigFixedRatio,
-        minRatio: bigMinRatio,
-        alignItems: bigAlignItems,
-        maxWidth: bigMaxWidth,
-        maxHeight: bigMaxHeight,
-        scaleLastRow: bigScaleLastRow,
-      }, bigOnes);
+      areas.big = {
+        left: bigOffsetLeft,
+        top: bigOffsetTop,
+        width: bigWidth,
+        height: bigHeight,
+      };
+      areas.small = {
+        top: 0,
+        left: 0,
+        width: containerWidth - offsetLeft,
+        height: containerHeight - offsetTop,
+      };
     }
   } else if (bigOnes.length > 0 && smallOnes.length === 0) {
     // We only have one bigOne just center it
+    areas.big = {
+      top: 0,
+      left: 0,
+      width: containerWidth,
+      height: containerHeight,
+    };
+  } else {
+    areas.small = {
+      top: offsetTop,
+      left: offsetLeft,
+      width: containerWidth - offsetLeft,
+      height: containerHeight - offsetTop,
+    };
+  }
+
+  if (areas.big) {
     bigBoxes = getLayout({
-      containerWidth,
-      containerHeight,
+      containerWidth: areas.big.width,
+      containerHeight: areas.big.height,
+      offsetLeft: areas.big.left,
+      offsetTop: areas.big.top,
       fixedRatio: bigFixedRatio,
       minRatio: bigMinRatio,
       maxRatio: bigMaxRatio,
@@ -388,18 +380,19 @@ module.exports = (opts, elements) => {
       maxHeight: bigMaxHeight,
       scaleLastRow: bigScaleLastRow,
     }, bigOnes);
-  } else {
+  }
+  if (areas.small) {
     smallBoxes = getLayout({
-      containerWidth: containerWidth - offsetLeft,
-      containerHeight: containerHeight - offsetTop,
-      offsetLeft,
-      offsetTop,
+      containerWidth: areas.small.width,
+      containerHeight: areas.small.height,
+      offsetLeft: areas.small.left,
+      offsetTop: areas.small.top,
       fixedRatio,
       minRatio,
       maxRatio,
-      alignItems,
-      maxWidth,
-      maxHeight,
+      alignItems: areas.big ? smallAlignItems : alignItems,
+      maxWidth: areas.big ? smallMaxWidth : maxWidth,
+      maxHeight: areas.big ? smallMaxHeight : maxHeight,
       scaleLastRow,
     }, smallOnes);
   }
@@ -417,5 +410,5 @@ module.exports = (opts, elements) => {
       smallBoxesIdx += 1;
     }
   });
-  return boxes;
+  return { boxes, areas };
 };
