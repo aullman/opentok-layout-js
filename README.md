@@ -58,10 +58,14 @@ const layout = initLayoutContainer(document.getElementById("layout"), options);
 layout.layout();
 ```
 
-The other way to use this library is to just use the `getLayout()` method to get the layout data and position the elements yourself. This is the more modern way of doing things and works better with frameworks like React and Vue. `getLayout()` takes an array of objects with a width and height property along with a `big` property indicating whether it should be treated as a bigger element. eg.
+The other way to use this library is to just use the `getLayout()` method to get the layout data and position the elements yourself. This is the more modern way of doing things and works better with frameworks like React and Vue. `getLayout()` takes an array of objects with a width and height property along with a `big` property indicating whether it should be treated as a bigger element. You also need to provide the `containerWidth` and `containerHeight` options if you use it in this way eg.
 
 ```javascript
-const layout = initLayoutContainer(options);
+const layout = initLayoutContainer({
+  containerWidth: 640,
+  containerHeight: 480,
+  ...options
+});
 const { boxes } = layout.getLayout([
     {
         width: 640,     // The native width of this element (eg. subscriber.videoWidth())
