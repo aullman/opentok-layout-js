@@ -526,6 +526,64 @@ describe('opentok layout', () => {
     });
   });
 
+  describe('handling layout of 4 elements', () => {
+    let layoutDiv;
+    let divs = [];
+    const divCount = 4;
+    beforeEach(() => {
+      layoutDiv = document.createElement('div');
+      layoutDiv.setAttribute('id', 'layoutDiv');
+      layoutDiv.style.position = 'absolute';
+      layoutDiv.style.top = '0px';
+      layoutDiv.style.left = '0px';
+      layoutDiv.style.width = '1280px';
+      layoutDiv.style.height = '720px';
+      layoutDiv.style.backgroundColor = 'grey';
+      document.body.style.margin = '0px';
+      document.body.style.padding = '0px';
+      document.body.appendChild(layoutDiv);
+      const colors = ['blue', 'green', 'orange', 'teal'];
+      for (let i = 0; i < divCount; i += 1) {
+        divs[i] = document.createElement('div');
+        divs[i].style.backgroundColor = colors[i];
+        layoutDiv.appendChild(divs[i]);
+      }
+    });
+
+    afterEach(() => {
+      document.body.removeChild(layoutDiv);
+      layoutDiv = null;
+      divs = [];
+    });
+
+    it('favours an even number of elements in each row', () => {
+      const layoutContainer = initLayoutContainer(layoutDiv, {
+        maxWidth: 400,
+        maxHeight: 300,
+      });
+      layoutContainer.layout();
+      // Expect them to all have the same width and height
+      let rect;
+      for (let i = 0; i < divs.length; i += 1) {
+        rect = divs[i].getBoundingClientRect();
+        expect(rect.width).toBe(400);
+        expect(rect.height).toBe(300);
+      }
+      rect = divs[0].getBoundingClientRect();
+      expect(rect.left).toBeCloseTo(240, 1);
+      expect(rect.top).toBeCloseTo(60, 1);
+      rect = divs[1].getBoundingClientRect();
+      expect(rect.left).toBeCloseTo(640, 1);
+      expect(rect.top).toBeCloseTo(60, 1);
+      rect = divs[2].getBoundingClientRect();
+      expect(rect.left).toBeCloseTo(240, 1);
+      expect(rect.top).toBeCloseTo(360, 1);
+      rect = divs[3].getBoundingClientRect();
+      expect(rect.left).toBeCloseTo(640, 1);
+      expect(rect.top).toBeCloseTo(360, 1);
+    });
+  });
+
   describe('handling layout of 5 elements', () => {
     let layoutDiv;
     let divs = [];
