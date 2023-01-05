@@ -1,9 +1,13 @@
 declare module 'opentok-layout-js' {
   type alignOptions = 'start' | 'center' | 'end';
 
+  export type AnimateProps = { duration: number, easing: string, complete?: () => void }
+  export type Animate = boolean | AnimateProps
+  export type OnLayout = (element: HTMLElement, dimensions: { width: number, height: number, top: number, left: number }) => void
+
   export type Options = {
     alignItems?: alignOptions;
-    animate?: boolean;
+    animate?: Animate;
     bigAlignItems?: alignOptions;
     bigClass?: string;
     bigFirst?: boolean | 'column' | 'row';
@@ -27,24 +31,26 @@ declare module 'opentok-layout-js' {
     smallMaxWidth?: number;
     scaleLastRow?: boolean;
     bigScaleLastRow?: boolean;
-    onLayout?: (element: HTMLElement, dimensions: { width: number, height: number, top: number, left: number }) => void,
+    onLayout?: OnLayout,
     window?: Window;
   };
 
-  type Element = {
+  export type Element = {
     big: boolean;
     height: number;
     width: number;
   };
 
-  type Box = {
+  export type Box = {
     height: number;
     left: number;
     top: number;
     width: number;
   };
 
-  type GetLayout = (elements: Array<Element>) => { boxes: Array<Box>, areas: { small?: Box, big?: Box } };
+  export type GetLayoutRes = { boxes: Array<Box>, areas: { small?: Box, big?: Box } }
+
+  type GetLayout = (elements: Array<Element>) => GetLayoutRes;
 
   export type LayoutContainer = {
     getLayout: GetLayout;
