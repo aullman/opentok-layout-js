@@ -1,12 +1,16 @@
-const getBestDimensions = (minRatio, maxRatio, Width, Height, count, maxWidth, maxHeight) => {
-  let maxArea;
-  let targetCols;
-  let targetRows;
-  let targetHeight;
-  let targetWidth;
-  let tWidth;
-  let tHeight;
-  let tRatio;
+/// <reference path="../types/opentok-layout-js.d.ts" />
+
+import { Element, Options, Box, GetLayoutRes } from 'opentok-layout-js';
+
+const getBestDimensions = (minRatio: number, maxRatio: number, Width: number, Height: number, count: number, maxWidth: number, maxHeight: number) => {
+  let maxArea: number;
+  let targetCols: number;
+  let targetRows: number;
+  let targetHeight: number;
+  let targetWidth: number;
+  let tWidth: number;
+  let tHeight: number;
+  let tRatio: number;
 
   // Iterate through every possible combination of rows and columns
   // and see which one has the least amount of whitespace
@@ -57,7 +61,20 @@ const getBestDimensions = (minRatio, maxRatio, Width, Height, count, maxWidth, m
   };
 };
 
-const getLayout = (opts, elements) => {
+type Offsets = {
+  offsetLeft: number;
+  offsetTop: number;
+}
+
+type Row = {
+  ratios: number[];
+  width: number;
+  height: number;
+}
+
+type Areas = { small?: Box, big?: Box }
+
+const getLayout = (opts: Options & Offsets, elements: Element[]): Box[] => {
   const {
     maxRatio,
     minRatio,
@@ -75,7 +92,7 @@ const getLayout = (opts, elements) => {
   const count = ratios.length;
 
 
-  let dimensions;
+  let dimensions: ReturnType<typeof getBestDimensions>;
 
   if (!fixedRatio) {
     dimensions = getBestDimensions(minRatio, maxRatio, containerWidth, containerHeight, count,
@@ -90,9 +107,9 @@ const getLayout = (opts, elements) => {
   // Loop through each stream in the container and place it inside
   let x = 0;
   let y = 0;
-  const rows = [];
-  let row;
-  const boxes = [];
+  const rows: Row[] = [];
+  let row: Row;
+  const boxes: Box[] = [];
   // Iterate through the children and create an array with a new item for each row
   // and calculate the width of each row so that we know if we go over the size and need
   // to adjust
@@ -209,9 +226,9 @@ const getLayout = (opts, elements) => {
   return boxes;
 };
 
-const getVideoRatio = element => element.height / element.width;
+const getVideoRatio = (element: Element) => element.height / element.width;
 
-module.exports = (opts, elements) => {
+export default (opts: Options, elements: Element[]): GetLayoutRes => {
   const {
     maxRatio = 3 / 2,
     minRatio = 9 / 16,
@@ -242,7 +259,7 @@ module.exports = (opts, elements) => {
   let offsetTop = 0;
   let bigOffsetTop = 0;
   let bigOffsetLeft = 0;
-  const bigIndices = [];
+  const bigIndices: number[] = [];
   const bigOnes = elements.filter((element, idx) => {
     if (element.big) {
       bigIndices.push(idx);
@@ -251,12 +268,12 @@ module.exports = (opts, elements) => {
     return false;
   });
   const smallOnes = elements.filter(element => !element.big);
-  let bigBoxes = [];
-  let smallBoxes = [];
-  const areas = {};
+  let bigBoxes: Box[] = [];
+  let smallBoxes: Box[] = [];
+  const areas: Areas = {};
   if (bigOnes.length > 0 && smallOnes.length > 0) {
-    let bigWidth;
-    let bigHeight;
+    let bigWidth: number;
+    let bigHeight: number;
     let showBigFirst = bigFirst === true;
 
     if (availableRatio > getVideoRatio(bigOnes[0])) {
@@ -266,7 +283,7 @@ module.exports = (opts, elements) => {
       bigHeight = Math.floor(containerHeight * bigPercentage);
       if (minBigPercentage > 0) {
         // Find the best size for the big area
-        let bigDimensions;
+        let bigDimensions: ReturnType<typeof getBestDimensions>;
         if (!bigFixedRatio) {
           bigDimensions = getBestDimensions(bigMinRatio, bigMaxRatio, bigWidth,
             bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight);
@@ -299,7 +316,7 @@ module.exports = (opts, elements) => {
       bigWidth = Math.floor(containerWidth * bigPercentage);
       if (minBigPercentage > 0) {
         // Find the best size for the big area
-        let bigDimensions;
+        let bigDimensions: ReturnType<typeof getBestDimensions>;
         if (!bigFixedRatio) {
           bigDimensions = getBestDimensions(bigMinRatio, bigMaxRatio, bigWidth,
             bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight);
@@ -401,7 +418,7 @@ module.exports = (opts, elements) => {
     }, smallOnes);
   }
 
-  const boxes = [];
+  const boxes: Box[] = [];
   let bigBoxesIdx = 0;
   let smallBoxesIdx = 0;
   // Rebuild the array in the right order based on where the bigIndices should be

@@ -1,3 +1,4 @@
+/// <reference path="../types/opentok-layout-js.d.ts" />
 /*!
  *  opentok-layout-js (http://github.com/aullman/opentok-layout-js)
  *
@@ -13,15 +14,22 @@
 // in browser globals context, ...? (when using bower, there are dependencies that it has handled
 // for you, so these might be safe to assume)
 
-const getLayout = require('./getLayout');
-const layout = require('./layout');
+import getLayout from './getLayout'
+import layout from './layout'
+import type { Options, LayoutContainer } from 'opentok-layout-js'
 
-module.exports = function initLayoutContainer(container, opts) {
+declare global {
+  interface Window {
+    HTMLElement: typeof HTMLElement;
+  }
+}
+
+module.exports = function initLayoutContainer(container: HTMLElement | Options, opts: Options): LayoutContainer {
   const win = (opts && opts.window) || (typeof window === 'undefined' ? undefined : window);
   container = typeof container === 'string' ? win.document.querySelector(container) : container;
   if (!(typeof (win && win.HTMLElement) === 'undefined' || container instanceof win.HTMLElement) && !opts) {
     // container is actually the options
-    opts = container;
+    opts = container as Options;
   } else if (!opts) {
     opts = {};
   }

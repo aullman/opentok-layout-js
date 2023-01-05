@@ -1,8 +1,14 @@
-const getLayout = require('./getLayout');
+/// <reference path="../types/opentok-layout-js.d.ts" />
 
-module.exports = (container, opts) => {
-  function css(el, propertyName, value) {
-    if (value) {
+import { Options, Element, OnLayout, Animate, AnimateProps } from 'opentok-layout-js';
+import getLayout from './getLayout';
+
+export default (container: HTMLElement, opts: Options) => {
+  function css(el: HTMLElement, propertyName: Record<string, string>): typeof NaN
+  function css(el: HTMLElement, propertyName: string, value: string): typeof NaN
+  function css(el: HTMLElement, propertyName: string): string
+  function css(el: HTMLElement, propertyName: string | Record<string, string>, value?: string) {
+    if (typeof propertyName === 'string' && value) {
       // We are setting one css property
       el.style[propertyName] = value;
       return NaN;
@@ -41,7 +47,7 @@ module.exports = (container, opts) => {
     return css(el, 'width');
   }
 
-  const positionElement = function positionElement(elem, x, y, w, h, animate, onLayout) {
+  const positionElement = function positionElement(elem: HTMLElement, x: number, y: number, w: number, h: number, animate: Animate, onLayout: OnLayout) {
     const targetPosition = {
       left: `${x}px`,
       top: `${y}px`,
@@ -50,7 +56,7 @@ module.exports = (container, opts) => {
     };
 
     const fixAspectRatio = function fixAspectRatio() {
-      const sub = elem.querySelector('.OT_root');
+      const sub = elem.querySelector('.OT_root') as HTMLElement;
       if (sub) {
         // If this is the parent of a subscriber or publisher then we need
         // to force the mutation observer on the publisher or subscriber to
@@ -64,10 +70,11 @@ module.exports = (container, opts) => {
 
     if (animate && typeof $ !== 'undefined') {
       $(elem).stop();
-      $(elem).animate(targetPosition, animate.duration || 200, animate.easing || 'swing',
+      const animateProps: AnimateProps = typeof animate === 'boolean' ? { duration: 200, easing: 'swing' } : animate;
+      $(elem).animate(targetPosition, animateProps.duration, animateProps.easing,
         () => {
           fixAspectRatio();
-          if (animate.complete) animate.complete.call(this);
+          if (animateProps.complete) animateProps.complete.call(this);
           if (onLayout) {
             onLayout(elem, {
               left: x,
@@ -94,12 +101,12 @@ module.exports = (container, opts) => {
     fixAspectRatio();
   };
 
-  const getChildDims = function getChildDims(child) {
+  const getChildDims = function getChildDims(child: HTMLVideoElement | HTMLElement): Omit<Element, 'big'> {
     if (child) {
-      if (child.videoHeight && child.videoWidth) {
+      if ((child as HTMLVideoElement).videoHeight && (child as HTMLVideoElement).videoWidth) {
         return {
-          height: child.videoHeight,
-          width: child.videoWidth,
+          height: (child as HTMLVideoElement).videoHeight,
+          width: (child as HTMLVideoElement).videoWidth,
         };
       }
       const video = child.querySelector('video');
@@ -116,7 +123,7 @@ module.exports = (container, opts) => {
     };
   };
 
-  const getCSSNumber = function getCSSNumber(elem, prop) {
+  const getCSSNumber = function getCSSNumber(elem: HTMLElement, prop: string) {
     const cssStr = css(elem, prop);
     return cssStr ? parseInt(cssStr, 10) : 0;
   };
@@ -158,14 +165,15 @@ module.exports = (container, opts) => {
     - getCSSNumber(container, 'border-left')
     - getCSSNumber(container, 'border-right');
 
-  const children = Array.prototype.filter.call(
+  const children: HTMLElement[] = Array.prototype.filter.call(
     container.querySelectorAll(`#${id}>*:not(.${ignoreClass})`),
     filterDisplayNone
   );
-  const elements = children.map((element) => {
-    const res = getChildDims(element);
-    res.big = element.classList.contains(bigClass);
-    return res;
+  const elements: Element[] = children.map((element) => {
+    return {
+      ...getChildDims(element),
+      big: element.classList.contains(bigClass),
+    };
   });
 
   const layout = getLayout(opts, elements);
