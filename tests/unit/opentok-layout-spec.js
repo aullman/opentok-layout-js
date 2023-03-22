@@ -921,6 +921,30 @@ describe('opentok layout', () => {
         expect(rect.left).toBeCloseTo(811.1, 1);
         expect(rect.top).toBeCloseTo(200, 1);
       });
+
+      it('with fixedRatio does not scale the big percentage down too small and leave floating elements', () => {
+        // If you set the width to be wide and have a portrait aspect ratio
+        divs[0].className = 'OT_big';
+        divs.forEach((div) => {
+          div.videoWidth = 360;
+          div.videoHeight = 480;
+        });
+        const layoutContainer = initLayoutContainer(layoutDiv, {
+          bigPercentage: 0.9,
+          minBigPercentage: 0.6,
+          smallMaxWidth: 300,
+          smallMaxHeight: 300,
+          fixedRatio: true,
+        });
+        layoutContainer.layout();
+        // Divs are right up against the edge
+        let maxRight = 0;
+        for (let i = 1; i < divs.length; i += 1) {
+          const rect = divs[i].getBoundingClientRect();
+          maxRight = Math.max(maxRight, rect.left + rect.width);
+        }
+        expect(maxRight).toBeCloseTo(1000, -1);
+      });
     });
 
     describe('in really tall div', () => {
@@ -1042,6 +1066,30 @@ describe('opentok layout', () => {
         rect = divs[4].getBoundingClientRect();
         expect(rect.left).toBeCloseTo(266.5, 1);
         expect(rect.top).toBeCloseTo(640, 1);
+      });
+
+      it('with fixedRatio does not scale the big percentage down too small and leave floating elements', () => {
+        // If you set the width to be wide and have a portrait aspect ratio
+        divs[0].className = 'OT_big';
+        divs.forEach((div) => {
+          div.videoWidth = 1280;
+          div.videoHeight = 720;
+        });
+        const layoutContainer = initLayoutContainer(layoutDiv, {
+          bigPercentage: 0.9,
+          minBigPercentage: 0.6,
+          smallMaxWidth: 300,
+          smallMaxHeight: 300,
+          fixedRatio: true,
+        });
+        layoutContainer.layout();
+        // Divs are right up against the edge
+        let maxBottom = 0;
+        for (let i = 1; i < divs.length; i += 1) {
+          const rect = divs[i].getBoundingClientRect();
+          maxBottom = Math.max(maxBottom, rect.top + rect.height);
+        }
+        expect(maxBottom).toBeCloseTo(800, 1);
       });
     });
   });

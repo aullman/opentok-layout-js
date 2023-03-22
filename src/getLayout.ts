@@ -311,15 +311,12 @@ export default (opts: Options, elements: Element[]): GetLayoutRes => {
           scaleLastRow,
         }, smallOnes);
         let smallHeight = 0
-        let currentHeight = 0
-        let left = 0
+        let currentTop = undefined
         smallBoxes.forEach(box => {
-          if (box.left !== left) {
-            currentHeight = 0
-            left = box.left
+          if (currentTop !== box.top) {
+            currentTop = box.top
+            smallHeight += box.height
           }
-          currentHeight += box.height
-          smallHeight = Math.max(smallHeight, currentHeight)
         })
         bigHeight = Math.max(bigHeight, containerHeight - smallHeight);
       }

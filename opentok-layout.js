@@ -346,15 +346,12 @@ exports["default"] = (function (opts, elements) {
                     scaleLastRow: scaleLastRow
                 }, smallOnes);
                 var smallHeight_1 = 0;
-                var currentHeight_1 = 0;
-                var left_1 = 0;
+                var currentTop_1 = undefined;
                 smallBoxes_1.forEach(function (box) {
-                    if (box.left !== left_1) {
-                        currentHeight_1 = 0;
-                        left_1 = box.left;
+                    if (currentTop_1 !== box.top) {
+                        currentTop_1 = box.top;
+                        smallHeight_1 += box.height;
                     }
-                    currentHeight_1 += box.height;
-                    smallHeight_1 = Math.max(smallHeight_1, currentHeight_1);
                 });
                 bigHeight = Math.max(bigHeight, containerHeight - smallHeight_1);
             }
