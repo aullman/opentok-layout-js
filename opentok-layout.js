@@ -332,9 +332,31 @@ exports["default"] = (function (opts, elements) {
                 bigHeight = Math.max(containerHeight * minBigPercentage, Math.min(bigHeight, bigDimensions.targetHeight * bigDimensions.targetRows));
                 // Don't awkwardly scale the small area bigger than we need to and end up with floating
                 // videos in the middle
-                var smallDimensions = getBestDimensions(minRatio, maxRatio, containerWidth, containerHeight - bigHeight, smallOnes.length, smallMaxWidth, smallMaxHeight);
-                bigHeight = Math.max(bigHeight, containerHeight
-                    - (smallDimensions.targetRows * smallDimensions.targetHeight));
+                var smallBoxes_1 = getLayout({
+                    containerWidth: containerWidth,
+                    containerHeight: containerHeight - bigHeight,
+                    offsetLeft: 0,
+                    offsetTop: 0,
+                    fixedRatio: fixedRatio,
+                    minRatio: minRatio,
+                    maxRatio: maxRatio,
+                    alignItems: smallAlignItems,
+                    maxWidth: smallMaxWidth,
+                    maxHeight: smallMaxHeight,
+                    scaleLastRow: scaleLastRow
+                }, smallOnes);
+                var smallHeight_1 = 0;
+                var currentHeight_1 = 0;
+                var left_1 = 0;
+                smallBoxes_1.forEach(function (box) {
+                    if (box.left !== left_1) {
+                        currentHeight_1 = 0;
+                        left_1 = box.left;
+                    }
+                    currentHeight_1 += box.height;
+                    smallHeight_1 = Math.max(smallHeight_1, currentHeight_1);
+                });
+                bigHeight = Math.max(bigHeight, containerHeight - smallHeight_1);
             }
             offsetTop = bigHeight;
             bigOffsetTop = containerHeight - offsetTop;
@@ -364,9 +386,31 @@ exports["default"] = (function (opts, elements) {
                 bigWidth = Math.max(containerWidth * minBigPercentage, Math.min(bigWidth, bigDimensions.targetWidth * bigDimensions.targetCols));
                 // Don't awkwardly scale the small area bigger than we need to and end up with floating
                 // videos in the middle
-                var smallDimensions = getBestDimensions(minRatio, maxRatio, containerWidth - bigWidth, containerHeight, smallOnes.length, smallMaxWidth, smallMaxHeight);
-                bigWidth = Math.max(bigWidth, containerWidth
-                    - (smallDimensions.targetCols * smallDimensions.targetWidth));
+                var smallBoxes_2 = getLayout({
+                    containerWidth: containerWidth - bigWidth,
+                    containerHeight: containerHeight,
+                    offsetLeft: 0,
+                    offsetTop: 0,
+                    fixedRatio: fixedRatio,
+                    minRatio: minRatio,
+                    maxRatio: maxRatio,
+                    alignItems: smallAlignItems,
+                    maxWidth: smallMaxWidth,
+                    maxHeight: smallMaxHeight,
+                    scaleLastRow: scaleLastRow
+                }, smallOnes);
+                var smallWidth_1 = 0;
+                var currentWidth_1 = 0;
+                var top_1 = 0;
+                smallBoxes_2.forEach(function (box) {
+                    if (box.top !== top_1) {
+                        currentWidth_1 = 0;
+                        top_1 = box.top;
+                    }
+                    currentWidth_1 += box.width;
+                    smallWidth_1 = Math.max(smallWidth_1, currentWidth_1);
+                });
+                bigWidth = Math.max(bigWidth, containerWidth - smallWidth_1);
             }
             offsetLeft = bigWidth;
             bigOffsetLeft = containerWidth - offsetLeft;
