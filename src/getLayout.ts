@@ -297,10 +297,31 @@ export default (opts: Options, elements: Element[]): GetLayoutRes => {
           Math.min(bigHeight, bigDimensions.targetHeight * bigDimensions.targetRows));
         // Don't awkwardly scale the small area bigger than we need to and end up with floating
         // videos in the middle
-        const smallDimensions = getBestDimensions(minRatio, maxRatio, containerWidth,
-          containerHeight - bigHeight, smallOnes.length, smallMaxWidth, smallMaxHeight);
-        bigHeight = Math.max(bigHeight, containerHeight
-          - (smallDimensions.targetRows * smallDimensions.targetHeight));
+        const smallBoxes = getLayout({
+          containerWidth: containerWidth,
+          containerHeight: containerHeight - bigHeight,
+          offsetLeft: 0,
+          offsetTop: 0,
+          fixedRatio,
+          minRatio,
+          maxRatio,
+          alignItems: smallAlignItems,
+          maxWidth: smallMaxWidth,
+          maxHeight: smallMaxHeight,
+          scaleLastRow,
+        }, smallOnes);
+        let smallHeight = 0
+        let currentHeight = 0
+        let left = 0
+        smallBoxes.forEach(box => {
+          if (box.left !== left) {
+            currentHeight = 0
+            left = box.left
+          }
+          currentHeight += box.height
+          smallHeight = Math.max(smallHeight, currentHeight)
+        })
+        bigHeight = Math.max(bigHeight, containerHeight - smallHeight);
       }
       offsetTop = bigHeight;
       bigOffsetTop = containerHeight - offsetTop;
@@ -330,10 +351,31 @@ export default (opts: Options, elements: Element[]): GetLayoutRes => {
           Math.min(bigWidth, bigDimensions.targetWidth * bigDimensions.targetCols));
         // Don't awkwardly scale the small area bigger than we need to and end up with floating
         // videos in the middle
-        const smallDimensions = getBestDimensions(minRatio, maxRatio, containerWidth - bigWidth,
-          containerHeight, smallOnes.length, smallMaxWidth, smallMaxHeight);
-        bigWidth = Math.max(bigWidth, containerWidth
-          - (smallDimensions.targetCols * smallDimensions.targetWidth));
+        const smallBoxes = getLayout({
+          containerWidth: containerWidth - bigWidth,
+          containerHeight: containerHeight,
+          offsetLeft: 0,
+          offsetTop: 0,
+          fixedRatio,
+          minRatio,
+          maxRatio,
+          alignItems: smallAlignItems,
+          maxWidth: smallMaxWidth,
+          maxHeight: smallMaxHeight,
+          scaleLastRow,
+        }, smallOnes);
+        let smallWidth = 0
+        let currentWidth = 0
+        let top = 0
+        smallBoxes.forEach(box => {
+          if (box.top !== top) {
+            currentWidth = 0
+            top = box.top
+          }
+          currentWidth += box.width
+          smallWidth = Math.max(smallWidth, currentWidth)
+        })
+        bigWidth = Math.max(bigWidth, containerWidth - smallWidth);
       }
       offsetLeft = bigWidth;
       bigOffsetLeft = containerWidth - offsetLeft;
