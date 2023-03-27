@@ -604,7 +604,7 @@ describe('opentok layout', () => {
       divs = [];
     });
 
-    it('favours an even number of elements in each row', () => {
+    it('favours an even distribution of elements in each row', () => {
       const layoutContainer = initLayoutContainer(layoutDiv, {
         maxWidth: 400,
         maxHeight: 300,
@@ -1093,4 +1093,64 @@ describe('opentok layout', () => {
       });
     });
   });
+
+  function testLotsOfElements(howMany) {
+    describe(`handling layout of ${howMany} elements`, () => {
+      let layoutDiv;
+      let divs = [];
+      const divCount = 23;
+      beforeEach(() => {
+        layoutDiv = document.createElement('div');
+        layoutDiv.setAttribute('id', 'layoutDiv');
+        layoutDiv.style.position = 'absolute';
+        layoutDiv.style.top = '0px';
+        layoutDiv.style.left = '0px';
+        layoutDiv.style.width = '400px';
+        layoutDiv.style.height = '300px';
+        layoutDiv.style.backgroundColor = 'grey';
+        document.body.style.margin = '0px';
+        document.body.style.padding = '0px';
+        document.body.appendChild(layoutDiv);
+        for (let i = 0; i < divCount; i += 1) {
+          divs[i] = document.createElement('div');
+          divs[i].style.backgroundColor = `rgb(${15 * i}, ${15 * i}, ${15 * i}`;
+          divs[i].videoWidth = 360;
+          divs[i].videoHeight = 720;
+          layoutDiv.appendChild(divs[i]);
+        }
+      });
+
+      afterEach(() => {
+        document.body.removeChild(layoutDiv);
+        layoutDiv = null;
+        divs = [];
+      });
+
+      it('favours an even distribution of elements in each row with fixed Ratio', () => {
+        const layoutContainer = initLayoutContainer(layoutDiv, { fixedRatio: true });
+        layoutContainer.layout();
+        // Expect there to be a close number of items on each row
+        let rect;
+        let currentRow = -1;
+        let currentRowTop = -1;
+        const rowItemCount = [];
+
+        for (let i = 0; i < divs.length; i += 1) {
+          rect = divs[i].getBoundingClientRect();
+          if (rect.top > currentRowTop) {
+            currentRowTop = rect.top;
+            currentRow += 1;
+          }
+          rowItemCount[currentRow] = (rowItemCount[currentRow] || 0) + 1;
+        }
+        for (let i = 0; i < rowItemCount.length - 1; i += 1) {
+          expect(Math.abs(rowItemCount[i] - rowItemCount[i + 1])).toBeLessThan(2);
+        }
+      });
+    });
+  }
+
+  testLotsOfElements(7);
+  testLotsOfElements(13);
+  testLotsOfElements(18);
 });

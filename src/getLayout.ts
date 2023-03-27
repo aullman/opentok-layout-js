@@ -40,15 +40,16 @@ const getBestDimensions = (minRatio: number, maxRatio: number, Width: number, He
 
     // If this width and height takes up the most space then we're going with that
     if (maxArea === undefined || (area >= maxArea)) {
-      if (!(area === maxArea && (count % (cols * rows)) > (count % (targetRows * targetCols)))) {
-        // Favour even numbers of participants in each row, eg. 2 on each row
-        // instead of 3 in one row and then 1 on the next
-        maxArea = area;
-        targetHeight = tHeight;
-        targetWidth = tWidth;
-        targetCols = cols;
-        targetRows = rows;
+      if (area === maxArea && ((cols * rows) % count) > ((targetRows * targetCols) % count)) {
+        // We have the same area but there are more left over spots in the last row
+        // Let's keep the previous one
+        continue;
       }
+      maxArea = area;
+      targetHeight = tHeight;
+      targetWidth = tWidth;
+      targetCols = cols;
+      targetRows = rows;
     }
   }
   return {
