@@ -147,6 +147,7 @@ export default (container: HTMLElement, opts: Options) => {
     animate = false,
     bigClass = 'OT_big',
     ignoreClass = 'OT_ignore',
+    fixedRatioClass = 'OT_fixedRatio',
   } = opts;
 
   if (css(container, 'display') === 'none') {
@@ -173,6 +174,7 @@ export default (container: HTMLElement, opts: Options) => {
     return {
       ...getChildDims(element),
       big: element.classList.contains(bigClass),
+      fixedRatio: element.classList.contains(fixedRatioClass),
     };
   });
 
