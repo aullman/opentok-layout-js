@@ -702,6 +702,24 @@ describe('opentok layout', () => {
       expect(rect.top + rect.height).toBeCloseTo(600, 1);
     });
 
+    it('allows some elements to be fixedRatio and some not', () => {
+      divs[1].videoWidth = 480;
+      divs[1].videoHeight = 640;
+      divs[1].className = 'OT_fixedRatio';
+      divs[2].videoWidth = 1280;
+      divs[2].videoHeight = 720;
+      divs[2].className = 'OT_fixedRatio';
+      const layoutContainer = initLayoutContainer(layoutDiv);
+      layoutContainer.layout();
+      const rect = divs[1].getBoundingClientRect();
+      expect(rect.width / rect.height).toBeCloseTo(480 / 640, 1);
+      const rect2 = divs[2].getBoundingClientRect();
+      expect(rect2.width / rect2.height).toBeCloseTo(1280 / 720, 1);
+      const rect3 = divs[3].getBoundingClientRect();
+      expect(rect3.width / rect3.height).not.toBeCloseTo(1280 / 720, 1);
+      expect(rect3.width / rect3.height).not.toBeCloseTo(480 / 640, 1);
+    });
+
     it('does not grows to take up the whole height if you pass scaleLastRow=false', () => {
       divs[1].videoWidth = 480;
       divs[1].videoHeight = 640;

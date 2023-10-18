@@ -19,6 +19,7 @@ declare module 'opentok-layout-js' {
     bigPercentage?: number;
     minBigPercentage?: number;
     fixedRatio?: boolean;
+    fixedRatioClass?: string;
     ignoreClass?: string;
     maxHeight?: number;
     maxRatio?: number;
@@ -39,6 +40,7 @@ declare module 'opentok-layout-js' {
     big: boolean;
     height: number;
     width: number;
+    fixedRatio?: boolean;
   };
 
   export type Box = {

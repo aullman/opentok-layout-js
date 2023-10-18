@@ -69,6 +69,7 @@ type Offsets = {
 
 type Row = {
   ratios: number[];
+  elements: Element[];
   width: number;
   height: number;
 }
@@ -119,17 +120,20 @@ const getLayout = (opts: Options & Offsets, elements: Element[]): Box[] => {
       // This is a new row
       row = {
         ratios: [],
+        elements: [],
         width: 0,
         height: 0,
       };
       rows.push(row);
     }
     const ratio = ratios[i];
+    const element = elements[i];
+    row.elements.push(element);
     row.ratios.push(ratio);
     let targetWidth = dimensions.targetWidth;
     const targetHeight = dimensions.targetHeight;
     // If we're using a fixedRatio then we need to set the correct ratio for this element
-    if (fixedRatio) {
+    if (fixedRatio || element.fixedRatio) {
       targetWidth = targetHeight / ratio;
     }
     row.width += targetWidth;
@@ -202,11 +206,12 @@ const getLayout = (opts: Options & Offsets, elements: Element[]): Box[] => {
     let targetHeight;
     for (let j = 0; j < row.ratios.length; j += 1) {
       const ratio = row.ratios[j];
+      const element = row.elements[j];
 
       let targetWidth = dimensions.targetWidth;
       targetHeight = row.height;
       // If we're using a fixedRatio then we need to set the correct ratio for this element
-      if (fixedRatio) {
+      if (fixedRatio || element.fixedRatio) {
         targetWidth = Math.floor(targetHeight / ratio);
       } else if ((targetHeight / targetWidth)
         !== (dimensions.targetHeight / dimensions.targetWidth)) {

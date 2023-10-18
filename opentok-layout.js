@@ -183,17 +183,20 @@ var getLayout = function (opts, elements) {
             // This is a new row
             row = {
                 ratios: [],
+                elements: [],
                 width: 0,
                 height: 0
             };
             rows.push(row);
         }
         var ratio = ratios[i];
+        var element = elements[i];
+        row.elements.push(element);
         row.ratios.push(ratio);
         var targetWidth = dimensions.targetWidth;
         var targetHeight = dimensions.targetHeight;
         // If we're using a fixedRatio then we need to set the correct ratio for this element
-        if (fixedRatio) {
+        if (fixedRatio || element.fixedRatio) {
             targetWidth = targetHeight / ratio;
         }
         row.width += targetWidth;
@@ -267,10 +270,11 @@ var getLayout = function (opts, elements) {
         var targetHeight = void 0;
         for (var j = 0; j < row.ratios.length; j += 1) {
             var ratio = row.ratios[j];
+            var element = row.elements[j];
             var targetWidth = dimensions.targetWidth;
             targetHeight = row.height;
             // If we're using a fixedRatio then we need to set the correct ratio for this element
-            if (fixedRatio) {
+            if (fixedRatio || element.fixedRatio) {
                 targetWidth = Math.floor(targetHeight / ratio);
             }
             else if ((targetHeight / targetWidth)
@@ -698,7 +702,7 @@ exports["default"] = (function (container, opts) {
         var widthStr = width(elem);
         return widthStr ? parseInt(widthStr, 10) : 0;
     };
-    var _a = opts.animate, animate = _a === void 0 ? false : _a, _b = opts.bigClass, bigClass = _b === void 0 ? 'OT_big' : _b, _c = opts.ignoreClass, ignoreClass = _c === void 0 ? 'OT_ignore' : _c;
+    var _a = opts.animate, animate = _a === void 0 ? false : _a, _b = opts.bigClass, bigClass = _b === void 0 ? 'OT_big' : _b, _c = opts.ignoreClass, ignoreClass = _c === void 0 ? 'OT_ignore' : _c, _d = opts.fixedRatioClass, fixedRatioClass = _d === void 0 ? 'OT_fixedRatio' : _d;
     if (css(container, 'display') === 'none') {
         return;
     }
@@ -715,7 +719,7 @@ exports["default"] = (function (container, opts) {
         - getCSSNumber(container, 'border-right');
     var children = Array.prototype.filter.call(container.querySelectorAll("#".concat(id, ">*:not(.").concat(ignoreClass, ")")), filterDisplayNone);
     var elements = children.map(function (element) {
-        return __assign(__assign({}, getChildDims(element)), { big: element.classList.contains(bigClass) });
+        return __assign(__assign({}, getChildDims(element)), { big: element.classList.contains(bigClass), fixedRatio: element.classList.contains(fixedRatioClass) });
     });
     var layout = (0, getLayout_1["default"])(opts, elements);
     layout.boxes.forEach(function (box, idx) {

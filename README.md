@@ -30,6 +30,7 @@ const options = {
     maxRatio: 3/2,             // The narrowest ratio that will be used (default 2x3)
     minRatio: 9/16,            // The widest ratio that will be used (default 16x9)
     fixedRatio: false,         // If this is true then the aspect ratio of the video is maintained and minRatio and maxRatio are ignored (default false)
+    fixedRatioClass: "OT_fixedRatio" // The class to add to elements that should respect their native aspect ratio
     scaleLastRow: true,        // If there are less elements on the last row then we can scale them up to take up more space
     alignItems: 'center',      // Can be 'start', 'center' or 'end'. Determines where to place items when on a row or column that is not full
     bigClass: "OT_big",        // The class to add to elements that should be sized bigger
@@ -68,9 +69,10 @@ const layout = initLayoutContainer({
 });
 const { boxes } = layout.getLayout([
     {
-        width: 640,     // The native width of this element (eg. subscriber.videoWidth())
-        height: 480,    // The native height of this element (eg. subscriber.videoHeight())
-        big: false      // Whether to treat this element as a bigger element
+        width: 640,       // The native width of this element (eg. subscriber.videoWidth())
+        height: 480,      // The native height of this element (eg. subscriber.videoHeight())
+        big: false        // Whether to treat this element as a bigger element
+        fixedRatio: false // Whether this element should respect it's native aspect ratio 
     }
 ]);
 ```
