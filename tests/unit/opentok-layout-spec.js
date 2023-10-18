@@ -70,7 +70,27 @@ describe('opentok layout', () => {
         containerHeight: 300,
       });
       expect(layoutContainer.getLayout(children.map(() => ({ width: 300, height: 200 }))))
-        .toEqual(expectedLayout);
+        .toEqual({
+          boxes: expectedLayout,
+          areas: {
+            small: {
+              top: 0, left: 0, width: 400, height: 300,
+            },
+          },
+        });
+    });
+
+    it('triggers the onLayout method', () => {
+      const layoutContainer = initLayoutContainer(layoutDiv, {
+        onLayout: (elem, position) => {
+          ['width', 'height', 'top', 'left'].forEach((key) => {
+            expect(
+              position[key] === expectedLayout[0][key] || position[key] === expectedLayout[1][key]
+            ).toBe(true);
+          });
+        },
+      });
+      layoutContainer.layout();
     });
 
     it('handles default layout', () => {
@@ -79,7 +99,7 @@ describe('opentok layout', () => {
       expectedLayout.forEach((box, idx) => {
         const boundingRect = children[idx].getBoundingClientRect();
         ['width', 'height', 'left', 'top'].forEach((val) => {
-          expect(boundingRect[val]).toEqual(expectedLayout[idx][val]);
+          expect(boundingRect[val]).toBeCloseTo(expectedLayout[idx][val], 1);
         });
       });
     });
@@ -116,8 +136,8 @@ describe('opentok layout', () => {
       layoutContainer.layout();
       const div1Rect = div1.getBoundingClientRect();
       const div2Rect = div2.getBoundingClientRect();
-      expect(div1Rect.height).toBe(300);
-      expect(div2Rect.height).toBe(300);
+      expect(div1Rect.height).toBeCloseTo(300, 1);
+      expect(div2Rect.height).toBeCloseTo(300, 1);
       expect(div2Rect.width).not.toBeGreaterThan(640);
     });
 
@@ -157,34 +177,34 @@ describe('opentok layout', () => {
               expect(boundingRect.left).toEqual(0);
               break;
             case 'end':
-              expect(boundingRect.left).toEqual(160);
+              expect(boundingRect.left).toBeCloseTo(160, 1);
               break;
             case 'center':
             default:
-              expect(boundingRect.left).toEqual(80);
+              expect(boundingRect.left).toBeCloseTo(80, 1);
               break;
           }
         });
       });
     });
 
-    describe('smallMaxWidth and smallMaxHeight', () => {
-      it('does not go over the smallMaxWidth and smallMaxHeight and stays centered', () => {
+    describe('maxWidth and maxHeight', () => {
+      it('does not go over the maxWidth and maxHeight and stays centered', () => {
         const layoutContainer = initLayoutContainer(layoutDiv, {
-          smallMaxWidth: 160,
-          smallMaxHeight: 100,
+          maxWidth: 160,
+          maxHeight: 100,
         });
         layoutContainer.layout();
         const div1Rect = div1.getBoundingClientRect();
-        expect(div1Rect.width).toEqual(160);
-        expect(div1Rect.height).toEqual(100);
-        expect(div1Rect.left).toEqual(40);
-        expect(div1Rect.top).toEqual(100);
+        expect(div1Rect.width).toBeCloseTo(160, 1);
+        expect(div1Rect.height).toBeCloseTo(100, 1);
+        expect(div1Rect.left).toBeCloseTo(40, 1);
+        expect(div1Rect.top).toBeCloseTo(100, 1);
         const div2Rect = div2.getBoundingClientRect();
-        expect(div2Rect.width).toEqual(160);
-        expect(div2Rect.height).toEqual(100);
-        expect(div2Rect.left).toEqual(200);
-        expect(div2Rect.top).toEqual(100);
+        expect(div2Rect.width).toBeCloseTo(160, 1);
+        expect(div2Rect.height).toBeCloseTo(100, 1);
+        expect(div2Rect.left).toBeCloseTo(200, 1);
+        expect(div2Rect.top).toBeCloseTo(100, 1);
       });
     });
 
@@ -200,15 +220,15 @@ describe('opentok layout', () => {
         const layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
         const div1Rect = div1.getBoundingClientRect();
-        expect(div1Rect.width).toBe(100);
-        expect(div1Rect.height).toBe(100);
-        expect(div1Rect.top).toBe(0);
-        expect(div1Rect.left).toBe(0);
+        expect(div1Rect.width).toBeCloseTo(100, 1);
+        expect(div1Rect.height).toBeCloseTo(100, 1);
+        expect(div1Rect.top).toBeCloseTo(0, 1);
+        expect(div1Rect.left).toBeCloseTo(0, 1);
         const div2Rect = div2.getBoundingClientRect();
-        expect(div2Rect.width).toBe(400);
-        expect(div2Rect.height).toBe(300);
-        expect(div2Rect.top).toBe(0);
-        expect(div2Rect.left).toBe(0);
+        expect(div2Rect.width).toBeCloseTo(400, 1);
+        expect(div2Rect.height).toBeCloseTo(300, 1);
+        expect(div2Rect.top).toBeCloseTo(0, 1);
+        expect(div2Rect.left).toBeCloseTo(0, 1);
       });
     });
 
@@ -239,7 +259,17 @@ describe('opentok layout', () => {
           width: 640,
           height: 480,
           big: child.className === 'OT_big',
-        })))).toEqual(expectedLayout);
+        })))).toEqual({
+          boxes: expectedLayout,
+          areas: {
+            big: {
+              top: 0, left: 0, width: 320, height: 300,
+            },
+            small: {
+              top: 0, left: 320, width: 80, height: 300,
+            },
+          },
+        });
       });
 
       it('handles default layout', () => {
@@ -248,7 +278,7 @@ describe('opentok layout', () => {
         expectedLayout.forEach((box, idx) => {
           const boundingRect = children[idx].getBoundingClientRect();
           ['width', 'height', 'left', 'top'].forEach((val) => {
-            expect(boundingRect[val]).toEqual(expectedLayout[idx][val]);
+            expect(boundingRect[val]).toBeCloseTo(expectedLayout[idx][val], 1);
           });
         });
       });
@@ -273,18 +303,112 @@ describe('opentok layout', () => {
         layoutContainer.layout();
         const div1Rect = div1.getBoundingClientRect();
         const div2Rect = div2.getBoundingClientRect();
-        expect(div1Rect.width).toBe(360);
-        expect(div2Rect.width).toBe(40);
-        expect(div1Rect.height).toBe(300);
-        expect(div2Rect.height).toBe(60);
+        expect(div1Rect.width).toBeCloseTo(360, 1);
+        expect(div2Rect.width).toBeCloseTo(40, 1);
+        expect(div1Rect.height).toBeCloseTo(300, 1);
+        expect(div2Rect.height).toBeCloseTo(60, 1);
       });
 
-      it('handles bigFirst', () => {
+      it('handles minBigPercentage', () => {
+        layoutDiv.style.width = '800px';
+        let layoutContainer = initLayoutContainer(layoutDiv, {
+          bigPercentage: 0.9,
+          minBigPercentage: 0.8,
+        });
+        layoutContainer.layout();
+        let div1Rect = div1.getBoundingClientRect();
+        let div2Rect = div2.getBoundingClientRect();
+        expect(div1Rect.width).toBeCloseTo(533, -1);
+        expect(div2Rect.width).toBeCloseTo(160, 1);
+        expect(div1Rect.height).toBeCloseTo(300, 1);
+        expect(div2Rect.height).toBeCloseTo(240, 1);
+
+        layoutContainer = initLayoutContainer(layoutDiv, {
+          bigPercentage: 0.9,
+          minBigPercentage: 0.6,
+        });
+        layoutContainer.layout();
+        div1Rect = div1.getBoundingClientRect();
+        div2Rect = div2.getBoundingClientRect();
+        expect(div1Rect.width).toBeCloseTo(533, -1);
+        expect(div2Rect.width).toBeCloseTo(266, 1);
+        expect(div1Rect.height).toBeCloseTo(300, 1);
+        expect(div2Rect.height).toBeCloseTo(300, 1);
+      });
+
+      it('does not scale the big percentage down too small and leave floating elements', () => {
+        // If you set the width to be wide
+        layoutDiv.style.width = '1000px';
+        const layoutContainer = initLayoutContainer(layoutDiv, {
+          bigPercentage: 0.9,
+          minBigPercentage: 0.6,
+          smallMaxWidth: 300,
+          smallMaxHeight: 300,
+        });
+        layoutContainer.layout();
+        const div1Rect = div1.getBoundingClientRect();
+        const div2Rect = div2.getBoundingClientRect();
+        // Make sure div2 is right up against the right hand side
+        expect(div2Rect.width + div2Rect.left).toBeCloseTo(1000, 1);
+        expect(div1Rect.width).toBeCloseTo(533, -1);
+        expect(div2Rect.width).toBeCloseTo(300, 1);
+        expect(div1Rect.height).toBeCloseTo(300, 1);
+        expect(div2Rect.height).toBeCloseTo(300, 1);
+        expect(div2Rect.left).toBeCloseTo(700, 1);
+      });
+
+      it('with fixedRatio does not scale the big percentage down too small and leave floating elements', () => {
+        // If you set the width to be wide and have a portrait aspect ratio
+        layoutDiv.style.width = '1000px';
+        div2.videoWidth = 360;
+        div2.videoHeight = 480;
+        const layoutContainer = initLayoutContainer(layoutDiv, {
+          bigPercentage: 0.9,
+          minBigPercentage: 0.6,
+          smallMaxWidth: 300,
+          smallMaxHeight: 300,
+          fixedRatio: true,
+        });
+        layoutContainer.layout();
+        const div1Rect = div1.getBoundingClientRect();
+        const div2Rect = div2.getBoundingClientRect();
+        // Make sure div2 is right up against the right hand side, not floating
+        expect(div2Rect.width + div2Rect.left).toBeCloseTo(1000, 1);
+        expect(div1Rect.width).toBeCloseTo(533, -1);
+        expect(div1Rect.height).toBeCloseTo(300, 1);
+        expect(div2Rect.width).toBeCloseTo(225, 1);
+        expect(div2Rect.height).toBeCloseTo(300, 1);
+      });
+
+      it('when tall with fixedRatio does not scale the big percentage down too small and leave floating elements', () => {
+        // If you set the width to be wide and have a landscape aspect ratio
+        layoutDiv.style.height = '1000px';
+        div2.videoWidth = 1280;
+        div2.videoHeight = 720;
+        const layoutContainer = initLayoutContainer(layoutDiv, {
+          bigPercentage: 0.9,
+          minBigPercentage: 0.6,
+          smallMaxWidth: 300,
+          smallMaxHeight: 300,
+          fixedRatio: true,
+        });
+        layoutContainer.layout();
+        const div1Rect = div1.getBoundingClientRect();
+        const div2Rect = div2.getBoundingClientRect();
+        // Make sure div2 is right up against the bottom, not floating
+        expect(div2Rect.height + div2Rect.top).toBeCloseTo(1000, 1);
+        expect(div1Rect.width).toBeCloseTo(400, -1);
+        expect(div1Rect.height).toBeCloseTo(600, 1);
+        expect(div2Rect.width).toBeCloseTo(400, 1);
+        expect(div2Rect.height).toBeCloseTo(225, 1);
+      });
+
+      it('handles bigFirst false', () => {
         const layoutContainer = initLayoutContainer(layoutDiv, { bigFirst: false });
         layoutContainer.layout();
         const div1Rect = div1.getBoundingClientRect();
-        expect(div1Rect.left).toBe(80);
-        expect(div1Rect.top).toBe(0);
+        expect(div1Rect.left).toBeCloseTo(80, 1);
+        expect(div1Rect.top).toBeCloseTo(0, 1);
       });
 
       it('takes margin into account', () => {
@@ -295,10 +419,28 @@ describe('opentok layout', () => {
         layoutContainer.layout();
         const div1Rect = div1.getBoundingClientRect();
         const div2Rect = div2.getBoundingClientRect();
-        expect(div1Rect.width).toBe(310);
-        expect(div2Rect.width).toBe(70);
-        expect(div1Rect.height).toBe(290);
-        expect(div2Rect.height).toBe(110);
+        expect(div1Rect.width).toBeCloseTo(310, 1);
+        expect(div2Rect.width).toBeCloseTo(70, 1);
+        expect(div1Rect.height).toBeCloseTo(290, 1);
+        expect(div2Rect.height).toBeCloseTo(110, 1);
+      });
+
+      it('takes margin CSS styles into account', () => {
+        const style = document.createElement('style');
+        style.innerHTML = '.margin { margin: 5px; }';
+        document.head.appendChild(style);
+
+        div1.classList.add('margin');
+        div2.classList.add('margin');
+
+        const layoutContainer = initLayoutContainer(layoutDiv);
+        layoutContainer.layout();
+        const div1Rect = div1.getBoundingClientRect();
+        const div2Rect = div2.getBoundingClientRect();
+        expect(div1Rect.width).toBeCloseTo(310, 1);
+        expect(div2Rect.width).toBeCloseTo(70, 1);
+        expect(div1Rect.height).toBeCloseTo(290, 1);
+        expect(div2Rect.height).toBeCloseTo(110, 1);
       });
 
       it('takes padding into account', () => {
@@ -307,10 +449,42 @@ describe('opentok layout', () => {
 
         const layoutContainer = initLayoutContainer(layoutDiv);
         layoutContainer.layout();
-        expect(div1.clientWidth).toBe(320);
-        expect(div2.clientWidth).toBe(80);
-        expect(div1.clientHeight).toBe(300);
-        expect(div2.clientHeight).toBe(120);
+        expect(div1.clientWidth).toBeCloseTo(320, 1);
+        expect(div2.clientWidth).toBeCloseTo(80, -1);
+        expect(div1.clientHeight).toBeCloseTo(300, 1);
+        expect(div2.clientHeight).toBeCloseTo(120, 1);
+      });
+
+      it('takes border into account', () => {
+        const style = document.createElement('style');
+        style.innerHTML = '.border { border: 1px solid blue; }';
+        document.head.appendChild(style);
+
+        div1.classList.add('border');
+        div2.classList.add('border');
+
+        const layoutContainer = initLayoutContainer(layoutDiv);
+        layoutContainer.layout();
+        expect(div1.clientWidth).toBeCloseTo(318, 1);
+        expect(div2.clientWidth).toBeCloseTo(78, -1);
+        expect(div1.clientHeight).toBeCloseTo(298, 1);
+        expect(div2.clientHeight).toBeCloseTo(118, 1);
+      });
+
+      it('takes box-sizing into account', () => {
+        const style = document.createElement('style');
+        style.innerHTML = '.box-sizing { padding: 5px; box-sizing: border-box; }';
+        document.head.appendChild(style);
+
+        div1.classList.add('box-sizing');
+        div2.classList.add('box-sizing');
+
+        const layoutContainer = initLayoutContainer(layoutDiv);
+        layoutContainer.layout();
+        expect(div1.clientWidth).toBeCloseTo(320, 1);
+        expect(div2.clientWidth).toBeCloseTo(80, -1);
+        expect(div1.clientHeight).toBeCloseTo(300, 1);
+        expect(div2.clientHeight).toBeCloseTo(120, 1);
       });
 
       describe('smallAlignItems', () => {
@@ -321,14 +495,14 @@ describe('opentok layout', () => {
             const boundingRect = children[1].getBoundingClientRect();
             switch (smallAlignItems) {
               case 'start':
-                expect(boundingRect.top).toEqual(0);
+                expect(boundingRect.top).toBeCloseTo(0, 1);
                 break;
               case 'end':
-                expect(boundingRect.top).toEqual(180);
+                expect(boundingRect.top).toBeCloseTo(180, 1);
                 break;
               case 'center':
               default:
-                expect(boundingRect.top).toEqual(90);
+                expect(boundingRect.top).toBeCloseTo(90, 1);
                 break;
             }
           });
@@ -346,21 +520,21 @@ describe('opentok layout', () => {
             const boundingRect = children[0].getBoundingClientRect();
             switch (bigAlignItems) {
               case 'start':
-                expect(boundingRect.top).toEqual(0);
+                expect(boundingRect.top).toBeCloseTo(0, 1);
                 break;
               case 'end':
-                expect(boundingRect.top).toEqual(60);
+                expect(boundingRect.top).toBeCloseTo(60, 1);
                 break;
               case 'center':
               default:
-                expect(boundingRect.top).toEqual(30);
+                expect(boundingRect.top).toBeCloseTo(30, 1);
                 break;
             }
           });
         });
       });
 
-      describe('bigMaxWidth and bigMaxHeight', () => {
+      describe('small and big maxWidth and maxHeight', () => {
         it('does not go over the bigMaxWidth and bigMaxHeight and stays centered', () => {
           const layoutContainer = initLayoutContainer(layoutDiv, {
             bigMaxWidth: 200,
@@ -368,17 +542,93 @@ describe('opentok layout', () => {
           });
           layoutContainer.layout();
           const div1Rect = div1.getBoundingClientRect();
-          expect(div1Rect.width).toEqual(200);
-          expect(div1Rect.height).toEqual(220);
-          expect(div1Rect.left).toEqual(60);
-          expect(div1Rect.top).toEqual(40);
+          expect(div1Rect.width).toBeCloseTo(200, 1);
+          expect(div1Rect.height).toBeCloseTo(220, 1);
+          expect(div1Rect.left).toBeCloseTo(60, 1);
+          expect(div1Rect.top).toBeCloseTo(40, 1);
           const div2Rect = div2.getBoundingClientRect();
-          expect(div2Rect.width).toEqual(80);
-          expect(div2Rect.height).toEqual(120);
-          expect(div2Rect.left).toEqual(320);
-          expect(div2Rect.top).toEqual(90);
+          expect(div2Rect.width).toBeCloseTo(80, 1);
+          expect(div2Rect.height).toBeCloseTo(120, 1);
+          expect(div2Rect.left).toBeCloseTo(320, 1);
+          expect(div2Rect.top).toBeCloseTo(90, 1);
+        });
+
+        it('does not go over the smallMaxWidth and smallMaxHeight and stays centered', () => {
+          const layoutContainer = initLayoutContainer(layoutDiv, {
+            smallMaxWidth: 50,
+            smallMaxHeight: 50,
+          });
+          layoutContainer.layout();
+          const div1Rect = div1.getBoundingClientRect();
+          expect(div1Rect.width).toBeCloseTo(320, 1);
+          expect(div1Rect.height).toBeCloseTo(300, 1);
+          expect(div1Rect.left).toBeCloseTo(0, 1);
+          expect(div1Rect.top).toBeCloseTo(0, 1);
+          const div2Rect = div2.getBoundingClientRect();
+          expect(div2Rect.width).toBeCloseTo(50, 1);
+          expect(div2Rect.height).toBeCloseTo(50, 1);
+          expect(div2Rect.left).toBeCloseTo(335, 1);
+          expect(div2Rect.top).toBeCloseTo(125, 1);
         });
       });
+    });
+  });
+
+  describe('handling layout of 4 elements', () => {
+    let layoutDiv;
+    let divs = [];
+    const divCount = 4;
+    beforeEach(() => {
+      layoutDiv = document.createElement('div');
+      layoutDiv.setAttribute('id', 'layoutDiv');
+      layoutDiv.style.position = 'absolute';
+      layoutDiv.style.top = '0px';
+      layoutDiv.style.left = '0px';
+      layoutDiv.style.width = '1280px';
+      layoutDiv.style.height = '720px';
+      layoutDiv.style.backgroundColor = 'grey';
+      document.body.style.margin = '0px';
+      document.body.style.padding = '0px';
+      document.body.appendChild(layoutDiv);
+      const colors = ['blue', 'green', 'orange', 'teal'];
+      for (let i = 0; i < divCount; i += 1) {
+        divs[i] = document.createElement('div');
+        divs[i].style.backgroundColor = colors[i];
+        layoutDiv.appendChild(divs[i]);
+      }
+    });
+
+    afterEach(() => {
+      document.body.removeChild(layoutDiv);
+      layoutDiv = null;
+      divs = [];
+    });
+
+    it('favours an even distribution of elements in each row', () => {
+      const layoutContainer = initLayoutContainer(layoutDiv, {
+        maxWidth: 400,
+        maxHeight: 300,
+      });
+      layoutContainer.layout();
+      // Expect them to all have the same width and height
+      let rect;
+      for (let i = 0; i < divs.length; i += 1) {
+        rect = divs[i].getBoundingClientRect();
+        expect(rect.width).toBe(400);
+        expect(rect.height).toBe(300);
+      }
+      rect = divs[0].getBoundingClientRect();
+      expect(rect.left).toBeCloseTo(240, 1);
+      expect(rect.top).toBeCloseTo(60, 1);
+      rect = divs[1].getBoundingClientRect();
+      expect(rect.left).toBeCloseTo(640, 1);
+      expect(rect.top).toBeCloseTo(60, 1);
+      rect = divs[2].getBoundingClientRect();
+      expect(rect.left).toBeCloseTo(240, 1);
+      expect(rect.top).toBeCloseTo(360, 1);
+      rect = divs[3].getBoundingClientRect();
+      expect(rect.left).toBeCloseTo(640, 1);
+      expect(rect.top).toBeCloseTo(360, 1);
     });
   });
 
@@ -419,24 +669,24 @@ describe('opentok layout', () => {
       let rect;
       for (let i = 0; i < divs.length; i += 1) {
         rect = divs[i].getBoundingClientRect();
-        expect(rect.width).toBe(133);
-        expect(rect.height).toBe(150);
+        expect(rect.width).toBeCloseTo(133, 1);
+        expect(rect.height).toBeCloseTo(150, 1);
       }
       rect = divs[0].getBoundingClientRect();
-      expect(rect.left).toBe(0.5);
-      expect(rect.top).toBe(0);
+      expect(rect.left).toBeCloseTo(0.5, 1);
+      expect(rect.top).toBeCloseTo(0, 1);
       rect = divs[1].getBoundingClientRect();
-      expect(rect.left).toBe(133.5);
-      expect(rect.top).toBe(0);
+      expect(rect.left).toBeCloseTo(133.5, 1);
+      expect(rect.top).toBeCloseTo(0, 1);
       rect = divs[2].getBoundingClientRect();
-      expect(rect.left).toBe(266.5);
-      expect(rect.top).toBe(0);
+      expect(rect.left).toBeCloseTo(266.5, 1);
+      expect(rect.top).toBeCloseTo(0, 1);
       rect = divs[3].getBoundingClientRect();
-      expect(rect.left).toBe(67);
-      expect(rect.top).toBe(150);
+      expect(rect.left).toBeCloseTo(67, 1);
+      expect(rect.top).toBeCloseTo(150, 1);
       rect = divs[4].getBoundingClientRect();
-      expect(rect.left).toBe(200);
-      expect(rect.top).toBe(150);
+      expect(rect.left).toBeCloseTo(200, 1);
+      expect(rect.top).toBeCloseTo(150, 1);
     });
 
     it('grows to takes up the whole height if there are narrow elements', () => {
@@ -449,7 +699,41 @@ describe('opentok layout', () => {
       const layoutContainer = initLayoutContainer(layoutDiv, { fixedRatio: true });
       layoutContainer.layout();
       const rect = divs[4].getBoundingClientRect();
-      expect(rect.top + rect.height).toBe(600);
+      expect(rect.top + rect.height).toBeCloseTo(600, 1);
+    });
+
+    it('allows some elements to be fixedRatio and some not', () => {
+      divs[1].videoWidth = 480;
+      divs[1].videoHeight = 640;
+      divs[1].className = 'OT_fixedRatio';
+      divs[2].videoWidth = 1280;
+      divs[2].videoHeight = 720;
+      divs[2].className = 'OT_fixedRatio';
+      const layoutContainer = initLayoutContainer(layoutDiv);
+      layoutContainer.layout();
+      const rect = divs[1].getBoundingClientRect();
+      expect(rect.width / rect.height).toBeCloseTo(480 / 640, 1);
+      const rect2 = divs[2].getBoundingClientRect();
+      expect(rect2.width / rect2.height).toBeCloseTo(1280 / 720, 1);
+      const rect3 = divs[3].getBoundingClientRect();
+      expect(rect3.width / rect3.height).not.toBeCloseTo(1280 / 720, 1);
+      expect(rect3.width / rect3.height).not.toBeCloseTo(480 / 640, 1);
+    });
+
+    it('does not grows to take up the whole height if you pass scaleLastRow=false', () => {
+      divs[1].videoWidth = 480;
+      divs[1].videoHeight = 640;
+      divs[2].videoWidth = 1280;
+      divs[2].videoHeight = 720;
+      layoutDiv.style.width = '400px';
+      layoutDiv.style.height = '600px';
+      const layoutContainer = initLayoutContainer(layoutDiv, {
+        fixedRatio: true,
+        scaleLastRow: false,
+      });
+      layoutContainer.layout();
+      const rect = divs[4].getBoundingClientRect();
+      expect(rect.top + rect.height).toBeCloseTo(514, 1);
     });
 
     it('does not mess up the aspect ratio of the last row when it grows', () => {
@@ -470,29 +754,29 @@ describe('opentok layout', () => {
       layoutContainer.layout();
       // Expect div[0] to be big
       const bigRect = divs[0].getBoundingClientRect();
-      expect(bigRect.width).toBe(320);
-      expect(bigRect.height).toBe(300);
-      expect(bigRect.left).toBe(0);
-      expect(bigRect.top).toBe(0);
+      expect(bigRect.width).toBeCloseTo(320, 1);
+      expect(bigRect.height).toBeCloseTo(300, 1);
+      expect(bigRect.left).toBeCloseTo(0, 1);
+      expect(bigRect.top).toBeCloseTo(0, 1);
       // Expect them to all have the same width and height
       let rect;
       for (let i = 1; i < divs.length; i += 1) {
         rect = divs[i].getBoundingClientRect();
-        expect(rect.width).toBe(80);
-        expect(rect.height).toBe(75);
+        expect(rect.width).toBeCloseTo(80, 1);
+        expect(rect.height).toBeCloseTo(75, 1);
       }
       rect = divs[1].getBoundingClientRect();
-      expect(rect.left).toBe(320);
-      expect(rect.top).toBe(0);
+      expect(rect.left).toBeCloseTo(320, 1);
+      expect(rect.top).toBeCloseTo(0, 1);
       rect = divs[2].getBoundingClientRect();
-      expect(rect.left).toBe(320);
-      expect(rect.top).toBe(75);
+      expect(rect.left).toBeCloseTo(320, 1);
+      expect(rect.top).toBeCloseTo(75, 1);
       rect = divs[3].getBoundingClientRect();
-      expect(rect.left).toBe(320);
-      expect(rect.top).toBe(150);
+      expect(rect.left).toBeCloseTo(320, 1);
+      expect(rect.top).toBeCloseTo(150, 1);
       rect = divs[4].getBoundingClientRect();
-      expect(rect.left).toBe(320);
-      expect(rect.top).toBe(225);
+      expect(rect.left).toBeCloseTo(320, 1);
+      expect(rect.top).toBeCloseTo(225, 1);
     });
 
     it('handles two big elements', () => {
@@ -503,31 +787,31 @@ describe('opentok layout', () => {
       // Expect div[0] to be big
       const bigRect = divs[0].getBoundingClientRect();
       expect(bigRect.width).toBeCloseTo(266.66, 1);
-      expect(bigRect.height).toBe(150);
+      expect(bigRect.height).toBeCloseTo(150, 1);
       expect(bigRect.left).toBeCloseTo(26.66, 1);
-      expect(bigRect.top).toBe(0);
+      expect(bigRect.top).toBeCloseTo(0, 1);
       // Expect div[1] to be big
       const big2Rect = divs[1].getBoundingClientRect();
       expect(big2Rect.width).toBeCloseTo(266.66, 1);
-      expect(big2Rect.height).toBe(150);
+      expect(big2Rect.height).toBeCloseTo(150, 1);
       expect(big2Rect.left).toBeCloseTo(26.66, 1);
-      expect(big2Rect.top).toBe(150);
+      expect(big2Rect.top).toBeCloseTo(150, 1);
       // Expect them to all have the same width and height
       let rect;
       for (let i = 2; i < divs.length; i += 1) {
         rect = divs[i].getBoundingClientRect();
-        expect(rect.width).toBe(80);
-        expect(rect.height).toBe(100);
+        expect(rect.width).toBeCloseTo(80, 1);
+        expect(rect.height).toBeCloseTo(100, 1);
       }
       rect = divs[2].getBoundingClientRect();
-      expect(rect.left).toBe(320);
-      expect(rect.top).toBe(0);
+      expect(rect.left).toBeCloseTo(320, 1);
+      expect(rect.top).toBeCloseTo(0, 1);
       rect = divs[3].getBoundingClientRect();
-      expect(rect.left).toBe(320);
-      expect(rect.top).toBe(100);
+      expect(rect.left).toBeCloseTo(320, 1);
+      expect(rect.top).toBeCloseTo(100, 1);
       rect = divs[4].getBoundingClientRect();
-      expect(rect.left).toBe(320);
-      expect(rect.top).toBe(200);
+      expect(rect.left).toBeCloseTo(320, 1);
+      expect(rect.top).toBeCloseTo(200, 1);
     });
 
     it('handles hidden elements', () => {
@@ -536,8 +820,8 @@ describe('opentok layout', () => {
       layoutContainer.layout();
       for (let i = 1; i < divs.length; i += 1) {
         const rect = divs[i].getBoundingClientRect();
-        expect(rect.width).toBe(200);
-        expect(rect.height).toBe(150);
+        expect(rect.width).toBeCloseTo(200, 1);
+        expect(rect.height).toBeCloseTo(150, 1);
       }
     });
 
@@ -553,24 +837,24 @@ describe('opentok layout', () => {
         let rect;
         for (let i = 0; i < divs.length; i += 1) {
           rect = divs[i].getBoundingClientRect();
-          expect(rect.width).toBe(200);
-          expect(rect.height).toBe(300);
+          expect(rect.width).toBeCloseTo(200, 1);
+          expect(rect.height).toBeCloseTo(300, 1);
         }
         rect = divs[0].getBoundingClientRect();
-        expect(rect.left).toBe(0);
-        expect(rect.top).toBe(0);
+        expect(rect.left).toBeCloseTo(0, 1);
+        expect(rect.top).toBeCloseTo(0, 1);
         rect = divs[1].getBoundingClientRect();
-        expect(rect.left).toBe(200);
-        expect(rect.top).toBe(0);
+        expect(rect.left).toBeCloseTo(200, 1);
+        expect(rect.top).toBeCloseTo(0, 1);
         rect = divs[2].getBoundingClientRect();
-        expect(rect.left).toBe(400);
-        expect(rect.top).toBe(0);
+        expect(rect.left).toBeCloseTo(400, 1);
+        expect(rect.top).toBeCloseTo(0, 1);
         rect = divs[3].getBoundingClientRect();
-        expect(rect.left).toBe(600);
-        expect(rect.top).toBe(0);
+        expect(rect.left).toBeCloseTo(600, 1);
+        expect(rect.top).toBeCloseTo(0, 1);
         rect = divs[4].getBoundingClientRect();
-        expect(rect.left).toBe(800);
-        expect(rect.top).toBe(0);
+        expect(rect.left).toBeCloseTo(800, 1);
+        expect(rect.top).toBeCloseTo(0, 1);
       });
 
       it('handles a big element', () => {
@@ -580,28 +864,45 @@ describe('opentok layout', () => {
         // Expect div[0] to be big
         const bigRect = divs[0].getBoundingClientRect();
         expect(bigRect.width).toBeCloseTo(533.33, 1);
-        expect(bigRect.height).toBe(300);
+        expect(bigRect.height).toBeCloseTo(300, 1);
         expect(bigRect.left).toBeCloseTo(133.33, 1);
-        expect(bigRect.top).toBe(0);
+        expect(bigRect.top).toBeCloseTo(0, 1);
         // Expect them to all have the same width and height
         let rect;
         for (let i = 1; i < divs.length; i += 1) {
           rect = divs[i].getBoundingClientRect();
-          expect(rect.width).toBe(100);
-          expect(rect.height).toBe(150);
+          expect(rect.width).toBeCloseTo(100, 1);
+          expect(rect.height).toBeCloseTo(150, 1);
         }
         rect = divs[1].getBoundingClientRect();
-        expect(rect.left).toBe(800);
-        expect(rect.top).toBe(0);
+        expect(rect.left).toBeCloseTo(800, 1);
+        expect(rect.top).toBeCloseTo(0, 1);
         rect = divs[2].getBoundingClientRect();
-        expect(rect.left).toBe(900);
-        expect(rect.top).toBe(0);
+        expect(rect.left).toBeCloseTo(900, 1);
+        expect(rect.top).toBeCloseTo(0, 1);
         rect = divs[3].getBoundingClientRect();
-        expect(rect.left).toBe(800);
-        expect(rect.top).toBe(150);
+        expect(rect.left).toBeCloseTo(800, 1);
+        expect(rect.top).toBeCloseTo(150, 1);
         rect = divs[4].getBoundingClientRect();
-        expect(rect.left).toBe(900);
-        expect(rect.top).toBe(150);
+        expect(rect.left).toBeCloseTo(900, 1);
+        expect(rect.top).toBeCloseTo(150, 1);
+      });
+
+      it('handles bigFirst "column" and "row"', () => {
+        divs[0].className = 'OT_big';
+        let layoutContainer = initLayoutContainer(layoutDiv, { bigFirst: 'column' });
+        layoutContainer.layout();
+        // Big element is displayed on the left because we are in a column layout
+        let bigDivRect = divs[0].getBoundingClientRect();
+        expect(bigDivRect.left).toBeCloseTo(133.33);
+        expect(bigDivRect.top).toBe(0);
+
+        layoutContainer = initLayoutContainer(layoutDiv, { bigFirst: 'row' });
+        layoutContainer.layout();
+        // Big element is displayed on the right because we are in a column layout
+        bigDivRect = divs[0].getBoundingClientRect();
+        expect(bigDivRect.left).toBeCloseTo(333.33);
+        expect(bigDivRect.top).toBe(0);
       });
 
       it('handles two big elements', () => {
@@ -611,32 +912,56 @@ describe('opentok layout', () => {
         layoutContainer.layout();
         // Expect div[0] to be big
         const bigRect = divs[0].getBoundingClientRect();
-        expect(bigRect.width).toBe(400);
-        expect(bigRect.height).toBe(300);
-        expect(bigRect.left).toBe(0);
-        expect(bigRect.top).toBe(0);
+        expect(bigRect.width).toBeCloseTo(400, 1);
+        expect(bigRect.height).toBeCloseTo(300, 1);
+        expect(bigRect.left).toBeCloseTo(0, 1);
+        expect(bigRect.top).toBeCloseTo(0, 1);
         // Expect div[1] to be big
         const big2Rect = divs[1].getBoundingClientRect();
-        expect(big2Rect.width).toBe(400);
-        expect(big2Rect.height).toBe(300);
-        expect(big2Rect.left).toBe(400);
-        expect(big2Rect.top).toBe(0);
+        expect(big2Rect.width).toBeCloseTo(400, 1);
+        expect(big2Rect.height).toBeCloseTo(300, 1);
+        expect(big2Rect.left).toBeCloseTo(400, 1);
+        expect(big2Rect.top).toBeCloseTo(0, 1);
         // Expect them to all have the same width and height
         let rect;
         for (let i = 2; i < divs.length; i += 1) {
           rect = divs[i].getBoundingClientRect();
           expect(rect.width).toBeCloseTo(177.76, 1);
-          expect(rect.height).toBe(100);
+          expect(rect.height).toBeCloseTo(100, 1);
         }
         rect = divs[2].getBoundingClientRect();
         expect(rect.left).toBeCloseTo(811.1, 1);
-        expect(rect.top).toBe(0);
+        expect(rect.top).toBeCloseTo(0, 1);
         rect = divs[3].getBoundingClientRect();
         expect(rect.left).toBeCloseTo(811.1, 1);
-        expect(rect.top).toBe(100);
+        expect(rect.top).toBeCloseTo(100, 1);
         rect = divs[4].getBoundingClientRect();
         expect(rect.left).toBeCloseTo(811.1, 1);
-        expect(rect.top).toBe(200);
+        expect(rect.top).toBeCloseTo(200, 1);
+      });
+
+      it('with fixedRatio does not scale the big percentage down too small and leave floating elements', () => {
+        // If you set the width to be wide and have a portrait aspect ratio
+        divs[0].className = 'OT_big';
+        divs.forEach((div) => {
+          div.videoWidth = 360;
+          div.videoHeight = 480;
+        });
+        const layoutContainer = initLayoutContainer(layoutDiv, {
+          bigPercentage: 0.9,
+          minBigPercentage: 0.6,
+          smallMaxWidth: 300,
+          smallMaxHeight: 300,
+          fixedRatio: true,
+        });
+        layoutContainer.layout();
+        // Divs are right up against the edge
+        let maxRight = 0;
+        for (let i = 1; i < divs.length; i += 1) {
+          const rect = divs[i].getBoundingClientRect();
+          maxRight = Math.max(maxRight, rect.left + rect.width);
+        }
+        expect(maxRight).toBeCloseTo(1000, -1);
       });
     });
 
@@ -654,27 +979,27 @@ describe('opentok layout', () => {
           rect = divs[i].getBoundingClientRect();
           if (i > divs.length - 2) {
             // The last row grows a little bit to take up the extra space
-            expect(rect.height).toBe(268);
-            expect(rect.width).toBe(201);
+            expect(rect.height).toBeCloseTo(268, 1);
+            expect(rect.width).toBeCloseTo(201, 1);
           } else {
-            expect(rect.height).toBe(266);
-            expect(rect.width).toBe(200);
+            expect(rect.height).toBeCloseTo(266, 1);
+            expect(rect.width).toBeCloseTo(200, 1);
           }
         }
         rect = divs[0].getBoundingClientRect();
-        expect(rect.left).toBe(0);
-        expect(rect.top).toBe(0);
+        expect(rect.left).toBeCloseTo(0, 1);
+        expect(rect.top).toBeCloseTo(0, 1);
         rect = divs[1].getBoundingClientRect();
-        expect(rect.left).toBe(200);
-        expect(rect.top).toBe(0);
+        expect(rect.left).toBeCloseTo(200, 1);
+        expect(rect.top).toBeCloseTo(0, 1);
         rect = divs[2].getBoundingClientRect();
-        expect(rect.left).toBe(0);
-        expect(rect.top).toBe(266);
+        expect(rect.left).toBeCloseTo(0, 1);
+        expect(rect.top).toBeCloseTo(266, 1);
         rect = divs[3].getBoundingClientRect();
-        expect(rect.left).toBe(200);
-        expect(rect.top).toBe(266);
+        expect(rect.left).toBeCloseTo(200, 1);
+        expect(rect.top).toBeCloseTo(266, 1);
         rect = divs[4].getBoundingClientRect();
-        expect(rect.left).toBe(99.5);
+        expect(rect.left).toBeCloseTo(99.5, 1);
         expect(rect.top).toBeCloseTo(532, 0);
       });
 
@@ -684,29 +1009,46 @@ describe('opentok layout', () => {
         layoutContainer.layout();
         // Expect div[0] to be big
         const bigRect = divs[0].getBoundingClientRect();
-        expect(bigRect.width).toBe(400);
-        expect(bigRect.height).toBe(600);
-        expect(bigRect.left).toBe(0);
-        expect(bigRect.top).toBe(20);
+        expect(bigRect.width).toBeCloseTo(400, 1);
+        expect(bigRect.height).toBeCloseTo(600, 1);
+        expect(bigRect.left).toBeCloseTo(0, 1);
+        expect(bigRect.top).toBeCloseTo(20, 1);
         // Expect them to all have the same width and height
         let rect;
         for (let i = 1; i < divs.length; i += 1) {
           rect = divs[i].getBoundingClientRect();
-          expect(rect.width).toBe(100);
-          expect(rect.height).toBe(150);
+          expect(rect.width).toBeCloseTo(100, 1);
+          expect(rect.height).toBeCloseTo(150, 1);
         }
         rect = divs[1].getBoundingClientRect();
-        expect(rect.left).toBe(0);
-        expect(rect.top).toBe(645);
+        expect(rect.left).toBeCloseTo(0, 1);
+        expect(rect.top).toBeCloseTo(645, 1);
         rect = divs[2].getBoundingClientRect();
-        expect(rect.left).toBe(100);
-        expect(rect.top).toBe(645);
+        expect(rect.left).toBeCloseTo(100, 1);
+        expect(rect.top).toBeCloseTo(645, 1);
         rect = divs[3].getBoundingClientRect();
-        expect(rect.left).toBe(200);
-        expect(rect.top).toBe(645);
+        expect(rect.left).toBeCloseTo(200, 1);
+        expect(rect.top).toBeCloseTo(645, 1);
         rect = divs[4].getBoundingClientRect();
-        expect(rect.left).toBe(300);
-        expect(rect.top).toBe(645);
+        expect(rect.left).toBeCloseTo(300, 1);
+        expect(rect.top).toBeCloseTo(645, 1);
+      });
+
+      it('handles bigFirst "column" and "row"', () => {
+        divs[0].className = 'OT_big';
+        let layoutContainer = initLayoutContainer(layoutDiv, { bigFirst: 'column' });
+        layoutContainer.layout();
+        // Big element is displayed at the bottom because we are in a row layout
+        let bigDivRect = divs[0].getBoundingClientRect();
+        expect(bigDivRect.left).toBeCloseTo(0, 1);
+        expect(bigDivRect.top).toBeCloseTo(180, 1);
+
+        layoutContainer = initLayoutContainer(layoutDiv, { bigFirst: 'row' });
+        layoutContainer.layout();
+        // Big element is displayed at the top because we are in a row layout
+        bigDivRect = divs[0].getBoundingClientRect();
+        expect(bigDivRect.left).toBeCloseTo(0, 1);
+        expect(bigDivRect.top).toBeCloseTo(20, 1);
       });
 
       it('handles two big elements', () => {
@@ -716,33 +1058,117 @@ describe('opentok layout', () => {
         layoutContainer.layout();
         // Expect div[0] to be big
         const bigRect = divs[0].getBoundingClientRect();
-        expect(bigRect.width).toBe(400);
-        expect(bigRect.height).toBe(320);
-        expect(bigRect.left).toBe(0);
-        expect(bigRect.top).toBe(0);
+        expect(bigRect.width).toBeCloseTo(400, 1);
+        expect(bigRect.height).toBeCloseTo(320, 1);
+        expect(bigRect.left).toBeCloseTo(0, 1);
+        expect(bigRect.top).toBeCloseTo(0, 1);
         // Expect div[1] to be big
         const big2Rect = divs[1].getBoundingClientRect();
-        expect(big2Rect.width).toBe(400);
-        expect(big2Rect.height).toBe(320);
-        expect(big2Rect.left).toBe(0);
-        expect(big2Rect.top).toBe(320);
+        expect(big2Rect.width).toBeCloseTo(400, 1);
+        expect(big2Rect.height).toBeCloseTo(320, 1);
+        expect(big2Rect.left).toBeCloseTo(0, 1);
+        expect(big2Rect.top).toBeCloseTo(320, 1);
         // Expect them to all have the same width and height
         let rect;
         for (let i = 2; i < divs.length; i += 1) {
           rect = divs[i].getBoundingClientRect();
-          expect(rect.width).toBe(133);
-          expect(rect.height).toBe(160);
+          expect(rect.width).toBeCloseTo(133, 1);
+          expect(rect.height).toBeCloseTo(160, 1);
         }
         rect = divs[2].getBoundingClientRect();
-        expect(rect.left).toBe(0.5);
-        expect(rect.top).toBe(640);
+        expect(rect.left).toBeCloseTo(0.5, 1);
+        expect(rect.top).toBeCloseTo(640, 1);
         rect = divs[3].getBoundingClientRect();
-        expect(rect.left).toBe(133.5);
-        expect(rect.top).toBe(640);
+        expect(rect.left).toBeCloseTo(133.5, 1);
+        expect(rect.top).toBeCloseTo(640, 1);
         rect = divs[4].getBoundingClientRect();
-        expect(rect.left).toBe(266.5);
-        expect(rect.top).toBe(640);
+        expect(rect.left).toBeCloseTo(266.5, 1);
+        expect(rect.top).toBeCloseTo(640, 1);
+      });
+
+      it('with fixedRatio does not scale the big percentage down too small and leave floating elements', () => {
+        // If you set the width to be wide and have a portrait aspect ratio
+        divs[0].className = 'OT_big';
+        divs.forEach((div) => {
+          div.videoWidth = 1280;
+          div.videoHeight = 720;
+        });
+        const layoutContainer = initLayoutContainer(layoutDiv, {
+          bigPercentage: 0.9,
+          minBigPercentage: 0.6,
+          smallMaxWidth: 300,
+          smallMaxHeight: 300,
+          fixedRatio: true,
+        });
+        layoutContainer.layout();
+        // Divs are right up against the edge
+        let maxBottom = 0;
+        for (let i = 1; i < divs.length; i += 1) {
+          const rect = divs[i].getBoundingClientRect();
+          maxBottom = Math.max(maxBottom, rect.top + rect.height);
+        }
+        expect(maxBottom).toBeCloseTo(800, 1);
       });
     });
   });
+
+  function testLotsOfElements(howMany) {
+    describe(`handling layout of ${howMany} elements`, () => {
+      let layoutDiv;
+      let divs = [];
+      const divCount = 23;
+      beforeEach(() => {
+        layoutDiv = document.createElement('div');
+        layoutDiv.setAttribute('id', 'layoutDiv');
+        layoutDiv.style.position = 'absolute';
+        layoutDiv.style.top = '0px';
+        layoutDiv.style.left = '0px';
+        layoutDiv.style.width = '400px';
+        layoutDiv.style.height = '300px';
+        layoutDiv.style.backgroundColor = 'grey';
+        document.body.style.margin = '0px';
+        document.body.style.padding = '0px';
+        document.body.appendChild(layoutDiv);
+        for (let i = 0; i < divCount; i += 1) {
+          divs[i] = document.createElement('div');
+          divs[i].style.backgroundColor = `rgb(${15 * i}, ${15 * i}, ${15 * i}`;
+          divs[i].videoWidth = 360;
+          divs[i].videoHeight = 720;
+          layoutDiv.appendChild(divs[i]);
+        }
+      });
+
+      afterEach(() => {
+        document.body.removeChild(layoutDiv);
+        layoutDiv = null;
+        divs = [];
+      });
+
+      it('favours an even distribution of elements in each row with fixed Ratio', () => {
+        const layoutContainer = initLayoutContainer(layoutDiv, { fixedRatio: true });
+        layoutContainer.layout();
+        // Expect there to be a close number of items on each row
+        let rect;
+        let currentRow = -1;
+        let currentRowTop = -1;
+        const rowItemCount = [];
+
+        for (let i = 0; i < divs.length; i += 1) {
+          rect = divs[i].getBoundingClientRect();
+          if (rect.top > currentRowTop) {
+            currentRowTop = rect.top;
+            currentRow += 1;
+          }
+          rowItemCount[currentRow] = (rowItemCount[currentRow] || 0) + 1;
+        }
+        for (let i = 0; i < rowItemCount.length - 1; i += 1) {
+          expect(Math.abs(rowItemCount[i] - rowItemCount[i + 1])).toBeLessThan(2);
+        }
+      });
+    });
+  }
+
+  testLotsOfElements(7);
+  testLotsOfElements(13);
+  testLotsOfElements(18);
 });

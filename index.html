@@ -76,9 +76,9 @@
             }
 
             #buttons {
-                margin-top: 10px;
-                width: 100%;
-                text-align: center;
+              margin-top: 10px;
+              width: 100%;
+              text-align: center;
             }
 
             #advanced {
@@ -90,20 +90,25 @@
     <body>
         <div id="layout"></div>
         <div id="description">Click the Add/Remove buttons to add and remove video windows. Go ahead and resize the window and see it lay out automatically!<br>
-            Double-click on elements to make them bigger or smaller</div>
+            Double-click on elements to make them bigger or smaller. Alt+click on elements to make them fixed ratio.</div>
         <div id="buttons">
           <div id="advanced">
             <label>maxRatio</label><input id="maxRatio" type="text" name="maxRatio" value="3/2">
             <label>minRatio</label><input id="minRatio" type="text" name="minRatio" value="9/16">
             <label>alignItems</label><input id="alignItems" type="text" name="alignItems" value="center">
             <label>fixedRatio</label><input id="fixedRatio" type="text" name="fixedRatio" value="false">
+            <label>scaleLastRow</label><input id="scaleLastRow" type="text" name="scaleLastRow" value="true">
             <label>bigPercentage</label><input id="bigPercentage" type="text" name="bigPercentage" value="0.8">
+            <label>minBigPercentage</label><input id="minBigPercentage" type="text" name="minBigPercentage" value="0">
             <label>bigFixedRatio</label><input id="bigFixedRatio" type="text" name="bigFixedRatio" value="false">
+            <label>bigScaleLastRow</label><input id="bigScaleLastRow" type="text" name="bigScaleLastRow" value="true">
             <label>bigAlignItems</label><input id="bigAlignItems" type="text" name="bigAlignItems" value="center">
             <label>smallAlignItems</label><input id="smallAlignItems" type="text" name="smallAlignItems" value="center">
             <label>bigMaxRatio</label><input id="bigMaxRatio" type="text" name="bigMaxRatio" value="3/2">
             <label>bigMinRatio</label><input id="bigMinRatio" type="text" name="bigMinRatio" value="9/16">
             <label>bigFirst</label><input id="bigFirst" type="text" name="bigFirst" value="true">
+            <label>maxWidth</label><input id="maxWidth" type="text" name="maxWidth" value="Infinity">
+            <label>maxHeight</label><input id="maxHeight" type="text" name="maxHeight" value="Infinity">
             <label>smallMaxWidth</label><input id="smallMaxWidth" type="text" name="smallMaxWidth" value="Infinity">
             <label>smallMaxHeight</label><input id="smallMaxHeight" type="text" name="smallMaxHeight" value="Infinity">
             <label>bigMaxWidth</label><input id="bigMaxWidth" type="text" name="bigMaxWidth" value="Infinity">
@@ -128,16 +133,21 @@
               fixedRatio: eval(fixedRatio.value),
               alignItems: alignItems.value,
               bigPercentage: eval(bigPercentage.value),
+              minBigPercentage: eval(minBigPercentage.value),
               bigFixedRatio: eval(bigFixedRatio.value),
               bigMaxRatio: eval(bigMaxRatio.value),
               bigMinRatio: eval(bigMinRatio.value),
               bigFirst: eval(bigFirst.value),
               smallMaxWidth: eval(smallMaxWidth.value),
               smallMaxHeight: eval(smallMaxHeight.value),
+              maxWidth: eval(maxWidth.value),
+              maxHeight: eval(maxHeight.value),
               bigMaxWidth: eval(bigMaxWidth.value),
               bigMaxHeight: eval(bigMaxHeight.value),
               bigAlignItems: bigAlignItems.value,
               smallAlignItems: smallAlignItems.value,
+              scaleLastRow: eval(scaleLastRow.value),
+              bigScaleLastRow: eval(bigScaleLastRow.value),
           }).layout;
         }
         updateLayoutValues();
@@ -175,6 +185,17 @@
               el.classList.add('OT_big');
             }
             layout();
+          });
+          el.addEventListener('click', function (event) {
+            // If you alt click on them then make them fixed ratio
+            if (event.altKey) {
+              if (el.classList.contains('OT_fixedRatio')) {
+                el.classList.remove('OT_fixedRatio');
+              } else {
+                el.classList.add('OT_fixedRatio');
+              }
+              layout();
+            }
           });
           layoutEl.appendChild(el);
           layout();
