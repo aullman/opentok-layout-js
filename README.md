@@ -50,6 +50,7 @@ const options = {
     bigMinRatio: 9/16,         // The widest ratio to use for the big elements (default 16x9)
     bigFirst: true,            // Whether to place the big one in the top left (true) or bottom right (false).
                                // You can also pass 'column' or 'row' to change whether big is first when you are in a row (bottom) or a column (right) layout
+    evenRows: true,            // Whether or not to favor an even number of elements on each row
     animate: true,             // Whether you want to animate the transitions using jQuery (not recommended, use CSS transitions instead)
     window: window,            // Lets you pass in your own window object which should be the same window that the element is in
     ignoreClass: 'OT_ignore',  // Elements with this class will be ignored and not positioned. This lets you do things like picture-in-picture
