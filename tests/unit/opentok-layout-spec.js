@@ -604,10 +604,11 @@ describe('opentok layout', () => {
       divs = [];
     });
 
-    it('favours an even distribution of elements in each row', () => {
+    it('favours an even distribution of elements in each row with evenRows true', () => {
       const layoutContainer = initLayoutContainer(layoutDiv, {
         maxWidth: 400,
         maxHeight: 300,
+        evenRows: true,
       });
       layoutContainer.layout();
       // Expect them to all have the same width and height
@@ -617,6 +618,7 @@ describe('opentok layout', () => {
         expect(rect.width).toBe(400);
         expect(rect.height).toBe(300);
       }
+      // 2 on each row
       rect = divs[0].getBoundingClientRect();
       expect(rect.left).toBeCloseTo(240, 1);
       expect(rect.top).toBeCloseTo(60, 1);
@@ -628,6 +630,35 @@ describe('opentok layout', () => {
       expect(rect.top).toBeCloseTo(360, 1);
       rect = divs[3].getBoundingClientRect();
       expect(rect.left).toBeCloseTo(640, 1);
+      expect(rect.top).toBeCloseTo(360, 1);
+    });
+
+    it('does not favours an even distribution of elements in each row with evenRows false', () => {
+      const layoutContainer = initLayoutContainer(layoutDiv, {
+        maxWidth: 400,
+        maxHeight: 300,
+        evenRows: false,
+      });
+      layoutContainer.layout();
+      // Expect them to all have the same width and height
+      let rect;
+      for (let i = 0; i < divs.length; i += 1) {
+        rect = divs[i].getBoundingClientRect();
+        expect(rect.width).toBe(400);
+        expect(rect.height).toBe(300);
+      }
+      // 3 on same row, 1 on next row
+      rect = divs[0].getBoundingClientRect();
+      expect(rect.left).toBeCloseTo(40, 1);
+      expect(rect.top).toBeCloseTo(60, 1);
+      rect = divs[1].getBoundingClientRect();
+      expect(rect.left).toBeCloseTo(440, 1);
+      expect(rect.top).toBeCloseTo(60, 1);
+      rect = divs[2].getBoundingClientRect();
+      expect(rect.left).toBeCloseTo(840, 1);
+      expect(rect.top).toBeCloseTo(60, 1);
+      rect = divs[3].getBoundingClientRect();
+      expect(rect.left).toBeCloseTo(440, 1);
       expect(rect.top).toBeCloseTo(360, 1);
     });
   });

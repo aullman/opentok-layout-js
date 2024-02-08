@@ -102,7 +102,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /// <reference path="../types/opentok-layout-js.d.ts" />
 exports.__esModule = true;
-var getBestDimensions = function (minRatio, maxRatio, Width, Height, count, maxWidth, maxHeight) {
+var getBestDimensions = function (minRatio, maxRatio, Width, Height, count, maxWidth, maxHeight, evenRows) {
     var maxArea;
     var targetCols;
     var targetRows;
@@ -135,7 +135,7 @@ var getBestDimensions = function (minRatio, maxRatio, Width, Height, count, maxW
         var area = (tWidth * tHeight) * count;
         // If this width and height takes up the most space then we're going with that
         if (maxArea === undefined || (area >= maxArea)) {
-            if (area === maxArea && ((cols * rows) % count) > ((targetRows * targetCols) % count)) {
+            if (evenRows && area === maxArea && ((cols * rows) % count) > ((targetRows * targetCols) % count)) {
                 // We have the same area but there are more left over spots in the last row
                 // Let's keep the previous one
                 continue;
@@ -157,17 +157,17 @@ var getBestDimensions = function (minRatio, maxRatio, Width, Height, count, maxW
     };
 };
 var getLayout = function (opts, elements) {
-    var maxRatio = opts.maxRatio, minRatio = opts.minRatio, fixedRatio = opts.fixedRatio, containerWidth = opts.containerWidth, containerHeight = opts.containerHeight, _a = opts.offsetLeft, offsetLeft = _a === void 0 ? 0 : _a, _b = opts.offsetTop, offsetTop = _b === void 0 ? 0 : _b, _c = opts.alignItems, alignItems = _c === void 0 ? 'center' : _c, _d = opts.maxWidth, maxWidth = _d === void 0 ? Infinity : _d, _e = opts.maxHeight, maxHeight = _e === void 0 ? Infinity : _e, _f = opts.scaleLastRow, scaleLastRow = _f === void 0 ? true : _f;
+    var maxRatio = opts.maxRatio, minRatio = opts.minRatio, fixedRatio = opts.fixedRatio, containerWidth = opts.containerWidth, containerHeight = opts.containerHeight, _a = opts.offsetLeft, offsetLeft = _a === void 0 ? 0 : _a, _b = opts.offsetTop, offsetTop = _b === void 0 ? 0 : _b, _c = opts.alignItems, alignItems = _c === void 0 ? 'center' : _c, _d = opts.maxWidth, maxWidth = _d === void 0 ? Infinity : _d, _e = opts.maxHeight, maxHeight = _e === void 0 ? Infinity : _e, _f = opts.scaleLastRow, scaleLastRow = _f === void 0 ? true : _f, _g = opts.evenRows, evenRows = _g === void 0 ? true : _g;
     var ratios = elements.map(function (element) { return element.height / element.width; });
     var count = ratios.length;
     var dimensions;
     if (!fixedRatio) {
-        dimensions = getBestDimensions(minRatio, maxRatio, containerWidth, containerHeight, count, maxWidth, maxHeight);
+        dimensions = getBestDimensions(minRatio, maxRatio, containerWidth, containerHeight, count, maxWidth, maxHeight, evenRows);
     }
     else {
         // Use the ratio of the first video element we find to approximate
         var ratio = ratios.length > 0 ? ratios[0] : null;
-        dimensions = getBestDimensions(ratio, ratio, containerWidth, containerHeight, count, maxWidth, maxHeight);
+        dimensions = getBestDimensions(ratio, ratio, containerWidth, containerHeight, count, maxWidth, maxHeight, evenRows);
     }
     // Loop through each stream in the container and place it inside
     var x = 0;
@@ -296,7 +296,7 @@ var getLayout = function (opts, elements) {
 };
 var getVideoRatio = function (element) { return element.height / element.width; };
 exports["default"] = (function (opts, elements) {
-    var _a = opts.maxRatio, maxRatio = _a === void 0 ? 3 / 2 : _a, _b = opts.minRatio, minRatio = _b === void 0 ? 9 / 16 : _b, _c = opts.fixedRatio, fixedRatio = _c === void 0 ? false : _c, _d = opts.bigPercentage, bigPercentage = _d === void 0 ? 0.8 : _d, _e = opts.minBigPercentage, minBigPercentage = _e === void 0 ? 0 : _e, _f = opts.bigFixedRatio, bigFixedRatio = _f === void 0 ? false : _f, _g = opts.bigMaxRatio, bigMaxRatio = _g === void 0 ? 3 / 2 : _g, _h = opts.bigMinRatio, bigMinRatio = _h === void 0 ? 9 / 16 : _h, _j = opts.bigFirst, bigFirst = _j === void 0 ? true : _j, _k = opts.containerWidth, containerWidth = _k === void 0 ? 640 : _k, _l = opts.containerHeight, containerHeight = _l === void 0 ? 480 : _l, _m = opts.alignItems, alignItems = _m === void 0 ? 'center' : _m, _o = opts.bigAlignItems, bigAlignItems = _o === void 0 ? 'center' : _o, _p = opts.smallAlignItems, smallAlignItems = _p === void 0 ? 'center' : _p, _q = opts.maxWidth, maxWidth = _q === void 0 ? Infinity : _q, _r = opts.maxHeight, maxHeight = _r === void 0 ? Infinity : _r, _s = opts.smallMaxWidth, smallMaxWidth = _s === void 0 ? Infinity : _s, _t = opts.smallMaxHeight, smallMaxHeight = _t === void 0 ? Infinity : _t, _u = opts.bigMaxWidth, bigMaxWidth = _u === void 0 ? Infinity : _u, _v = opts.bigMaxHeight, bigMaxHeight = _v === void 0 ? Infinity : _v, _w = opts.scaleLastRow, scaleLastRow = _w === void 0 ? true : _w, _x = opts.bigScaleLastRow, bigScaleLastRow = _x === void 0 ? true : _x;
+    var _a = opts.maxRatio, maxRatio = _a === void 0 ? 3 / 2 : _a, _b = opts.minRatio, minRatio = _b === void 0 ? 9 / 16 : _b, _c = opts.fixedRatio, fixedRatio = _c === void 0 ? false : _c, _d = opts.bigPercentage, bigPercentage = _d === void 0 ? 0.8 : _d, _e = opts.minBigPercentage, minBigPercentage = _e === void 0 ? 0 : _e, _f = opts.bigFixedRatio, bigFixedRatio = _f === void 0 ? false : _f, _g = opts.bigMaxRatio, bigMaxRatio = _g === void 0 ? 3 / 2 : _g, _h = opts.bigMinRatio, bigMinRatio = _h === void 0 ? 9 / 16 : _h, _j = opts.bigFirst, bigFirst = _j === void 0 ? true : _j, _k = opts.containerWidth, containerWidth = _k === void 0 ? 640 : _k, _l = opts.containerHeight, containerHeight = _l === void 0 ? 480 : _l, _m = opts.alignItems, alignItems = _m === void 0 ? 'center' : _m, _o = opts.bigAlignItems, bigAlignItems = _o === void 0 ? 'center' : _o, _p = opts.smallAlignItems, smallAlignItems = _p === void 0 ? 'center' : _p, _q = opts.maxWidth, maxWidth = _q === void 0 ? Infinity : _q, _r = opts.maxHeight, maxHeight = _r === void 0 ? Infinity : _r, _s = opts.smallMaxWidth, smallMaxWidth = _s === void 0 ? Infinity : _s, _t = opts.smallMaxHeight, smallMaxHeight = _t === void 0 ? Infinity : _t, _u = opts.bigMaxWidth, bigMaxWidth = _u === void 0 ? Infinity : _u, _v = opts.bigMaxHeight, bigMaxHeight = _v === void 0 ? Infinity : _v, _w = opts.scaleLastRow, scaleLastRow = _w === void 0 ? true : _w, _x = opts.bigScaleLastRow, bigScaleLastRow = _x === void 0 ? true : _x, _y = opts.evenRows, evenRows = _y === void 0 ? true : _y;
     var availableRatio = containerHeight / containerWidth;
     var offsetLeft = 0;
     var offsetTop = 0;
@@ -327,12 +327,12 @@ exports["default"] = (function (opts, elements) {
                 // Find the best size for the big area
                 var bigDimensions = void 0;
                 if (!bigFixedRatio) {
-                    bigDimensions = getBestDimensions(bigMinRatio, bigMaxRatio, bigWidth, bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight);
+                    bigDimensions = getBestDimensions(bigMinRatio, bigMaxRatio, bigWidth, bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight, evenRows);
                 }
                 else {
                     // Use the ratio of the first video element we find to approximate
                     var ratio = bigOnes[0].height / bigOnes[0].width;
-                    bigDimensions = getBestDimensions(ratio, ratio, bigWidth, bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight);
+                    bigDimensions = getBestDimensions(ratio, ratio, bigWidth, bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight, evenRows);
                 }
                 bigHeight = Math.max(containerHeight * minBigPercentage, Math.min(bigHeight, bigDimensions.targetHeight * bigDimensions.targetRows));
                 // Don't awkwardly scale the small area bigger than we need to and end up with floating
@@ -348,7 +348,8 @@ exports["default"] = (function (opts, elements) {
                     alignItems: smallAlignItems,
                     maxWidth: smallMaxWidth,
                     maxHeight: smallMaxHeight,
-                    scaleLastRow: scaleLastRow
+                    scaleLastRow: scaleLastRow,
+                    evenRows: evenRows
                 }, smallOnes);
                 var smallHeight_1 = 0;
                 var currentTop_1 = undefined;
@@ -378,12 +379,12 @@ exports["default"] = (function (opts, elements) {
                 // Find the best size for the big area
                 var bigDimensions = void 0;
                 if (!bigFixedRatio) {
-                    bigDimensions = getBestDimensions(bigMinRatio, bigMaxRatio, bigWidth, bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight);
+                    bigDimensions = getBestDimensions(bigMinRatio, bigMaxRatio, bigWidth, bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight, evenRows);
                 }
                 else {
                     // Use the ratio of the first video element we find to approximate
                     var ratio = bigOnes[0].height / bigOnes[0].width;
-                    bigDimensions = getBestDimensions(ratio, ratio, bigWidth, bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight);
+                    bigDimensions = getBestDimensions(ratio, ratio, bigWidth, bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight, evenRows);
                 }
                 bigWidth = Math.max(containerWidth * minBigPercentage, Math.min(bigWidth, bigDimensions.targetWidth * bigDimensions.targetCols));
                 // Don't awkwardly scale the small area bigger than we need to and end up with floating
@@ -399,7 +400,8 @@ exports["default"] = (function (opts, elements) {
                     alignItems: smallAlignItems,
                     maxWidth: smallMaxWidth,
                     maxHeight: smallMaxHeight,
-                    scaleLastRow: scaleLastRow
+                    scaleLastRow: scaleLastRow,
+                    evenRows: evenRows
                 }, smallOnes);
                 var smallWidth_1 = 0;
                 var currentWidth_1 = 0;
@@ -481,7 +483,8 @@ exports["default"] = (function (opts, elements) {
             alignItems: bigAlignItems,
             maxWidth: bigMaxWidth,
             maxHeight: bigMaxHeight,
-            scaleLastRow: bigScaleLastRow
+            scaleLastRow: bigScaleLastRow,
+            evenRows: evenRows
         }, bigOnes);
     }
     if (areas.small) {
@@ -496,7 +499,8 @@ exports["default"] = (function (opts, elements) {
             alignItems: areas.big ? smallAlignItems : alignItems,
             maxWidth: areas.big ? smallMaxWidth : maxWidth,
             maxHeight: areas.big ? smallMaxHeight : maxHeight,
-            scaleLastRow: scaleLastRow
+            scaleLastRow: scaleLastRow,
+            evenRows: evenRows
         }, smallOnes);
     }
     var boxes = [];

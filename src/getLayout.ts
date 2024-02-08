@@ -2,7 +2,7 @@
 
 import { Element, Options, Box, GetLayoutRes } from 'opentok-layout-js';
 
-const getBestDimensions = (minRatio: number, maxRatio: number, Width: number, Height: number, count: number, maxWidth: number, maxHeight: number) => {
+const getBestDimensions = (minRatio: number, maxRatio: number, Width: number, Height: number, count: number, maxWidth: number, maxHeight: number, evenRows: boolean) => {
   let maxArea: number;
   let targetCols: number;
   let targetRows: number;
@@ -40,7 +40,7 @@ const getBestDimensions = (minRatio: number, maxRatio: number, Width: number, He
 
     // If this width and height takes up the most space then we're going with that
     if (maxArea === undefined || (area >= maxArea)) {
-      if (area === maxArea && ((cols * rows) % count) > ((targetRows * targetCols) % count)) {
+      if (evenRows && area === maxArea && ((cols * rows) % count) > ((targetRows * targetCols) % count)) {
         // We have the same area but there are more left over spots in the last row
         // Let's keep the previous one
         continue;
@@ -89,6 +89,7 @@ const getLayout = (opts: Options & Offsets, elements: Element[]): Box[] => {
     maxWidth = Infinity,
     maxHeight = Infinity,
     scaleLastRow = true,
+    evenRows = true,
   } = opts;
   const ratios = elements.map(element => element.height / element.width);
   const count = ratios.length;
@@ -98,12 +99,12 @@ const getLayout = (opts: Options & Offsets, elements: Element[]): Box[] => {
 
   if (!fixedRatio) {
     dimensions = getBestDimensions(minRatio, maxRatio, containerWidth, containerHeight, count,
-      maxWidth, maxHeight);
+      maxWidth, maxHeight, evenRows);
   } else {
     // Use the ratio of the first video element we find to approximate
     const ratio = ratios.length > 0 ? ratios[0] : null;
     dimensions = getBestDimensions(ratio, ratio, containerWidth, containerHeight, count,
-      maxWidth, maxHeight);
+      maxWidth, maxHeight, evenRows);
   }
 
   // Loop through each stream in the container and place it inside
@@ -258,6 +259,7 @@ export default (opts: Options, elements: Element[]): GetLayoutRes => {
     bigMaxHeight = Infinity,
     scaleLastRow = true,
     bigScaleLastRow = true,
+    evenRows = true,
   } = opts;
 
   const availableRatio = containerHeight / containerWidth;
@@ -292,12 +294,12 @@ export default (opts: Options, elements: Element[]): GetLayoutRes => {
         let bigDimensions: ReturnType<typeof getBestDimensions>;
         if (!bigFixedRatio) {
           bigDimensions = getBestDimensions(bigMinRatio, bigMaxRatio, bigWidth,
-            bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight);
+            bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight, evenRows);
         } else {
           // Use the ratio of the first video element we find to approximate
           const ratio = bigOnes[0].height / bigOnes[0].width;
           bigDimensions = getBestDimensions(ratio, ratio, bigWidth, bigHeight,
-            bigOnes.length, bigMaxWidth, bigMaxHeight);
+            bigOnes.length, bigMaxWidth, bigMaxHeight, evenRows);
         }
         bigHeight = Math.max(containerHeight * minBigPercentage,
           Math.min(bigHeight, bigDimensions.targetHeight * bigDimensions.targetRows));
@@ -315,6 +317,7 @@ export default (opts: Options, elements: Element[]): GetLayoutRes => {
           maxWidth: smallMaxWidth,
           maxHeight: smallMaxHeight,
           scaleLastRow,
+          evenRows,
         }, smallOnes);
         let smallHeight = 0
         let currentTop = undefined
@@ -343,12 +346,12 @@ export default (opts: Options, elements: Element[]): GetLayoutRes => {
         let bigDimensions: ReturnType<typeof getBestDimensions>;
         if (!bigFixedRatio) {
           bigDimensions = getBestDimensions(bigMinRatio, bigMaxRatio, bigWidth,
-            bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight);
+            bigHeight, bigOnes.length, bigMaxWidth, bigMaxHeight, evenRows);
         } else {
           // Use the ratio of the first video element we find to approximate
           const ratio = bigOnes[0].height / bigOnes[0].width;
           bigDimensions = getBestDimensions(ratio, ratio, bigWidth, bigHeight,
-            bigOnes.length, bigMaxWidth, bigMaxHeight);
+            bigOnes.length, bigMaxWidth, bigMaxHeight, evenRows);
         }
         bigWidth = Math.max(containerWidth * minBigPercentage,
           Math.min(bigWidth, bigDimensions.targetWidth * bigDimensions.targetCols));
@@ -366,6 +369,7 @@ export default (opts: Options, elements: Element[]): GetLayoutRes => {
           maxWidth: smallMaxWidth,
           maxHeight: smallMaxHeight,
           scaleLastRow,
+          evenRows,
         }, smallOnes);
         let smallWidth = 0
         let currentWidth = 0
@@ -445,6 +449,7 @@ export default (opts: Options, elements: Element[]): GetLayoutRes => {
       maxWidth: bigMaxWidth,
       maxHeight: bigMaxHeight,
       scaleLastRow: bigScaleLastRow,
+      evenRows,
     }, bigOnes);
   }
   if (areas.small) {
@@ -460,6 +465,7 @@ export default (opts: Options, elements: Element[]): GetLayoutRes => {
       maxWidth: areas.big ? smallMaxWidth : maxWidth,
       maxHeight: areas.big ? smallMaxHeight : maxHeight,
       scaleLastRow,
+      evenRows,
     }, smallOnes);
   }
 
