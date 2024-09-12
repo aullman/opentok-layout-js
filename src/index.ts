@@ -24,7 +24,8 @@ declare global {
   }
 }
 
-module.exports = function initLayoutContainer(container: HTMLElement | Options, opts: Options): LayoutContainer {
+module.exports = function initLayoutContainer(container: HTMLElement | Options, options: Options): LayoutContainer {
+  let opts = options;
   const win = (opts && opts.window) || (typeof window === 'undefined' ? undefined : window);
   container = typeof container === 'string' ? win.document.querySelector(container) : container;
   if (!(typeof (win && win.HTMLElement) === 'undefined' || container instanceof win.HTMLElement) && !opts) {
@@ -33,9 +34,18 @@ module.exports = function initLayoutContainer(container: HTMLElement | Options, 
   } else if (!opts) {
     opts = {};
   }
+  const setOptions = (newOptions) => {
+    opts = newOptions;
+  };
 
   return {
-    layout: layout.bind(this, container, opts),
-    getLayout: getLayout.bind(this, opts),
+    layout: () => {
+      return layout.apply(this, [container, opts])
+    },
+    getLayout: (...args) => {
+      console.log('getLayout apply');
+      return getLayout.apply(this, [opts, ...args]);
+    },
+    setOptions,
   };
 };
