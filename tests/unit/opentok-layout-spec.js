@@ -4,13 +4,14 @@ describe('opentok layout', () => {
     expect(typeof window.initLayoutContainer).toEqual('function');
   });
 
-  it('defines layout and getLayout methods', () => {
+  it('defines layout, getLayout and setOptions methods', () => {
     const layoutDiv = document.createElement('div');
     document.body.appendChild(layoutDiv);
     const layoutContainer = initLayoutContainer(layoutDiv);
 
     expect(typeof layoutContainer.layout).toEqual('function');
     expect(typeof layoutContainer.getLayout).toEqual('function');
+    expect(typeof layoutContainer.setOptions).toEqual('function');
   });
 
   it('does not break jQuery', () => {
@@ -162,6 +163,21 @@ describe('opentok layout', () => {
       expect(div1Rect.width / div1Rect.height).toBeCloseTo(16 / 9, 3);
     });
 
+    describe('setOptions', () => {
+      it('lets you update min and maxRatio options', () => {
+        const layoutContainer = initLayoutContainer(layoutDiv,
+          { minRatio: 9 / 16, maxRatio: 9 / 16 });
+        layoutContainer.layout();
+        const div1Rect = div1.getBoundingClientRect();
+        expect(div1Rect.width / div1Rect.height).toBeCloseTo(16 / 9, 3);
+
+        layoutContainer.setOptions({ minRatio: 3 / 4, maxRatio: 3 / 4 });
+        layoutContainer.layout();
+        const updatedDiv1Rect = div1.getBoundingClientRect();
+        expect(updatedDiv1Rect.width / updatedDiv1Rect.height).toBeCloseTo(4 / 3, 3);
+      });
+    });
+
     describe('alignItems', () => {
       ['start', 'center', 'end'].forEach((alignItems) => {
         it(`Handles ${alignItems}`, () => {
@@ -267,6 +283,62 @@ describe('opentok layout', () => {
             },
             small: {
               top: 0, left: 320, width: 80, height: 300,
+            },
+          },
+        });
+      });
+
+      it('lets you update container size for getLayout', () => {
+        const layoutContainer = initLayoutContainer({
+          containerWidth: 400,
+          containerHeight: 300,
+        });
+
+        expect(layoutContainer.getLayout(children.map(child => ({
+          width: 640,
+          height: 480,
+          big: child.className === 'OT_big',
+        })))).toEqual({
+          boxes: expectedLayout,
+          areas: {
+            big: {
+              top: 0, left: 0, width: 320, height: 300,
+            },
+            small: {
+              top: 0, left: 320, width: 80, height: 300,
+            },
+          },
+        });
+
+        layoutContainer.setOptions({
+          containerWidth: 800,
+          containerHeight: 600,
+        });
+
+        expect(layoutContainer.getLayout(children.map(child => ({
+          width: 640,
+          height: 480,
+          big: child.className === 'OT_big',
+        })))).toEqual({
+          boxes: [{
+            width: 640,
+            height: 600,
+            left: 0,
+            top: 0,
+          },
+          {
+            width: 160,
+            height: 240,
+            left: 640,
+            top: 180,
+          },
+          ],
+          areas: {
+            big: {
+              top: 0, left: 0, width: 640, height: 600,
+            },
+            small: {
+              top: 0, left: 640, width: 160, height: 600,
             },
           },
         });

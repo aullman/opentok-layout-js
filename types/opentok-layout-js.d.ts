@@ -54,10 +54,12 @@ declare module 'opentok-layout-js' {
   export type GetLayoutRes = { boxes: Array<Box>, areas: { small?: Box, big?: Box } }
 
   type GetLayout = (elements: Array<Element>) => GetLayoutRes;
+  export type SetOptions = (options: Options) => void;
 
   export type LayoutContainer = {
     getLayout: GetLayout;
     layout: () => void;
+    setOptions: SetOptions;
   };
 
   export default function initLayoutContainer(...args: [HTMLElement | string, Options] | [Options]): LayoutContainer;

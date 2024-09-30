@@ -538,13 +538,24 @@ exports["default"] = (function (opts, elements) {
  *  @Copyright (c) 2014 Adam Ullman
  *  @License: Released under the MIT license (http://opensource.org/licenses/MIT)
  * */
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 exports.__esModule = true;
 // in CommonJS context, this should be a `require()`d dependency.
 // in browser globals context, ...? (when using bower, there are dependencies that it has handled
 // for you, so these might be safe to assume)
 var getLayout_1 = __webpack_require__(0);
 var layout_1 = __webpack_require__(2);
-module.exports = function initLayoutContainer(container, opts) {
+module.exports = function initLayoutContainer(container, options) {
+    var _this = this;
+    var opts = options;
     var win = (opts && opts.window) || (typeof window === 'undefined' ? undefined : window);
     container = typeof container === 'string' ? win.document.querySelector(container) : container;
     if (!(typeof (win && win.HTMLElement) === 'undefined' || container instanceof win.HTMLElement) && !opts) {
@@ -554,9 +565,22 @@ module.exports = function initLayoutContainer(container, opts) {
     else if (!opts) {
         opts = {};
     }
+    var setOptions = function (newOptions) {
+        opts = newOptions;
+    };
     return {
-        layout: layout_1["default"].bind(this, container, opts),
-        getLayout: getLayout_1["default"].bind(this, opts)
+        layout: function () {
+            return layout_1["default"].apply(_this, [container, opts]);
+        },
+        getLayout: function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            console.log('getLayout apply');
+            return getLayout_1["default"].apply(_this, __spreadArray([opts], args, true));
+        },
+        setOptions: setOptions
     };
 };
 
