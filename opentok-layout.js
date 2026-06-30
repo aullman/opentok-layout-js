@@ -577,7 +577,6 @@ module.exports = function initLayoutContainer(container, options) {
             for (var _i = 0; _i < arguments.length; _i++) {
                 args[_i] = arguments[_i];
             }
-            console.log('getLayout apply');
             return getLayout_1["default"].apply(_this, __spreadArray([opts], args, true));
         },
         setOptions: setOptions
