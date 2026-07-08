@@ -43,7 +43,6 @@ module.exports = function initLayoutContainer(container: HTMLElement | Options, 
       return layout.apply(this, [container, opts])
     },
     getLayout: (...args) => {
-      console.log('getLayout apply');
       return getLayout.apply(this, [opts, ...args]);
     },
     setOptions,
