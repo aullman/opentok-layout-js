@@ -63,7 +63,16 @@ module.exports = (config) => {
     // enable / disable watching file and executing tests whenever any file changes
     autoWatch: true,
 
-    browsers: ['ChromeHeadless'],
+    customLaunchers: {
+      // GitHub Actions ubuntu-24.04 runners restrict unprivileged user
+      // namespaces, so Chrome's sandbox cannot start there.
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: ['--no-sandbox', '--disable-setuid-sandbox'],
+      },
+    },
+
+    browsers: [process.env.CI ? 'ChromeHeadlessNoSandbox' : 'ChromeHeadless'],
 
 
     // Continuous Integration mode
